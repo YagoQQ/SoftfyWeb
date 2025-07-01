@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "Bienvenido, Oyente";
+}
+
+<h1>Bienvenido, @ViewBag.OyenteNombre</h1>
+
+<p>¡Gracias por ser parte de nuestra comunidad! Disfruta de tus canciones</p>
+
+<a asp-controller="VistasCanciones" asp-action="Index" class="btn btn-primary">
+    Canciones
+</a>

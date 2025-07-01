@@ -1,20 +1,7 @@
 ﻿@{
-    ViewData["Title"] = "Bienvenido, Oyente";
+    ViewData["Title"] = "Bienvenido";
 }
 
-<h1>Bienvenido, @ViewBag.ArtistaNombre</h1>
+<h2>¡Bienvenido a SoftfyWeb!</h2>
 
-<p>¡Gracias por ser parte de nuestra comunidad de artistas! Desde aquí podrás gestionar y subir tus canciones.</p>
-
-<p>
-    <!-- Usando tag helpers -->
-    <a asp-controller="VistasCanciones" asp-action="CrearCancion" class="btn btn-primary">
-        Subir Canción
-    </a>
-    <a asp-controller="VistasCanciones" asp-action="MisCanciones" class="btn btn-primary">
-        Mis Canciones
-    </a>
-    <a asp-controller="VistasPlaylists" asp-action="Index" class="btn btn-primary">
-        Mis Playlists
-    </a>
-</p>
+<p>Tu inicio de sesión fue exitoso.</p>

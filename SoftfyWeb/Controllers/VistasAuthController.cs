@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SoftfyWeb.Dtos;
+using SoftfyWeb.Modelos;
 using SoftfyWeb.Modelos.Dtos;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -206,6 +207,8 @@ namespace SoftfyWeb.Controllers
 
             if (role == "Artista")
                 return RedirectToAction(nameof(BienvenidoArtista));
+            if (role == "Oyente")
+                return RedirectToAction(nameof(BienvenidoOyente));
 
             return RedirectToAction(nameof(Bienvenido));
         }
@@ -251,6 +254,34 @@ namespace SoftfyWeb.Controllers
             ViewBag.ArtistaNombre = nombreArtistico;
             return View();
         }
+
+        public async Task<IActionResult> BienvenidoOyente()
+        {
+            var nombreOyente = User.Identity.Name;
+            try
+            {
+                var client = ObtenerClienteConToken();
+                var resp = await client.GetAsync("oyentes/mi-perfil");
+                if (resp.IsSuccessStatusCode)
+                {
+                    var raw = await resp.Content.ReadAsStringAsync();
+                    var perfil = JsonSerializer.Deserialize<PerfilOyenteDto>(raw,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (perfil != null)
+                    {
+                        nombreOyente = $"{perfil.Nombre} {perfil.Apellido}";
+                    }
+                }
+            }
+            catch
+            {
+            }
+            ViewBag.OyenteNombre = nombreOyente;
+
+            return View();
+        }
+
+
 
         public IActionResult Bienvenido() => View();
 
