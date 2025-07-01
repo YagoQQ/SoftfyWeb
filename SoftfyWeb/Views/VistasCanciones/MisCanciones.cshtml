@@ -1,0 +1,99 @@
+﻿@model List<SoftfyWeb.Modelos.Dtos.CancionRespuestaDto>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Canciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        /* Colores personalizados */
+        :root {
+            --bg-dark: #11151b;
+            --bg-panel: #2f343b;
+            --text-light: #cccfd5;
+            --accent: #79828c;
+            --btn-bg: #16191f;
+            --btn-hover: #252a31;
+            --input-bg: #23272c;
+            --input-border: #44494f;
+            --font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background: #1F242A;
+            color: var(--text-light);
+            font-family: var(--font-family);
+            min-height: 100vh;
+        }
+
+        /* Tarjeta de Canción */
+        .song-card {
+            background-color: var(--bg-panel);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .song-card h5 {
+            color: var(--text-light);
+        }
+
+        .song-card p {
+            color: var(--accent);
+        }
+
+        .audio-player {
+            background-color: var(--btn-bg);
+            border-radius: 6px;
+            margin-top: 1rem;
+            padding: 1rem;
+        }
+
+        .audio-player audio {
+            width: 100%;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container py-5">
+        <h2 class="text-center text-white mb-4">Mis Canciones</h2>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="row">
+                @foreach (var cancion in Model)
+                {
+                    <div class="col-md-4">
+                        <div class="song-card">
+                            <h5>@cancion.Titulo</h5>
+                            <p><strong>Género:</strong> @cancion.Genero</p>
+                            <p><strong>Fecha de Lanzamiento:</strong> @cancion.FechaLanzamiento.ToString("dd/MM/yyyy")</p>
+
+                            <!-- Reproductor de audio -->
+                            <div class="audio-player">
+                                <audio controls>
+                                    <source src="@cancion.UrlArchivo" type="audio/mpeg">
+                                    Tu navegador no soporta el elemento de audio.
+                                </audio>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-center text-white">No tienes canciones.</p>
+        }
+    </div>
+
+    <!-- Bootstrap JS y dependencias -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

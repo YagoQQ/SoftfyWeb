@@ -1,0 +1,51 @@
+﻿@model SoftfyWeb.Dtos.UsuarioLoginDto
+
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh; background-color: #1c1c1c;">
+    <div class="card p-4" style="max-width: 400px; width: 100%; background-color: #2c2c2c;">
+        <h2 class="text-center text-white mb-4">Iniciar sesión</h2>
+
+        <form method="post">
+            <div class="mb-3">
+                <input asp-for="Email" class="form-control" placeholder="Correo electrónico" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <input asp-for="Password" class="form-control" placeholder="Contraseña" type="password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <!-- Este campo oculta el returnUrl y lo envía junto con el formulario -->
+            <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+
+            <button type="submit" class="btn btn-success w-100 mb-2">Iniciar sesión</button>
+
+            <div class="text-center">
+                <p class="text-white">¿Olvidaste tu contraseña? <a href="@Url.Action("ForgotPassword", "VistasAuth")" class="text-primary">Recupérala aquí</a></p>
+            </div>
+        </form>
+
+
+
+
+        <!-- Mensaje de error -->
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger text-center">
+                @ViewBag.Error
+            </div>
+        }
+
+        <!-- Mensaje de cuenta bloqueada -->
+        @if (ViewBag.LockoutError != null)
+        {
+            <div class="alert alert-warning text-center">
+                @ViewBag.LockoutError
+            </div>
+        }
+    </div>
+</div>

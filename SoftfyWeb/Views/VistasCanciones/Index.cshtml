@@ -1,0 +1,26 @@
+﻿@model IEnumerable<SoftfyWeb.Modelos.Dtos.CancionRespuestaDto>
+@{
+    ViewData["Title"] = "Todas las canciones";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Género</th>
+            <th>Fecha Lanzamiento</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Titulo</td>
+                <td>@c.Genero</td>
+                <td>@c.FechaLanzamiento.ToString("yyyy-MM-dd")</td>
+            </tr>
+        }
+    </tbody>
+</table>
