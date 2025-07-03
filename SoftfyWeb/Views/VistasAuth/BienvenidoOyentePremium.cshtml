@@ -14,7 +14,6 @@
                 <div class="cancion-item">
                     <p><strong>@cancion.Titulo</strong></p>
                     <p><em>@cancion.Artista?.NombreArtistico</em></p> <!-- Muestra el nombre del artista -->
-                    <p><em>@cancion.Genero</em></p>
                     @if (!string.IsNullOrEmpty(cancion.UrlArchivo))
                     {
                         <audio controls>

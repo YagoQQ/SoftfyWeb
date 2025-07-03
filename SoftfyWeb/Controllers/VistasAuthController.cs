@@ -209,6 +209,8 @@ namespace SoftfyWeb.Controllers
                 return RedirectToAction(nameof(BienvenidoArtista));
             if (role == "Oyente")
                 return RedirectToAction(nameof(BienvenidoOyente));
+            if (role == "Oyente Premium")
+                return RedirectToAction(nameof(BienvenidoOyentePremium));
 
             return RedirectToAction(nameof(Bienvenido));
         }
@@ -256,6 +258,58 @@ namespace SoftfyWeb.Controllers
         }
 
         public async Task<IActionResult> BienvenidoOyente()
+        {
+            var nombreOyente = User.Identity.Name;
+
+            // Obtener nombre del Oyente desde el API
+            try
+            {
+                var client = ObtenerClienteConToken(); // Método para obtener el cliente HTTP con el token de autenticación
+                var resp = await client.GetAsync("oyentes/mi-perfil"); // Llamada al endpoint para obtener el perfil del oyente
+                if (resp.IsSuccessStatusCode)
+                {
+                    var raw = await resp.Content.ReadAsStringAsync();
+                    var perfil = JsonSerializer.Deserialize<PerfilOyenteDto>(raw,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    if (perfil != null)
+                    {
+                        nombreOyente = $"{perfil.Nombre} {perfil.Apellido}";
+                    }
+                }
+            }
+            catch
+            {
+                // Si hay algún error al obtener el perfil, no hacer nada y mantener el nombre de la sesión
+            }
+
+            ViewBag.OyenteNombre = nombreOyente;
+
+            // Obtener todas las canciones del sistema desde la API usando el endpoint proporcionado
+            var clientCanciones = ObtenerClienteConToken();
+            var respCanciones = await clientCanciones.GetAsync("https://localhost:7003/api/Canciones/canciones"); // Endpoint correcto
+            var todasCanciones = new List<CancionRespuestaDto>();
+            if (respCanciones.IsSuccessStatusCode)
+            {
+                var rawCanciones = await respCanciones.Content.ReadAsStringAsync();
+                todasCanciones = JsonSerializer.Deserialize<List<CancionRespuestaDto>>(rawCanciones,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                // Asegurarse de que la URL del archivo esté correctamente formada
+                foreach (var cancion in todasCanciones)
+                {
+                    var nombreArchivo = Path.GetFileName(cancion.UrlArchivo);
+                    cancion.UrlArchivo = $"https://localhost:7003/api/canciones/reproducir/{nombreArchivo}";
+                }
+            }
+
+            // Pasar las canciones al ViewBag
+            ViewBag.TodasCanciones = todasCanciones;
+
+            return View();
+        }
+
+        public async Task<IActionResult> BienvenidoOyentePremium()
         {
             var nombreOyente = User.Identity.Name;
 

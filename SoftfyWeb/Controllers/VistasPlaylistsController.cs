@@ -80,24 +80,35 @@ namespace SoftfyWeb.Controllers
         public async Task<IActionResult> Detalle(int id)
         {
             var client = ObtenerClienteConToken();
-            // Obtener la información de la playlist
+
+            // 1️⃣ Obtener las canciones que ya están en la playlist
             var resp = await client.GetAsync($"playlists/{id}/canciones");
             if (!resp.IsSuccessStatusCode)
                 return View("Error", CrearErrorModel());
 
             var raw = await resp.Content.ReadAsStringAsync();
-            var canciones = JsonSerializer.Deserialize<List<PlaylistCancionDto>>(raw, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var cancionesPlaylist = JsonSerializer.Deserialize<List<PlaylistCancionDto>>(raw, opciones);
 
-            // Crear las URL completas para los archivos de audio
-            foreach (var cancion in canciones)
+            // Ajustar URL de reproducción
+            foreach (var c in cancionesPlaylist)
             {
-                // Asegurarse de que solo tenemos el nombre del archivo (por ejemplo: "for.mp3")
-                var nombreArchivo = Path.GetFileName(cancion.UrlArchivo);  // Extraer solo el nombre del archivo
-                cancion.UrlArchivo = $"https://localhost:7003/api/canciones/reproducir/{nombreArchivo}";
+                var nombreArchivo = Path.GetFileName(c.UrlArchivo);
+                c.UrlArchivo = $"https://localhost:7003/api/canciones/reproducir/{nombreArchivo}";
+            }
+
+            var respArtista = await client.GetAsync("canciones/mis-canciones");
+            List<CancionDto> cancionesArtista = new();
+            if (respArtista.IsSuccessStatusCode)
+            {
+                var rawArtista = await respArtista.Content.ReadAsStringAsync();
+                cancionesArtista = JsonSerializer.Deserialize<List<CancionDto>>(rawArtista, opciones);
             }
 
             ViewBag.PlaylistId = id;
-            return View(canciones);
+            ViewBag.CancionesArtista = cancionesArtista;
+
+            return View(cancionesPlaylist);
         }
 
 
@@ -139,54 +150,19 @@ namespace SoftfyWeb.Controllers
         [HttpPost, Authorize(Roles = "OyentePremium,Artista"), ValidateAntiForgeryToken]
         public async Task<IActionResult> AgregarCancion(int playlistId, int cancionId)
         {
-            // Obtener el ID del artista logueado desde el token (esto se puede hacer por Claims)
-            var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (usuarioId == null)
-            {
-                // Si no hay ID de usuario, redirigir a error o a login
-                return RedirectToAction("Login", "Account");
-            }
-
-            // Configurar el cliente HTTP con el token de autenticación
             var client = ObtenerClienteConToken();
 
-            // Hacer la solicitud para obtener las canciones del artista
-            var respCanciones = await client.GetAsync($"canciones/{usuarioId}/canciones"); // Endpoint que filtra las canciones por ArtistaId
-            if (!respCanciones.IsSuccessStatusCode)
-            {
-                // Si no se pueden obtener las canciones del artista, devolver error
-                ModelState.AddModelError("", "Error al obtener las canciones del artista.");
-                return View("Error", CrearErrorModel());
-            }
-
-            // Leer la respuesta JSON con las canciones del artista
-            var rawCanciones = await respCanciones.Content.ReadAsStringAsync();
-            var cancionesArtista = JsonSerializer.Deserialize<List<CancionDto>>(rawCanciones, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-            ViewBag.CancionesArtista = cancionesArtista;
-            ViewBag.PlaylistId = playlistId;
-
-            // Verificar que la canción seleccionada exista en la lista de canciones del artista
-            var cancionSeleccionada = cancionesArtista.FirstOrDefault(c => c.Id == cancionId);
-            if (cancionSeleccionada == null)
-            {
-                // Si la canción no es del artista logueado, devolver mensaje de error
-                ModelState.AddModelError("", "La canción seleccionada no pertenece al artista.");
-                return View("Error", CrearErrorModel());
-            }
-
-            // Realizar la solicitud POST para agregar la canción a la playlist
+            // Llamamos al endpoint de la API que añade la canción a la playlist
             var resp = await client.PostAsync($"playlists/{playlistId}/agregar/{cancionId}", null);
+
             if (resp.IsSuccessStatusCode)
             {
-                // Si la canción fue agregada correctamente, redirigir a la vista de detalles de la playlist
+                // Redirigimos al detalle para recargar la lista
                 return RedirectToAction(nameof(Detalle), new { id = playlistId });
             }
 
-            // Si hubo algún error al agregar la canción, mostrar un error genérico
-            ModelState.AddModelError("", "No se pudo agregar la canción a la playlist.");
-            return View("Error", CrearErrorModel());
+            TempData["Error"] = "No se pudo agregar la canción. Intenta de nuevo.";
+            return RedirectToAction(nameof(Detalle), new { id = playlistId });
         }
 
 

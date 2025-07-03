@@ -7,7 +7,6 @@ namespace SoftfyWeb.Modelos.Dtos
         public string Titulo { get; set; }
         public string ArtistaNombre { get; set; }
         public string UrlArchivo { get; set; }
-        // Agrega otros campos relevantes (por ejemplo, género, duración, etc.)
-        public ArtistaDto Artista { get; set; }
+        // Agrega otros campos relevantes (por ejemplo, género, duración, etc.
     }
 }
