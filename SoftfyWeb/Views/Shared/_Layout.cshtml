@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,61 +7,102 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SoftfyWeb.styles.css" asp-append-version="true" />
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #1e1e2f;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 0;
+        }
+
+        .sidebar a:hover {
+            background-color: #343456;
+            border-radius: 5px;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar .logout {
+            margin-top: auto;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 2rem;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SoftfyWeb</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacidad</a>
-                        </li>
-                    </ul>
+    <div class="sidebar">
+        <h3>Softfy</h3>
 
-                    <ul class="navbar-nav">
-                        @if (User.Identity?.IsAuthenticated == true)
-                        {
-                            <li class="nav-item">
-                                <form method="post" asp-controller="VistasAuth" asp-action="Logout" class="form-inline">
-                                    <button type="submit" class="btn btn-link nav-link">Cerrar sesión</button>
-                                </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="VistasAuth" asp-action="Login">Iniciar sesión</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="VistasAuth" asp-action="Registro">Registrarse</a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            @* Usuario Free *@
+            if (User.IsInRole("Oyente"))
+            {
+                <a asp-controller="VistasAuth" asp-action="BienvenidoOyente">Inicio</a>
+                <a asp-controller="VistasCanciones" asp-action="Index">Explorar Canciones</a>
+            }
+            @* Usuario Premium *@
+            else if (User.IsInRole("OyentePremium"))
+            {
+                <a asp-controller="VistasCanciones" asp-action="Index">Explorar Canciones</a>
+            }
+            @* Artista *@
+            else if (User.IsInRole("Artista"))
+            {
+                <a asp-controller="VistasAuth" asp-action="BienvenidoArtista">Inicio</a>
+                <a asp-controller="VistasCanciones" asp-action="MisCanciones">Mis Canciones</a>
+                <a asp-controller="VistasPlaylists" asp-action="Index">Mis Playlists</a>
+            }
+            @* Admin *@
+            else if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="Canciones" asp-action="SubirCancion">Subir Canción</a>
+                <a asp-controller="Usuarios" asp-action="Index">Gestionar Usuarios</a>
+            }
 
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">  
-            @RenderBody()
-        </main>
+            <form method="post" asp-controller="VistasAuth" asp-action="Logout" class="logout mt-3">
+                <button type="submit" class="btn btn-danger w-100">Cerrar sesión</button>
+            </form>
+        }
+        else
+        {
+            <a asp-controller="VistasAuth" asp-action="Login">Iniciar sesión</a>
+            <a asp-controller="VistasAuth" asp-action="Registro">Registrarse</a>
+        }
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - SoftfyWeb - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+    <div class="content">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+
+        <footer class="border-top footer text-muted mt-5">
+            <div class="container">
+                &copy; 2025 - SoftfyWeb - <a asp-controller="Home" asp-action="Privacy">Privacidad</a>
+            </div>
+        </footer>
+    </div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

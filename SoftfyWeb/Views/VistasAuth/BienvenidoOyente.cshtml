@@ -1,11 +1,63 @@
 ﻿@{
-    ViewData["Title"] = "Bienvenido, Oyente";
+    ViewData["Title"] = "Bienvenida, @ViewBag.OyenteNombre";
 }
 
-<h1>Bienvenido, @ViewBag.OyenteNombre</h1>
+<div class="container">
+    <h2>Bienvenido a Softfy 🎵, @ViewBag.OyenteNombre</h2>
 
-<p>¡Gracias por ser parte de nuestra comunidad! Disfruta de tus canciones</p>
+    <!-- Sección de todas las canciones del sistema -->
+    <div class="section">
+        <h3>Todas las Canciones</h3>
+        <div class="canciones-container">
+            @foreach (var cancion in ViewBag.TodasCanciones)
+            {
+                <div class="cancion-item">
+                    <p><strong>@cancion.Titulo</strong></p>
+                    <p><em>@cancion.Artista?.NombreArtistico</em></p> <!-- Muestra el nombre del artista -->
+                    @if (!string.IsNullOrEmpty(cancion.UrlArchivo))
+                    {
+                        <audio controls>
+                            <source src="@cancion.UrlArchivo" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    }
+                    else
+                    {
+                        <p>No disponible</p>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
 
-<a asp-controller="VistasCanciones" asp-action="Index" class="btn btn-primary">
-    Canciones
-</a>
+<!-- Estilos CSS para una visualización horizontal -->
+<style>
+    .section {
+        margin-top: 2rem;
+    }
+
+    .canciones-container {
+        display: flex;
+        overflow-x: auto;
+        gap: 1rem;
+    }
+
+    .cancion-item {
+        min-width: 200px;
+        text-align: center;
+        background-color: #f1f1f1;
+        padding: 1rem;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+        .cancion-item p {
+            margin: 0.5rem 0;
+        }
+
+    audio {
+        width: 100%;
+        margin-top: 10px;
+    }
+</style>

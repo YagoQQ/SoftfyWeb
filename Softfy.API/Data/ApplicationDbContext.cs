@@ -42,10 +42,5 @@ namespace SoftfyWeb.Data
                    .HasIndex(u => u.Email)
                    .IsUnique();
         }
-
-
-
-        // Aquí luego agregaremos tus tablas: Canciones, Playlists, etc.
-        // public DbSet<Cancion> Canciones { get; set; }
     }
 }
