@@ -362,9 +362,6 @@ namespace SoftfyWeb.Controllers
         }
 
 
-
-
-
         public IActionResult Bienvenido() => View();
 
         // Métodos auxiliares
@@ -383,5 +380,52 @@ namespace SoftfyWeb.Controllers
             }
             catch { return false; }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Buscar(string termino)
+        {
+            if (string.IsNullOrEmpty(termino))
+            {
+                ViewBag.Error = "Por favor, ingrese un término de búsqueda.";
+                return View();
+            }
+
+            var client = _httpClientFactory.CreateClient();
+
+            // Llamada GET para obtener las canciones por nombre
+            var cancionesResponse = await client.GetAsync($"https://localhost:7003/api/Canciones/canciones/nombre?nombre={termino}");
+            var artistasResponse = await client.GetAsync($"https://localhost:7003/api/Artistas/artista/{termino}/perfil");
+
+            // Verificar las respuestas de las APIs
+            if (!cancionesResponse.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Error al obtener canciones: {cancionesResponse.StatusCode}");
+                ViewBag.Error = "No se encontraron canciones.";
+            }
+            else
+            {
+                var cancionesJson = await cancionesResponse.Content.ReadAsStringAsync();
+                var canciones = JsonSerializer.Deserialize<List<CancionRespuestaDto>>(cancionesJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                ViewBag.Canciones = canciones;
+            }
+
+            if (!artistasResponse.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Error al obtener artistas: {artistasResponse.StatusCode}");
+                ViewBag.Error = "No se encontraron artistas.";
+            }
+            else
+            {
+                var artistasJson = await artistasResponse.Content.ReadAsStringAsync();
+                var artistas = JsonSerializer.Deserialize<List<Artista>>(artistasJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                ViewBag.Artistas = artistas;
+            }
+
+            return View();
+        }
+
+
+
     }
+
 }

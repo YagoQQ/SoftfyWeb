@@ -90,5 +90,56 @@ namespace SoftfyWeb.Controllers
 
             return Ok(canciones); // Devuelve la lista de canciones del artista
         }
+
+        [HttpGet("artista/{nombre}/canciones")]
+        [AllowAnonymous]
+        public IActionResult ObtenerCancionesDelArtistaPorNombre(string nombre)
+        {
+            // Obtener el artista por su nombre
+            var artista = _context.Artistas
+                .FirstOrDefault(a => a.NombreArtistico == nombre);
+
+            if (artista == null)
+                return NotFound("No se encontró el artista.");
+
+            // Obtener las canciones subidas por el artista
+            var canciones = _context.Canciones
+                .Where(c => c.ArtistaId == artista.Id)
+                .Select(c => new
+                {
+                    c.Id,
+                    c.Titulo,
+                    c.UrlArchivo
+                })
+                .ToList();
+
+            if (!canciones.Any())
+                return NotFound("No hay canciones para este artista.");
+
+            return Ok(canciones); // Devuelve la lista de canciones del artista
+        }
+
+        [HttpGet("artista/{nombre}/perfil")]
+        [AllowAnonymous]
+        public IActionResult ObtenerPerfilDelArtistaPorNombre(string nombre)
+        {
+            // Obtener el artista por su nombre
+            var artista = _context.Artistas
+                .FirstOrDefault(a => a.NombreArtistico == nombre);
+
+            if (artista == null)
+                return NotFound("No se encontró el artista.");
+
+            // Crear un objeto con la información del artista
+            var perfilArtista = new
+            {
+                artista.Id,
+                artista.NombreArtistico,
+                artista.FotoUrl,
+                artista.Biografia  // Si tienes una biografía del artista
+            };
+
+            return Ok(perfilArtista); // Devuelve solo el perfil del artista
+        }
     }
 }
