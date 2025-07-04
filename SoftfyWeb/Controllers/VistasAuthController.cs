@@ -41,6 +41,7 @@ namespace SoftfyWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
         {
+            ViewData["ShowSearchBar"] = false;
             if (!IsValidEmail(dto.Email))
                 ModelState.AddModelError(nameof(dto.Email), "Correo inválido.");
             if (!ModelState.IsValid)
@@ -68,6 +69,7 @@ namespace SoftfyWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
         {
+            ViewData["ShowSearchBar"] = false;
             if (string.IsNullOrWhiteSpace(dto.NewPassword) || dto.NewPassword.Length < 6)
                 ModelState.AddModelError(nameof(dto.NewPassword), "La contraseña debe tener al menos 6 caracteres.");
             if (!ModelState.IsValid)
@@ -91,6 +93,7 @@ namespace SoftfyWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
+            ViewData["ShowSearchBar"] = false;
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             Response.Cookies.Delete("jwt_token");
             return RedirectToAction(nameof(Login));
@@ -105,6 +108,7 @@ namespace SoftfyWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> Registro(UsuarioRegistroDto dto)
         {
+            ViewData["ShowSearchBar"] = false;
             if (!EsContrasenaSegura(dto.Password))
                 ModelState.AddModelError(nameof(dto.Password), "Debe tener ≥6 caracteres, 1 mayúscula y 1 número.");
             if (!IsValidEmail(dto.Email))
@@ -133,6 +137,7 @@ namespace SoftfyWeb.Controllers
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
+            ViewData["ShowSearchBar"] = false;
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.Info = TempData["RegistroOk"];
             return View(new UsuarioLoginDto());
@@ -141,6 +146,7 @@ namespace SoftfyWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(UsuarioLoginDto dto, string returnUrl = null)
         {
+            ViewData["ShowSearchBar"] = false;
             var client = _httpClientFactory.CreateClient();
             var resp = await client.PostAsync(
                 "https://localhost:7003/api/auth/login",
@@ -218,6 +224,7 @@ namespace SoftfyWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
+            ViewData["ShowSearchBar"] = false;
             var client = _httpClientFactory.CreateClient();
             var resp = await client.GetAsync(
                 $"https://localhost:7003/api/auth/confirmar-email?userId={userId}&token={token}"
@@ -392,40 +399,44 @@ namespace SoftfyWeb.Controllers
 
             var client = _httpClientFactory.CreateClient();
 
-            // Llamada GET para obtener las canciones por nombre
+            // Intentamos buscar canciones
             var cancionesResponse = await client.GetAsync($"https://localhost:7003/api/Canciones/canciones/nombre?nombre={termino}");
             var artistasResponse = await client.GetAsync($"https://localhost:7003/api/Artistas/artista/{termino}/perfil");
 
-            // Verificar las respuestas de las APIs
-            if (!cancionesResponse.IsSuccessStatusCode)
-            {
-                Console.WriteLine($"Error al obtener canciones: {cancionesResponse.StatusCode}");
-                ViewBag.Error = "No se encontraron canciones.";
-            }
-            else
+            // Verificar el estado de la respuesta para canciones
+            if (cancionesResponse.IsSuccessStatusCode)
             {
                 var cancionesJson = await cancionesResponse.Content.ReadAsStringAsync();
                 var canciones = JsonSerializer.Deserialize<List<CancionRespuestaDto>>(cancionesJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                ViewBag.Canciones = canciones;
+
+                if (canciones != null && canciones.Any())
+                {
+                    ViewBag.Canciones = canciones;  // Guardamos las canciones para la vista
+                }
+                else
+                {
+                    ViewBag.Error = "No se encontraron canciones.";
+                }
             }
 
-            if (!artistasResponse.IsSuccessStatusCode)
-            {
-                Console.WriteLine($"Error al obtener artistas: {artistasResponse.StatusCode}");
-                ViewBag.Error = "No se encontraron artistas.";
-            }
-            else
+            // Verificar el estado de la respuesta para artistas
+            if (artistasResponse.IsSuccessStatusCode)
             {
                 var artistasJson = await artistasResponse.Content.ReadAsStringAsync();
-                var artistas = JsonSerializer.Deserialize<List<Artista>>(artistasJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                ViewBag.Artistas = artistas;
+                var artista = JsonSerializer.Deserialize<Artista>(artistasJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                if (artista != null)
+                {
+                    ViewBag.Artista = artista;  // Guardamos el artista para la vista
+                }
+                else
+                {
+                    ViewBag.Error = "No se encontró el artista.";
+                }
             }
 
             return View();
         }
-
-
-
     }
 
 }

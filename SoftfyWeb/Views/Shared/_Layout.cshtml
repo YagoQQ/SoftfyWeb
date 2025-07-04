@@ -23,16 +23,16 @@
             flex-direction: column;
         }
 
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 0;
-        }
+            .sidebar a {
+                color: white;
+                text-decoration: none;
+                padding: 0.5rem 0;
+            }
 
-        .sidebar a:hover {
-            background-color: #343456;
-            border-radius: 5px;
-        }
+                .sidebar a:hover {
+                    background-color: #343456;
+                    border-radius: 5px;
+                }
 
         .content {
             flex-grow: 1;
@@ -47,6 +47,38 @@
         .sidebar h3 {
             margin-bottom: 2rem;
         }
+
+        /* Estilos para el buscador */
+        .search-bar {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+        }
+
+        .search-form input {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            width: 300px;
+        }
+
+        .search-form button {
+            padding: 5px 10px;
+            border: 1px solid #007bff;
+            background-color: #007bff;
+            color: white;
+            border-radius: 20px;
+        }
+
+            .search-form button:hover {
+                background-color: #0056b3;
+            }
     </style>
 </head>
 <body>
@@ -92,6 +124,17 @@
     </div>
 
     <div class="content">
+        @* Agregar el buscador solo si no estamos en las vistas de Login o Registro *@
+        @if (ViewData["ShowSearchBar"] == null || (bool)ViewData["ShowSearchBar"] == true)
+        {
+            <div class="search-bar">
+                <form method="get" action="@Url.Action("Buscar", "VistasAuth")" class="search-form">
+                    <input type="text" name="termino" placeholder="Buscar canciones o artistas..." class="search-input" />
+                    <button type="submit" class="search-button">Buscar</button>
+                </form>
+            </div>
+        }
+
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
