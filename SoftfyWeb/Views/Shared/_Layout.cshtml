@@ -92,6 +92,7 @@
             {
                 <a asp-controller="VistasAuth" asp-action="BienvenidoOyente">Inicio</a>
                 <a asp-controller="VistasCanciones" asp-action="Index">Explorar Canciones</a>
+                <a asp-controller="Perfil" asp-action="VerPerfil">Mi Perfil</a>
             }
             @* Usuario Premium *@
             else if (User.IsInRole("OyentePremium"))
@@ -104,6 +105,7 @@
                 <a asp-controller="VistasAuth" asp-action="BienvenidoArtista">Inicio</a>
                 <a asp-controller="VistasCanciones" asp-action="MisCanciones">Mis Canciones</a>
                 <a asp-controller="VistasPlaylists" asp-action="Index">Mis Playlists</a>
+                <a asp-controller="Perfil" asp-action="VerPerfil">Mi Perfil</a>
             }
             @* Admin *@
             else if (User.IsInRole("Admin"))

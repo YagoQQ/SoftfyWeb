@@ -24,7 +24,6 @@ namespace SoftfyWeb.Controllers
         public VistasAuthController(IHttpClientFactory httpClientFactory)
             => _httpClientFactory = httpClientFactory;
 
-        // Helper para inyectar el token JWT desde la cookie
         private HttpClient ObtenerClienteConToken()
         {
             var client = _httpClientFactory.CreateClient("SoftfyApi");

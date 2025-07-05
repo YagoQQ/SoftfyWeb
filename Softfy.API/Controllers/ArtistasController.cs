@@ -43,7 +43,6 @@ namespace SoftfyWeb.Controllers
             return Ok(artistas);
         }
 
-        // GET: api/Artistas/mi-perfil
         [Authorize(Roles = "Artista")]
         [HttpGet("mi-perfil")]
         public async Task<IActionResult> ObtenerMiPerfil()

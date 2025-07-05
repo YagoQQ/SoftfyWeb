@@ -31,20 +31,22 @@ namespace Softfy.API.Controllers
             if (usuario == null)
                 return Unauthorized(new { mensaje = "No autenticado." });
 
-            // 2) Buscar la entidad Artista asociada
-            var oyente = await _context.Users
-                .FirstOrDefaultAsync(a => a.Id == usuario.Id);
+            // 2) Verificar si el usuario es un Oyente y extraer sus datos
+            if (usuario.TipoUsuario != "Oyente" && usuario.TipoUsuario != "Admin")
+            {
+                return Unauthorized(new { mensaje = "Este perfil no es un Oyente." });
+            }
 
-            if (oyente == null)
-                return NotFound(new { mensaje = "Perfil de artista no encontrado." });
-
-            // 3) Devolver solo los campos que interesan
-            return Ok(new
+            // 3) Obtener el perfil de usuario
+            var oyente = new
             {
                 usuario.Nombre,
                 usuario.Apellido,
-                usuario.TipoUsuario
-            });
+                usuario.TipoUsuario,
+                usuario.Email // Incluimos el correo para el perfil
+            };
+
+            return Ok(oyente);
         }
     }
 }
