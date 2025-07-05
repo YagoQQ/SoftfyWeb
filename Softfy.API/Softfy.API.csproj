@@ -33,4 +33,8 @@
     <ProjectReference Include="..\SoftfyWeb.Modelos\SoftfyWeb.Modelos.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="FotosArtistas\" />
+  </ItemGroup>
+
 </Project>

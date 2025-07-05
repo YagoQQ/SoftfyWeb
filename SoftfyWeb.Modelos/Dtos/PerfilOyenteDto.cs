@@ -10,6 +10,6 @@ namespace SoftfyWeb.Modelos.Dtos
     {
         public string Nombre { get; set; }
         public string Apellido { get; set; }
-        public string TipoUsuario { get; set; }
+        public string? TipoUsuario { get; set; }
     }
 }

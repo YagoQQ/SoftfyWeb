@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Perfil del Oyente";
+    var nombre = ViewBag.Nombre as string;
+    var apellido = ViewBag.Apellido as string;
+    var tipoUsuario = ViewBag.TipoUsuario as string;
+    var email = ViewBag.Email as string;
+}
+
+<div class="container mt-5">
+    <h2>Perfil del Oyente</h2>
+
+    <div id="modoTexto">
+        <p><strong>Nombre:</strong> @nombre</p>
+        <p><strong>Apellido:</strong> @apellido</p>
+        <p><strong>Email:</strong> <span class="text-muted">@email</span></p>
+        <p><strong>Tipo de Usuario:</strong> @tipoUsuario</p>
+        <button class="btn btn-warning" onclick="activarEdicion()">Editar</button>
+    </div>
+
+    <form id="formEditar" method="post" asp-action="ActualizarPerfilOyente" style="display:none">
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" name="Nombre" value="@nombre" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Apellido</label>
+            <input type="text" class="form-control" name="Apellido" value="@apellido" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Correo Electrónico</label>
+            <input type="email" class="form-control" value="@email" readonly />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <button type="button" class="btn btn-secondary" onclick="cancelarEdicion()">Cancelar</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function activarEdicion() {
+            document.getElementById('modoTexto').style.display = 'none';
+            document.getElementById('formEditar').style.display = 'block';
+        }
+
+        function cancelarEdicion() {
+            document.getElementById('formEditar').reset();
+            document.getElementById('modoTexto').style.display = 'block';
+            document.getElementById('formEditar').style.display = 'none';
+        }
+    </script>
+}

@@ -426,7 +426,12 @@ namespace SoftfyWeb.Controllers
 
                 if (artista != null)
                 {
-                    ViewBag.Artista = artista;  // Guardamos el artista para la vista
+                    if (!string.IsNullOrEmpty(artista.FotoUrl))
+                    {
+                        artista.FotoUrl = $"https://localhost:7003/api/artistas/foto/{artista.FotoUrl}";
+                    }
+
+                    ViewBag.Artista = artista;
                 }
                 else
                 {
@@ -436,6 +441,110 @@ namespace SoftfyWeb.Controllers
 
             return View();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> VerPerfil()
+        {
+            var client = ObtenerClienteConToken();
+            var rol = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+            if (rol == "Artista")
+            {
+                var response = await client.GetAsync("https://localhost:7003/api/Artistas/mi-perfil");
+                if (response.IsSuccessStatusCode)
+                {
+                    var raw = await response.Content.ReadAsStringAsync();
+                    var perfil = JsonSerializer.Deserialize<PerfilArtistaDto>(raw,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    if (perfil != null)
+                    {
+                        ViewBag.TipoUsuario = "Artista";
+                        ViewBag.NombreArtistico = perfil.NombreArtistico;
+                        ViewBag.FotoUrl = perfil.FotoUrl;
+                        ViewBag.Biografia = perfil.Biografia;
+                        return View("VerPerfilArtista");
+                    }
+                }
+            }
+
+            if (rol == "Oyente" || rol == "Oyente Premium")
+            {
+                var response = await client.GetAsync("https://localhost:7003/api/Oyentes/mi-perfil");
+                if (response.IsSuccessStatusCode)
+                {
+                    var raw = await response.Content.ReadAsStringAsync();
+                    var perfil = JsonSerializer.Deserialize<PerfilOyenteDto>(raw,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    if (perfil != null)
+                    {
+                        ViewBag.TipoUsuario = "Oyente";
+                        ViewBag.Nombre = perfil.Nombre;
+                        ViewBag.Apellido = perfil.Apellido;
+                        return View("VerPerfilOyente");
+                    }
+                }
+            }
+
+            return NotFound("Perfil no encontrado.");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ActualizarPerfilArtista(string NombreArtistico, string Biografia, IFormFile Foto)
+        {
+            var client = ObtenerClienteConToken();
+
+            var form = new MultipartFormDataContent();
+            form.Add(new StringContent(NombreArtistico ?? ""), "nombreArtistico");
+            form.Add(new StringContent(Biografia ?? ""), "biografia");
+
+            if (Foto != null && Foto.Length > 0)
+            {
+                var streamContent = new StreamContent(Foto.OpenReadStream());
+                streamContent.Headers.ContentType = new MediaTypeHeaderValue(Foto.ContentType);
+                form.Add(streamContent, "foto", Foto.FileName);
+            }
+
+            var response = await client.PutAsync("https://localhost:7003/api/artistas/actualizar", form);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["Mensaje"] = "Perfil actualizado correctamente.";
+                return RedirectToAction("VerPerfil");
+            }
+
+            TempData["Error"] = "Error al actualizar perfil.";
+            return RedirectToAction("VerPerfil");
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ActualizarPerfilOyente(string Nombre, string Apellido)
+        {
+            var client = ObtenerClienteConToken();
+
+            var jsonBody = new
+            {
+                nombre = Nombre,
+                apellido = Apellido
+            };
+
+            var content = new StringContent(JsonSerializer.Serialize(jsonBody), Encoding.UTF8, "application/json");
+
+            var response = await client.PutAsync("https://localhost:7003/api/oyentes/actualizar", content);
+            var respuestaTexto = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["Mensaje"] = "Perfil actualizado correctamente.";
+                return RedirectToAction("VerPerfil");
+            }
+
+            TempData["Error"] = $"Error al actualizar perfil: {respuestaTexto}";
+            return RedirectToAction("VerPerfil");
+        }
+
     }
 
 }

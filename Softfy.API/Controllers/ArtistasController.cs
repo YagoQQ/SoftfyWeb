@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SoftfyWeb.Data;
 using SoftfyWeb.Modelos;
+using SoftfyWeb.Modelos.Dtos;
 using System.Threading.Tasks;
 
 namespace SoftfyWeb.Controllers
@@ -70,6 +71,7 @@ namespace SoftfyWeb.Controllers
                 UsuarioEmail = artista.Usuario.Email
             });
         }
+
         [HttpGet("{id}/canciones")]
         public IActionResult ObtenerCancionesDelArtista(int id)
         {
@@ -140,5 +142,55 @@ namespace SoftfyWeb.Controllers
 
             return Ok(perfilArtista); // Devuelve solo el perfil del artista
         }
+
+        [Authorize(Roles = "Artista")]
+        [HttpPut("actualizar")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> ActualizarPerfil([FromForm] string nombreArtistico,[FromForm] string biografia,[FromForm] IFormFile? foto)
+        {
+            var email = User.Identity?.Name;
+
+            var artista = await _context.Artistas
+                .Include(a => a.Usuario)
+                .FirstOrDefaultAsync(a => a.Usuario.Email == email);
+
+            if (artista == null)
+                return NotFound("Artista no encontrado.");
+
+            // Actualizar campos básicos
+            artista.NombreArtistico = nombreArtistico;
+            artista.Biografia = biografia;
+
+            if (foto != null && foto.Length > 0)
+            {
+                var extension = Path.GetExtension(foto.FileName);
+                var nombreArchivo = $"{Guid.NewGuid()}{extension}";
+                var ruta = Path.Combine(Directory.GetCurrentDirectory(), "FotosArtistas", nombreArchivo);
+
+                using (var stream = new FileStream(ruta, FileMode.Create))
+                {
+                    await foto.CopyToAsync(stream);
+                }
+
+                artista.FotoUrl = nombreArchivo; // Solo guardamos el nombre del archivo
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok("Perfil actualizado correctamente.");
+        }
+
+        [AllowAnonymous]
+        [HttpGet("foto/{nombreArchivo}")]
+        public IActionResult ObtenerFoto(string nombreArchivo)
+        {
+            var ruta = Path.Combine(Directory.GetCurrentDirectory(), "FotosArtistas", nombreArchivo);
+
+            if (!System.IO.File.Exists(ruta))
+                return NotFound("Imagen no encontrada.");
+
+            var tipoMime = "image/jpeg"; // O usa lógica para detectar MIME según extensión
+            return PhysicalFile(ruta, tipoMime);
+        }
+
     }
 }
