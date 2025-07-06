@@ -16,7 +16,7 @@ namespace SoftfyWeb.Modelos
         [Required]
         public int MaxUsuarios { get; set; }
 
-        public ICollection<Suscripcion> Suscripciones { get; set; }
+        public ICollection<Suscripcion>? Suscripciones { get; set; }
     }
 
 }

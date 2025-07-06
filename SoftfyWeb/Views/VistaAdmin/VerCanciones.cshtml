@@ -1,0 +1,25 @@
+﻿@model IEnumerable<SoftfyWeb.Modelos.Dtos.PlaylistCancionDto>
+
+<h2>Detalle de la Playlist</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Archivo</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Titulo</td>
+                <td>
+                    <audio controls>
+                        <source src="@c.UrlArchivo" type="audio/mpeg" />
+                    </audio>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

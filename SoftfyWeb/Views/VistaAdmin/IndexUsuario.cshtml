@@ -1,36 +1,71 @@
-﻿@model IEnumerable<SoftfyWeb.Modelos.Dtos.PerfilOyenteDto>
-
-@{
-    ViewData["Title"] = "IndexUsuario";
+﻿@{
+    ViewData["Title"] = "Gestión de Usuarios";
+    var oyentes = ViewBag.Oyentes as List<SoftfyWeb.Modelos.Dtos.PerfilOyenteDto>;
+    var artistas = ViewBag.Artistas as List<SoftfyWeb.Modelos.Dtos.PerfilArtistaDto>;
 }
 
 <h1>Gestión de Usuarios</h1>
 
+<h2>Oyentes</h2>
 <table class="table">
     <thead>
         <tr>
             <th>Acciones</th>
-            <th>@Html.DisplayNameFor(model => model.Nombre)</th>
-            <th>@Html.DisplayNameFor(model => model.Apellido)</th>
-            <th>@Html.DisplayNameFor(model => model.TipoUsuario)</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Tipo</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @if (oyentes != null)
         {
-            <tr>
-                <td>
-                    <form asp-action="EliminarUsuario" asp-controller="VistaAdmin" method="post" style="display:inline;">
-                        <input type="hidden" name="email" value="@item.Email" />
-                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar este usuario?')">
-                            🗑 Eliminar
-                        </button>
-                    </form>
-                </td>
-                <td>@Html.DisplayFor(modelItem => item.Nombre)</td>
-                <td>@Html.DisplayFor(modelItem => item.Apellido)</td>
-                <td>@Html.DisplayFor(modelItem => item.TipoUsuario)</td>
-            </tr>
+            foreach (var item in oyentes)
+            {
+                <tr>
+                    <td>
+                        <form asp-action="EliminarUsuario" asp-controller="VistaAdmin" method="post" style="display:inline;">
+                            <input type="hidden" name="email" value="@item.Email" />
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar este usuario?')">
+                                🗑 Eliminar
+                            </button>
+                        </form>
+                    </td>
+                    <td>@item.Nombre</td>
+                    <td>@item.Apellido</td>
+                    <td>@item.TipoUsuario</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<h2>Artistas</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Acciones</th>
+            <th>Nombre artístico</th>
+            <th>Biografia</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (artistas != null)
+        {
+            foreach (var item in artistas)
+            {
+                <tr>
+                    <td>
+                        <form asp-action="EliminarUsuario" asp-controller="VistaAdmin" method="post" style="display:inline;">
+                            <input type="hidden" name="email" value="@item.UsuarioEmail" />
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar este usuario?')">
+                                🗑 Eliminar
+                            </button>
+                        </form>
+                    </td>
+                    <td>@item.NombreArtistico</td>
+                    <td>@item.Biografia</td>
+                </tr>
+            }
         }
     </tbody>
 </table>

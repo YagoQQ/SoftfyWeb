@@ -58,21 +58,23 @@ namespace SoftfyWeb.Controllers
             return Ok(playlists);
         }
 
-        [Authorize(Roles = "OyentePremium,Artista")]
         [HttpGet("{id}/canciones")]
         public async Task<IActionResult> ObtenerCanciones(int id)
         {
-            var usuario = await _userManager.GetUserAsync(User);
+            var playlist = await _context.Playlists
+                .Include(p => p.PlaylistCanciones)
+                    .ThenInclude(pc => pc.Cancion)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
-            var canciones = _context.PlaylistCanciones
-                .Where(pc => pc.Playlist.UsuarioId == usuario.Id && pc.PlaylistId == id)
-                .Select(pc => new
-                {
-                    pc.Cancion.Id,
-                    pc.Cancion.Titulo,
-                    pc.Cancion.UrlArchivo
-                })
-                .ToList();
+            if (playlist == null)
+                return NotFound(new { mensaje = "Playlist no encontrada." });
+
+            var canciones = playlist.PlaylistCanciones.Select(pc => new
+            {
+                pc.Cancion.Id,
+                pc.Cancion.Titulo,
+                pc.Cancion.UrlArchivo
+            }).ToList();
 
             return Ok(canciones);
         }

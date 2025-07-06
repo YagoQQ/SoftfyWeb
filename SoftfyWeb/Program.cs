@@ -1,11 +1,15 @@
-using Microsoft.AspNetCore.Builder;
+ï»¿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+using SoftfyWeb.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<SoftfyWebContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SoftfyWebContext") ?? throw new InvalidOperationException("Connection string 'SoftfyWebContext' not found.")));
 
 // 1) Servicios
 builder.Services.AddControllersWithViews();
@@ -17,7 +21,7 @@ builder.Services.AddHttpClient("SoftfyApi", client =>
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
-// 3) Autenticación con Cookie (almacena el JWT ahí)
+// 3) Autenticaciï¿½n con Cookie (almacena el JWT ahï¿½)
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -39,7 +43,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    // En Prod, redirige a tu acción Error
+    // En Prod, redirige a tu acciï¿½n Error
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
@@ -50,7 +54,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// 6) Autenticación / Autorización
+// 6) Autenticaciï¿½n / Autorizaciï¿½n
 app.UseAuthentication();
 app.UseAuthorization();
 

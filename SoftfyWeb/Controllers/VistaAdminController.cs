@@ -40,22 +40,35 @@ namespace SoftfyWeb.Controllers
             }
 
             cliente.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var response = await cliente.GetAsync("https://localhost:7003/api/oyentes");
 
-            if (!response.IsSuccessStatusCode)
+            var oyentesResp = await cliente.GetAsync("https://localhost:7003/api/oyentes");
+            var artistasResp = await cliente.GetAsync("https://localhost:7003/api/Artistas");
+
+            if (!oyentesResp.IsSuccessStatusCode || !artistasResp.IsSuccessStatusCode)
             {
-                ViewBag.Error = "Error al obtener los oyentes.";
-                return View(new List<PerfilOyenteDto>());
+                ViewBag.Error = "Error al obtener usuarios.";
+                return View(); // vista vacía si falla
             }
 
-            var contenido = await response.Content.ReadAsStringAsync();
-            var listaOyentes = JsonSerializer.Deserialize<List<PerfilOyenteDto>>(contenido, new JsonSerializerOptions
+            var oyentesJson = await oyentesResp.Content.ReadAsStringAsync();
+            var artistasJson = await artistasResp.Content.ReadAsStringAsync();
+
+            var oyentes = JsonSerializer.Deserialize<List<PerfilOyenteDto>>(oyentesJson, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
 
-            return View(listaOyentes);
+            var artistas = JsonSerializer.Deserialize<List<PerfilArtistaDto>>(artistasJson, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            ViewBag.Oyentes = oyentes;
+            ViewBag.Artistas = artistas;
+
+            return View();
         }
+
 
         public async Task<IActionResult> IndexCanciones()
         {
@@ -166,6 +179,37 @@ namespace SoftfyWeb.Controllers
             }
 
             return RedirectToAction("IndexPlaylists");
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> VerCanciones(int id)
+        {
+            var client = ObtenerClienteConToken();
+            var response = await client.GetAsync($"https://localhost:7003/api/playlists/{id}/canciones");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.Error = "No se pudieron obtener las canciones de la playlist.";
+                return View(new List<PlaylistCancionDto>());
+            }
+
+            var contenido = await response.Content.ReadAsStringAsync();
+            var canciones = JsonSerializer.Deserialize<List<PlaylistCancionDto>>(contenido,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            // ✅ Ajustar URL del archivo para reproducción correcta
+            foreach (var cancion in canciones)
+            {
+                if (!string.IsNullOrWhiteSpace(cancion.UrlArchivo))
+                {
+                    var nombreArchivo = Path.GetFileName(cancion.UrlArchivo);
+                    cancion.UrlArchivo = $"https://localhost:7003/api/canciones/reproducir/{nombreArchivo}";
+                }
+            }
+
+            ViewBag.PlaylistId = id;
+            return View("VerCanciones", canciones);
         }
 
     }
