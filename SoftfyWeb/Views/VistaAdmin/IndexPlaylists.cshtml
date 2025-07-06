@@ -1,0 +1,41 @@
+﻿@model IEnumerable<SoftfyWeb.Modelos.Dtos.PlaylistDto>
+
+@{
+    ViewData["Title"] = "Todas las playlists";
+}
+
+<h2>Playlists del sistema</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Acciones</th>
+            <th>Nombre</th>
+            <th>Propietario</th>
+            <th>Total de canciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td>
+                    <form asp-action="EliminarPlaylist" asp-controller="VistaAdmin" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@p.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm" title="Eliminar playlist" onclick="return confirm('¿Estás seguro de eliminar esta playlist?')">
+                            🗑 Eliminar
+                        </button>
+                    </form>
+                </td>
+                <td>@p.Nombre</td>
+                <td>@p.Propietario</td>
+                <td>@p.TotalCanciones</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -122,5 +122,51 @@ namespace SoftfyWeb.Controllers
 
             return RedirectToAction("IndexUsuario");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> IndexPlaylists()
+        {
+            var client = _httpClientFactory.CreateClient("SoftfyApi");
+            var token = Request.Cookies["jwt_token"];
+
+            if (!string.IsNullOrEmpty(token))
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await client.GetAsync("https://localhost:7003/api/Playlists/todas");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.Error = "Error al obtener las playlists.";
+                return View(new List<PlaylistDto>());
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            var playlists = JsonSerializer.Deserialize<List<PlaylistDto>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return View("IndexPlaylists", playlists);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EliminarPlaylist(int id)
+        {
+            var client = _httpClientFactory.CreateClient("SoftfyApi");
+            var token = Request.Cookies["jwt_token"];
+
+            if (!string.IsNullOrEmpty(token))
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await client.DeleteAsync($"https://localhost:7003/api/playlists/{id}/eliminar");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                TempData["Error"] = "No se pudo eliminar la playlist.";
+            }
+
+            return RedirectToAction("IndexPlaylists");
+        }
+
     }
 }

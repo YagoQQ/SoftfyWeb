@@ -147,23 +147,34 @@ namespace SoftfyWeb.Controllers
             return Ok(new { mensaje = "Nombre de playlist actualizado", nuevoNombre });
         }
 
-        [Authorize(Roles = "OyentePremium,Artista")]
+        [Authorize(Roles = "Admin,Artista,OyentePremium")]
         [HttpDelete("{playlistId}/eliminar")]
         public async Task<IActionResult> EliminarPlaylist(int playlistId)
         {
             var usuario = await _userManager.GetUserAsync(User);
 
+            // Buscar la playlist, incluyendo usuario y canciones
             var playlist = await _context.Playlists
                 .Include(p => p.PlaylistCanciones)
-                .FirstOrDefaultAsync(p => p.Id == playlistId && p.UsuarioId == usuario.Id && !p.EsMeGusta);
+                .Include(p => p.Usuario)
+                .FirstOrDefaultAsync(p => p.Id == playlistId);
 
             if (playlist == null)
                 return NotFound(new { mensaje = "Playlist no encontrada" });
 
-            // Elimina primero las relaciones con canciones
+            if (playlist.EsMeGusta)
+                return BadRequest(new { mensaje = "No se puede eliminar la playlist 'Me Gusta'" });
+
+            var esAdmin = await _userManager.IsInRoleAsync(usuario, "Admin");
+
+            // Si no es admin, verificar que la playlist le pertenezca
+            if (!esAdmin && playlist.UsuarioId != usuario.Id)
+                return Forbid("No tienes permiso para eliminar esta playlist.");
+
+            // Eliminar relaciones con canciones
             _context.PlaylistCanciones.RemoveRange(playlist.PlaylistCanciones);
 
-            // Luego elimina la playlist
+            // Eliminar la playlist
             _context.Playlists.Remove(playlist);
             await _context.SaveChangesAsync();
 
@@ -265,6 +276,25 @@ namespace SoftfyWeb.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { mensaje = "Canción removida de Me Gusta" });
+        }
+
+
+        [HttpGet("todas")]
+        public async Task<IActionResult> ObtenerTodasLasPlaylists()
+        {
+            var playlists = await _context.Playlists
+                .Include(p => p.Usuario)
+                .Include(p => p.PlaylistCanciones)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Nombre,
+                    Propietario = p.Usuario.Email,
+                    TotalCanciones = p.PlaylistCanciones.Count,
+                })
+                .ToListAsync();
+
+            return Ok(playlists);
         }
     }
 }
