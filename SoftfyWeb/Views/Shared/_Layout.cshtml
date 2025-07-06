@@ -34,51 +34,53 @@
                     border-radius: 5px;
                 }
 
+            .sidebar .logout {
+                margin-top: auto;
+            }
+
+            .sidebar h3 {
+                margin-bottom: 2rem;
+            }
+
         .content {
             flex-grow: 1;
             padding: 1.5rem;
             background-color: #f8f9fa;
         }
 
-        .sidebar .logout {
-            margin-top: auto;
-        }
-
-        .sidebar h3 {
-            margin-bottom: 2rem;
-        }
-
-        /* Estilos para el buscador */
+        /* Buscador integrado (flujo normal) */
         .search-bar {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
+            margin-bottom: 20px;
             background-color: #fff;
-            padding: 5px 15px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            z-index: 999;
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .search-form input {
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            width: 300px;
+        .search-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
 
-        .search-form button {
-            padding: 5px 10px;
-            border: 1px solid #007bff;
-            background-color: #007bff;
-            color: white;
-            border-radius: 20px;
-        }
-
-            .search-form button:hover {
-                background-color: #0056b3;
+            .search-form input {
+                flex: 1;
+                padding: 6px 12px;
+                border: 1px solid #ccc;
+                border-radius: 20px;
             }
+
+            .search-form button {
+                padding: 6px 16px;
+                border: 1px solid #007bff;
+                background-color: #007bff;
+                color: white;
+                border-radius: 20px;
+            }
+
+                .search-form button:hover {
+                    background-color: #0056b3;
+                }
     </style>
 </head>
 <body>
@@ -87,19 +89,16 @@
 
         @if (User.Identity?.IsAuthenticated == true)
         {
-            @* Usuario Free *@
             if (User.IsInRole("Oyente"))
             {
                 <a asp-controller="VistasAuth" asp-action="BienvenidoOyente">Inicio</a>
                 <a asp-controller="VistasCanciones" asp-action="Index">Explorar Canciones</a>
                 <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
             }
-            @* Usuario Premium *@
             else if (User.IsInRole("OyentePremium"))
             {
                 <a asp-controller="VistasCanciones" asp-action="Index">Explorar Canciones</a>
             }
-            @* Artista *@
             else if (User.IsInRole("Artista"))
             {
                 <a asp-controller="VistasAuth" asp-action="BienvenidoArtista">Inicio</a>
@@ -107,11 +106,12 @@
                 <a asp-controller="VistasPlaylists" asp-action="Index">Mis Playlists</a>
                 <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
             }
-            @* Admin *@
             else if (User.IsInRole("Admin"))
             {
-                <a asp-controller="Canciones" asp-action="SubirCancion">Subir Canción</a>
-                <a asp-controller="Usuarios" asp-action="Index">Gestionar Usuarios</a>
+                <a asp-controller="VistaAdmin" asp-action="IndexUsuario">Gestonar Usuarios</a>
+                <a asp-controller="VistaAdmin" asp-action="IndexCanciones">Gestionar Canciones</a>
+                <a asp-controller="VistasPlaylists" asp-action="Index">Gestionar Playlists</a>
+                <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
             }
 
             <form method="post" asp-controller="VistasAuth" asp-action="Logout" class="logout mt-3">
@@ -126,18 +126,19 @@
     </div>
 
     <div class="content">
-        @* Agregar el buscador solo si no estamos en las vistas de Login o Registro *@
-        @if (ViewData["ShowSearchBar"] == null || (bool)ViewData["ShowSearchBar"] == true)
-        {
-            <div class="search-bar">
-                <form method="get" action="@Url.Action("Buscar", "VistasAuth")" class="search-form">
-                    <input type="text" name="termino" placeholder="Buscar canciones o artistas..." class="search-input" />
-                    <button type="submit" class="search-button">Buscar</button>
-                </form>
-            </div>
-        }
-
         <main role="main" class="pb-3">
+
+            @* Mostrar buscador si no se oculta explícitamente *@
+            @if (ViewData["ShowSearchBar"] == null || (bool)ViewData["ShowSearchBar"] == true)
+            {
+                <div class="search-bar">
+                    <form method="get" action="@Url.Action("Buscar", "VistasAuth")" class="search-form">
+                        <input type="text" name="termino" placeholder="Buscar canciones o artistas..." />
+                        <button type="submit">Buscar</button>
+                    </form>
+                </div>
+            }
+
             @RenderBody()
         </main>
 

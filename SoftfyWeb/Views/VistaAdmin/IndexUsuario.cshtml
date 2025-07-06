@@ -1,0 +1,36 @@
+﻿@model IEnumerable<SoftfyWeb.Modelos.Dtos.PerfilOyenteDto>
+
+@{
+    ViewData["Title"] = "IndexUsuario";
+}
+
+<h1>Gestión de Usuarios</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Acciones</th>
+            <th>@Html.DisplayNameFor(model => model.Nombre)</th>
+            <th>@Html.DisplayNameFor(model => model.Apellido)</th>
+            <th>@Html.DisplayNameFor(model => model.TipoUsuario)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <form asp-action="EliminarUsuario" asp-controller="VistaAdmin" method="post" style="display:inline;">
+                        <input type="hidden" name="email" value="@item.Email" />
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar este usuario?')">
+                            🗑 Eliminar
+                        </button>
+                    </form>
+                </td>
+                <td>@Html.DisplayFor(modelItem => item.Nombre)</td>
+                <td>@Html.DisplayFor(modelItem => item.Apellido)</td>
+                <td>@Html.DisplayFor(modelItem => item.TipoUsuario)</td>
+            </tr>
+        }
+    </tbody>
+</table>

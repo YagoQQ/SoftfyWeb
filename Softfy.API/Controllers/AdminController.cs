@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SoftfyWeb.Modelos;
+using SoftfyWeb.Data;
 
 namespace SoftfyWeb.Controllers
 {
@@ -10,30 +12,35 @@ namespace SoftfyWeb.Controllers
     public class AdminController : ControllerBase
     {
         private readonly UserManager<Usuario> _userManager;
+        private readonly ApplicationDbContext _context;
 
-        public AdminController(UserManager<Usuario> userManager)
+        public AdminController(UserManager<Usuario> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
+            _context = context;
         }
 
-        // Solo admins pueden usar este endpoint
-       // [Authorize(Roles = "Admin")]
-        [HttpDelete("eliminar-usuarios-prueba")]
-        public async Task<IActionResult> EliminarUsuariosPrueba()
+        [HttpDelete("usuario/{email}")]
+        public async Task<IActionResult> EliminarUsuario(string email)
         {
-            var usuarios = _userManager.Users
-                .ToList();
+            // Buscar el usuario por Email usando UserManager
+            var usuario = await _userManager.FindByEmailAsync(email);
 
-            int eliminados = 0;
+            if (usuario == null)
+                return NotFound(new { mensaje = "Usuario no encontrado." });
 
-            foreach (var usuario in usuarios)
+            var resultado = await _userManager.DeleteAsync(usuario);
+
+            if (!resultado.Succeeded)
             {
-                var resultado = await _userManager.DeleteAsync(usuario);
-                if (resultado.Succeeded)
-                    eliminados++;
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    mensaje = "Error al eliminar el usuario.",
+                    errores = resultado.Errors
+                });
             }
 
-            return Ok(new { mensaje = $"Usuarios de prueba eliminados: {eliminados}" });
+            return NoContent(); // 204 OK sin cuerpo
         }
     }
 }

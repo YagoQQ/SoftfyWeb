@@ -1,0 +1,46 @@
+﻿@model IEnumerable<SoftfyWeb.Modelos.Cancion>
+
+@{
+    ViewData["Title"] = "Canciones";
+}
+
+<h1>Lista de Canciones</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Acciones</th>
+            <th>Título</th>
+            <th>Género</th>
+            <th>Fecha de Lanzamiento</th>
+            <th>Artista</th>
+            <th>Reproducir</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <form asp-action="EliminarCancion" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar esta canción?')">
+                            🗑 Eliminar
+                        </button>
+                    </form>
+                </td>
+
+                <td>@item.Titulo</td>
+                <td>@item.Genero</td>
+                <td>@item.FechaLanzamiento.ToShortDateString()</td>
+                <td>@item.Artista?.NombreArtistico</td>
+                <td>
+                    <audio controls style="width:200px;">
+                        <source src="@item.UrlArchivo" type="audio/mpeg" />
+                        Tu navegador no soporta audio.
+                    </audio>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

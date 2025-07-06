@@ -80,5 +80,24 @@ namespace Softfy.API.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<PerfilOyenteDto>>> ObtenerTodosLosOyentes()
+        {
+            var oyentes = await _context.Users
+                .Include(u => u.Suscripcion)
+                    .ThenInclude(s => s.Plan)
+                .Where(u => u.TipoUsuario == "Oyente" || u.TipoUsuario == "Oyente Premium")
+                .ToListAsync();
+
+            var resultado = oyentes.Select(u => new PerfilOyenteDto
+            {
+                Nombre = u.Nombre,
+                Apellido = u.Apellido,
+                TipoUsuario = u.TipoUsuario,
+                Email = u.Email // ← ¡AQUÍ estaba faltando!
+            }).ToList();
+
+            return Ok(resultado);
+        }
     }
 }

@@ -37,7 +37,7 @@ namespace SoftfyWeb.Controllers
             return new ErrorViewModel { RequestId = id };
         }
 
-        [Authorize(Roles = "OyentePremium,Artista")]
+        [Authorize(Roles = "OyentePremium,Artista,Admin")]
         public async Task<IActionResult> Index()
         {
             var client = ObtenerClienteConToken();
@@ -51,7 +51,7 @@ namespace SoftfyWeb.Controllers
             return View(listas);
         }
 
-        [Authorize(Roles = "OyentePremium,Artista")]
+        [Authorize(Roles = "OyentePremium,Artista,Admin")]
         public IActionResult Crear()
         {
             return View();
@@ -76,7 +76,7 @@ namespace SoftfyWeb.Controllers
             return View();
         }
 
-        [Authorize(Roles = "OyentePremium,Artista")]
+        [Authorize(Roles = "OyentePremium,Artista,Admin")]
         public async Task<IActionResult> Detalle(int id)
         {
             var client = ObtenerClienteConToken();
@@ -112,7 +112,7 @@ namespace SoftfyWeb.Controllers
         }
 
 
-        [HttpPost, Authorize(Roles = "OyentePremium,Artista"), ValidateAntiForgeryToken]
+        [HttpPost, Authorize(Roles = "OyentePremium,Artista,Admin"), ValidateAntiForgeryToken]
         public async Task<IActionResult> Renombrar(int id, string nuevoNombre)
         {
             var client = ObtenerClienteConToken();
@@ -125,7 +125,7 @@ namespace SoftfyWeb.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost, Authorize(Roles = "OyentePremium,Artista"), ValidateAntiForgeryToken]
+        [HttpPost, Authorize(Roles = "OyentePremium,Artista,Admin"), ValidateAntiForgeryToken]
         public async Task<IActionResult> Eliminar(int id)
         {
             var client = ObtenerClienteConToken();
@@ -147,7 +147,7 @@ namespace SoftfyWeb.Controllers
             return View("Error", CrearErrorModel());
         }
 
-        [HttpPost, Authorize(Roles = "OyentePremium,Artista"), ValidateAntiForgeryToken]
+        [HttpPost, Authorize(Roles = "OyentePremium,Artista,Admin"), ValidateAntiForgeryToken]
         public async Task<IActionResult> AgregarCancion(int playlistId, int cancionId)
         {
             var client = ObtenerClienteConToken();

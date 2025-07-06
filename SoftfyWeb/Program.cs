@@ -61,8 +61,3 @@ app.MapControllerRoute(
 );
 
 app.Run();
-
-app.MapControllerRoute(
-    name: "VistasAuth",
-    pattern: "VistasAuth/{action=Buscar}/{termino?}",
-    defaults: new { controller = "VistasAuth", action = "Buscar" });

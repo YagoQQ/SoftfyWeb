@@ -161,5 +161,19 @@ namespace SoftfyWeb.Controllers
 
             return Ok(canciones);
         }
+
+
+        // Eliminar canción
+        [HttpDelete("eliminar/{id}")]
+        public async Task<IActionResult> EliminarCancion(int id)
+        {
+            var cancion = await _context.Canciones.FindAsync(id);
+            if (cancion == null) return NotFound();
+
+            _context.Canciones.Remove(cancion);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { mensaje = "Canción eliminada correctamente." });
+        }
     }
 }

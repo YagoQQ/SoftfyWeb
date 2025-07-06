@@ -18,9 +18,6 @@ namespace SoftfyWeb.Data
         public DbSet<Plan> Planes { get; set; }
         public DbSet<MiembroSuscripcion> MiembrosSuscripciones { get; set; }
 
-
-
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

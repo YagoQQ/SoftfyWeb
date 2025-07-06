@@ -388,6 +388,7 @@ namespace SoftfyWeb.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Buscar(string termino)
         {
             if (string.IsNullOrEmpty(termino))
@@ -398,11 +399,10 @@ namespace SoftfyWeb.Controllers
 
             var client = _httpClientFactory.CreateClient();
 
-            // Intentamos buscar canciones
             var cancionesResponse = await client.GetAsync($"https://localhost:7003/api/Canciones/canciones/nombre?nombre={termino}");
             var artistasResponse = await client.GetAsync($"https://localhost:7003/api/Artistas/artista/{termino}/perfil");
 
-            // Verificar el estado de la respuesta para canciones
+            // CANCIONES
             if (cancionesResponse.IsSuccessStatusCode)
             {
                 var cancionesJson = await cancionesResponse.Content.ReadAsStringAsync();
@@ -410,7 +410,14 @@ namespace SoftfyWeb.Controllers
 
                 if (canciones != null && canciones.Any())
                 {
-                    ViewBag.Canciones = canciones;  // Guardamos las canciones para la vista
+                    // Actualizar URL para el reproductor
+                    foreach (var cancion in canciones)
+                    {
+                        var nombreArchivo = Path.GetFileName(cancion.UrlArchivo);
+                        cancion.UrlArchivo = $"https://localhost:7003/api/canciones/reproducir/{nombreArchivo}";
+                    }
+
+                    ViewBag.Canciones = canciones;
                 }
                 else
                 {
@@ -418,7 +425,7 @@ namespace SoftfyWeb.Controllers
                 }
             }
 
-            // Verificar el estado de la respuesta para artistas
+            // ARTISTA
             if (artistasResponse.IsSuccessStatusCode)
             {
                 var artistasJson = await artistasResponse.Content.ReadAsStringAsync();
@@ -439,8 +446,10 @@ namespace SoftfyWeb.Controllers
                 }
             }
 
-            return View();
+            return View(); // <- lo dejas así como pediste
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> VerPerfil()
@@ -463,12 +472,13 @@ namespace SoftfyWeb.Controllers
                         ViewBag.NombreArtistico = perfil.NombreArtistico;
                         ViewBag.FotoUrl = perfil.FotoUrl;
                         ViewBag.Biografia = perfil.Biografia;
+                        ViewBag.Email = perfil.UsuarioEmail;
                         return View("VerPerfilArtista");
                     }
                 }
             }
 
-            if (rol == "Oyente" || rol == "Oyente Premium")
+            if (rol == "Oyente" || rol == "OyentePremium" || rol == "Admin")
             {
                 var response = await client.GetAsync("https://localhost:7003/api/Oyentes/mi-perfil");
                 if (response.IsSuccessStatusCode)
@@ -479,7 +489,7 @@ namespace SoftfyWeb.Controllers
 
                     if (perfil != null)
                     {
-                        ViewBag.TipoUsuario = "Oyente";
+                        ViewBag.TipoUsuario = perfil.TipoUsuario;
                         ViewBag.Nombre = perfil.Nombre;
                         ViewBag.Apellido = perfil.Apellido;
                         return View("VerPerfilOyente");

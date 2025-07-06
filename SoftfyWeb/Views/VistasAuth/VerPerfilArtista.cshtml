@@ -2,6 +2,7 @@
     var nombre = ViewBag.NombreArtistico as string;
     var biografia = ViewBag.Biografia as string;
     var fotoUrl = ViewBag.FotoUrl as string;
+    var correo = ViewBag.Email as string;
     var urlImagen = $"https://localhost:7003/api/artistas/foto/{fotoUrl}";
 }
 
@@ -19,6 +20,7 @@
             <div id="modoTexto">
                 <p><strong>Nombre artístico:</strong> @nombre</p>
                 <p><strong>Biografía:</strong> @biografia</p>
+                <p><strong>Correo:</strong> @correo</p>
                 <button class="btn btn-warning" onclick="activarEdicion()">Editar</button>
             </div>
 
@@ -28,7 +30,6 @@
                     <label class="form-label">Nombre artístico</label>
                     <input type="text" class="form-control" name="NombreArtistico" value="@nombre" required />
                 </div>
-
                 <div class="mb-3">
                     <label class="form-label">Biografía</label>
                     <textarea class="form-control" name="Biografia" rows="5">@biografia</textarea>
