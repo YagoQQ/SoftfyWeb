@@ -32,19 +32,17 @@ namespace Softfy.API.Controllers
             if (usuario == null)
                 return Unauthorized(new { mensaje = "No autenticado." });
 
-            // 2) Verificar si el usuario es un Oyente y extraer sus datos
             if (usuario.TipoUsuario != "Oyente" && usuario.TipoUsuario != "Admin")
             {
                 return Unauthorized(new { mensaje = "Este perfil no es un Oyente." });
             }
 
-            // 3) Obtener el perfil de usuario
             var oyente = new
             {
                 usuario.Nombre,
                 usuario.Apellido,
                 usuario.TipoUsuario,
-                usuario.Email // Incluimos el correo para el perfil
+                usuario.Email
             };
 
             return Ok(oyente);

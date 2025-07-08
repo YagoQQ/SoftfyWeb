@@ -2,9 +2,48 @@
     ViewData["Title"] = "Gestión de Usuarios";
     var oyentes = ViewBag.Oyentes as List<SoftfyWeb.Modelos.Dtos.PerfilOyenteDto>;
     var artistas = ViewBag.Artistas as List<SoftfyWeb.Modelos.Dtos.PerfilArtistaDto>;
+    var usuariosBloqueados = ViewBag.UsuariosBloqueados as List<SoftfyWeb.Modelos.Usuario>;
 }
 
 <h1>Gestión de Usuarios</h1>
+<h2>Usuarios Bloqueados</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Lockout End</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (usuariosBloqueados != null && usuariosBloqueados.Any())
+        {
+            foreach (var usuario in usuariosBloqueados)
+            {
+                <tr>
+                    <td>@usuario.UserName</td>
+                    <td>@usuario.Email</td>
+                    <td>@usuario.LockoutEnd</td>
+                    <td>
+                        <form method="post" action="@Url.Action("DesbloquearUsuario", "VistaAdmin")" style="display:inline;">
+                            <input type="hidden" name="email" value="@usuario.Email" />
+                            <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('¿Seguro que deseas desbloquear a este usuario?')">
+                                Desbloquear
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4">No hay usuarios bloqueados actualmente.</td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 <h2>Oyentes</h2>
 <table class="table">
@@ -29,6 +68,12 @@
                                 🗑 Eliminar
                             </button>
                         </form>
+                        <form asp-action="BloquearUsuario" asp-controller="VistaAdmin" method="post" style="display:inline;">
+                            <input type="hidden" name="email" value="@item.Email" />
+                            <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('¿Bloquear este usuario?')">
+                                🚫 Bloquear
+                            </button>
+                        </form>
                     </td>
                     <td>@item.Nombre</td>
                     <td>@item.Apellido</td>
@@ -45,7 +90,7 @@
         <tr>
             <th>Acciones</th>
             <th>Nombre artístico</th>
-            <th>Biografia</th>
+            <th>Biografía</th>
         </tr>
     </thead>
     <tbody>
@@ -59,6 +104,12 @@
                             <input type="hidden" name="email" value="@item.UsuarioEmail" />
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar este usuario?')">
                                 🗑 Eliminar
+                            </button>
+                        </form>
+                        <form asp-action="BloquearUsuario" asp-controller="VistaAdmin" method="post" style="display:inline;">
+                            <input type="hidden" name="email" value="@item.UsuarioEmail" />
+                            <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('¿Bloquear este usuario?')">
+                                🚫 Bloquear
                             </button>
                         </form>
                     </td>

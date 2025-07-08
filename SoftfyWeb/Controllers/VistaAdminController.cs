@@ -47,7 +47,7 @@ namespace SoftfyWeb.Controllers
             if (!oyentesResp.IsSuccessStatusCode || !artistasResp.IsSuccessStatusCode)
             {
                 ViewBag.Error = "Error al obtener usuarios.";
-                return View(); // vista vacía si falla
+                return View();
             }
 
             var oyentesJson = await oyentesResp.Content.ReadAsStringAsync();
@@ -66,8 +66,26 @@ namespace SoftfyWeb.Controllers
             ViewBag.Oyentes = oyentes;
             ViewBag.Artistas = artistas;
 
+            var bloqueadosResp = await cliente.GetAsync("https://localhost:7003/api/Admin/usuarios-bloqueados");
+
+            if (!bloqueadosResp.IsSuccessStatusCode)
+            {
+                ViewBag.Error = "Error al obtener los usuarios bloqueados.";
+                return View();
+            }
+
+            var bloqueadosJson = await bloqueadosResp.Content.ReadAsStringAsync();
+
+            var bloqueados = JsonSerializer.Deserialize<List<Usuario>>(bloqueadosJson, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            ViewBag.Bloqueados = bloqueados;
+
             return View();
         }
+
 
 
         public async Task<IActionResult> IndexCanciones()
@@ -118,23 +136,6 @@ namespace SoftfyWeb.Controllers
             return RedirectToAction("IndexCanciones");
         }
 
-
-        [HttpPost]
-        public async Task<IActionResult> EliminarUsuario(string email)
-        {
-            var client = _httpClientFactory.CreateClient("Api");
-            var token = Request.Cookies["jwt_token"]; // o "jwt" si usas ese nombre
-
-            if (!string.IsNullOrEmpty(token))
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            var response = await client.DeleteAsync($"https://localhost:7003/api/Admin/usuario/{email}");
-
-            if (!response.IsSuccessStatusCode)
-                TempData["Error"] = "No se pudo eliminar el usuario.";
-
-            return RedirectToAction("IndexUsuario");
-        }
 
         [HttpGet]
         public async Task<IActionResult> IndexPlaylists()
@@ -198,7 +199,6 @@ namespace SoftfyWeb.Controllers
             var canciones = JsonSerializer.Deserialize<List<PlaylistCancionDto>>(contenido,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            // ✅ Ajustar URL del archivo para reproducción correcta
             foreach (var cancion in canciones)
             {
                 if (!string.IsNullOrWhiteSpace(cancion.UrlArchivo))
@@ -212,5 +212,72 @@ namespace SoftfyWeb.Controllers
             return View("VerCanciones", canciones);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> BloquearUsuario(string email)
+        {
+            var client = _httpClientFactory.CreateClient("SoftfyApi");
+            var token = Request.Cookies["jwt_token"];
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+            var response = await client.PostAsync($"https://localhost:7003/api/Admin/bloquear/{email}", null);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                TempData["Error"] = "No se pudo bloquear al usuario.";
+            }
+            else
+            {
+                TempData["Success"] = "Usuario bloqueado exitosamente.";
+            }
+
+            return RedirectToAction("IndexUsuario");
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> DesbloquearUsuario(string email)
+        {
+            var client = _httpClientFactory.CreateClient("SoftfyApi");
+            var token = Request.Cookies["jwt_token"];
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+            var response = await client.PostAsync($"https://localhost:7003/api/Admin/desbloquear/{email}", null);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                TempData["Error"] = "No se pudo desbloquear al usuario.";
+            }
+            else
+            {
+                TempData["Success"] = "Usuario desbloqueado exitosamente.";
+            }
+
+            return RedirectToAction("IndexUsuario");
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> EliminarUsuario(string email)
+        {
+            var client = _httpClientFactory.CreateClient("Api");
+            var token = Request.Cookies["jwt_token"];
+
+            if (!string.IsNullOrEmpty(token))
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await client.DeleteAsync($"https://localhost:7003/api/Admin/usuario/{email}");
+
+            if (!response.IsSuccessStatusCode)
+                TempData["Error"] = "No se pudo eliminar el usuario.";
+
+            return RedirectToAction("IndexUsuario");
+        }
     }
 }

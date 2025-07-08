@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using SoftfyWeb.Data;
 using SoftfyWeb.Dtos;
 using SoftfyWeb.Modelos;
@@ -163,6 +164,7 @@ namespace SoftfyWeb.Controllers
             });
         }
 
+
         [HttpPost("registro-artista")]
         public async Task<IActionResult> RegistrarArtista([FromBody] ArtistaRegistroDto dto)
         {
@@ -271,6 +273,67 @@ namespace SoftfyWeb.Controllers
             }
 
             return Ok(new { mensaje = "Contraseña restablecida correctamente." });
+        }
+
+        [HttpPost("bloquear/{email}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> BloquearUsuario(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return BadRequest(new { mensaje = "El email es obligatorio." });
+
+            var usuario = await _userManager.FindByEmailAsync(email);
+            if (usuario == null)
+                return NotFound(new { mensaje = "Usuario no encontrado" });
+
+            if (!usuario.LockoutEnabled)
+            {
+                usuario.LockoutEnabled = true;
+                var updateResult = await _userManager.UpdateAsync(usuario);
+                if (!updateResult.Succeeded)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = "Error al habilitar el bloqueo del usuario" });
+                }
+            }
+            var resultado = await _userManager.SetLockoutEndDateAsync(usuario, DateTimeOffset.UtcNow.AddHours(5));
+            if (!resultado.Succeeded)
+                return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = "Error al bloquear el usuario" });
+
+            return Ok(new { mensaje = "Usuario bloqueado exitosamente durante 5 horas" });
+        }
+
+
+        [HttpPost("desbloquear/{email}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DesbloquearUsuario(string email)
+        {
+            var usuario = await _userManager.FindByEmailAsync(email);
+            if (usuario == null)
+                return NotFound(new { mensaje = "Usuario no encontrado" });
+            var resultado = await _userManager.SetLockoutEndDateAsync(usuario, null);
+            if (!resultado.Succeeded)
+                return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = "Error al desbloquear el usuario" });
+            await _userManager.UpdateAsync(usuario);
+
+            return Ok(new { mensaje = "Usuario desbloqueado exitosamente" });
+        }
+
+        [HttpGet("usuarios-bloqueados")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ObtenerUsuariosBloqueados()
+        {
+            var usuariosBloqueados = await _userManager.Users
+                .Where(u => u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.UtcNow)
+                .ToListAsync();
+
+            var usuarios = usuariosBloqueados.Select(u => new
+            {
+                u.UserName,
+                u.Email,
+                LockoutEnd = u.LockoutEnd
+            }).ToList();
+
+            return Ok(usuarios);
         }
     }
 }
