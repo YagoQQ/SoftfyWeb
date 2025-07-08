@@ -111,17 +111,12 @@ namespace SoftfyWeb.Controllers
         {
             var usuario = await _userManager.FindByEmailAsync(dto.Email);
 
-            // Verificar si el usuario existe
             if (usuario == null)
                 return Unauthorized(new { error = "Credenciales inválidas" });
-
-            // Verificar si el correo está confirmado
             if (!usuario.EmailConfirmed)
             {
                 return Unauthorized(new { error = "Debes confirmar tu correo antes de iniciar sesión." });
             }
-
-            // Verificar si la cuenta está bloqueada
             if (await _userManager.IsLockedOutAsync(usuario))
             {
                 var lockoutEnd = await _userManager.GetLockoutEndDateAsync(usuario);
@@ -130,15 +125,12 @@ namespace SoftfyWeb.Controllers
                 return Unauthorized(new { error = $"La cuenta está bloqueada. Intenta nuevamente en {remainingLockoutTime?.Minutes} minutos." });
             }
 
-            // Validar las credenciales
             var resultado = await _signInManager.PasswordSignInAsync(dto.Email, dto.Password, false, false);
 
             if (!resultado.Succeeded)
             {
-                // Incrementar el contador de intentos fallidos
                 await _userManager.AccessFailedAsync(usuario);
 
-                // Verificar si la cuenta está bloqueada después del fallo
                 if (await _userManager.IsLockedOutAsync(usuario))
                 {
                     var lockoutEnd = await _userManager.GetLockoutEndDateAsync(usuario);
@@ -150,10 +142,8 @@ namespace SoftfyWeb.Controllers
                 return Unauthorized(new { error = "Credenciales inválidas" });
             }
 
-            // Si el login es exitoso, restablecer los intentos fallidos
             await _userManager.ResetAccessFailedCountAsync(usuario);
 
-            // Si el login es exitoso, generar el token JWT y devolverlo
             var roles = await _userManager.GetRolesAsync(usuario);
             var token = _jwtService.GenerarToken(usuario, roles);
 
@@ -275,65 +265,6 @@ namespace SoftfyWeb.Controllers
             return Ok(new { mensaje = "Contraseña restablecida correctamente." });
         }
 
-        [HttpPost("bloquear/{email}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> BloquearUsuario(string email)
-        {
-            if (string.IsNullOrEmpty(email))
-                return BadRequest(new { mensaje = "El email es obligatorio." });
-
-            var usuario = await _userManager.FindByEmailAsync(email);
-            if (usuario == null)
-                return NotFound(new { mensaje = "Usuario no encontrado" });
-
-            if (!usuario.LockoutEnabled)
-            {
-                usuario.LockoutEnabled = true;
-                var updateResult = await _userManager.UpdateAsync(usuario);
-                if (!updateResult.Succeeded)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = "Error al habilitar el bloqueo del usuario" });
-                }
-            }
-            var resultado = await _userManager.SetLockoutEndDateAsync(usuario, DateTimeOffset.UtcNow.AddHours(5));
-            if (!resultado.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = "Error al bloquear el usuario" });
-
-            return Ok(new { mensaje = "Usuario bloqueado exitosamente durante 5 horas" });
-        }
-
-
-        [HttpPost("desbloquear/{email}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DesbloquearUsuario(string email)
-        {
-            var usuario = await _userManager.FindByEmailAsync(email);
-            if (usuario == null)
-                return NotFound(new { mensaje = "Usuario no encontrado" });
-            var resultado = await _userManager.SetLockoutEndDateAsync(usuario, null);
-            if (!resultado.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = "Error al desbloquear el usuario" });
-            await _userManager.UpdateAsync(usuario);
-
-            return Ok(new { mensaje = "Usuario desbloqueado exitosamente" });
-        }
-
-        [HttpGet("usuarios-bloqueados")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ObtenerUsuariosBloqueados()
-        {
-            var usuariosBloqueados = await _userManager.Users
-                .Where(u => u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.UtcNow)
-                .ToListAsync();
-
-            var usuarios = usuariosBloqueados.Select(u => new
-            {
-                u.UserName,
-                u.Email,
-                LockoutEnd = u.LockoutEnd
-            }).ToList();
-
-            return Ok(usuarios);
-        }
+        
     }
 }

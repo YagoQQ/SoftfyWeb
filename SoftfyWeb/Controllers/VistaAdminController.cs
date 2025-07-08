@@ -43,15 +43,17 @@ namespace SoftfyWeb.Controllers
 
             var oyentesResp = await cliente.GetAsync("https://localhost:7003/api/oyentes");
             var artistasResp = await cliente.GetAsync("https://localhost:7003/api/Artistas");
+            var usuariosBloqueadosResp = await cliente.GetAsync("https://localhost:7003/api/Admin/usuarios-bloqueados");
 
-            if (!oyentesResp.IsSuccessStatusCode || !artistasResp.IsSuccessStatusCode)
+            if (!oyentesResp.IsSuccessStatusCode || !artistasResp.IsSuccessStatusCode || !usuariosBloqueadosResp.IsSuccessStatusCode)
             {
                 ViewBag.Error = "Error al obtener usuarios.";
-                return View();
+                return View(); // vista vacía si falla
             }
 
             var oyentesJson = await oyentesResp.Content.ReadAsStringAsync();
             var artistasJson = await artistasResp.Content.ReadAsStringAsync();
+            var usuariosBloqueadosJson = await usuariosBloqueadosResp.Content.ReadAsStringAsync();
 
             var oyentes = JsonSerializer.Deserialize<List<PerfilOyenteDto>>(oyentesJson, new JsonSerializerOptions
             {
@@ -63,29 +65,17 @@ namespace SoftfyWeb.Controllers
                 PropertyNameCaseInsensitive = true
             });
 
-            ViewBag.Oyentes = oyentes;
-            ViewBag.Artistas = artistas;
-
-            var bloqueadosResp = await cliente.GetAsync("https://localhost:7003/api/Admin/usuarios-bloqueados");
-
-            if (!bloqueadosResp.IsSuccessStatusCode)
-            {
-                ViewBag.Error = "Error al obtener los usuarios bloqueados.";
-                return View();
-            }
-
-            var bloqueadosJson = await bloqueadosResp.Content.ReadAsStringAsync();
-
-            var bloqueados = JsonSerializer.Deserialize<List<Usuario>>(bloqueadosJson, new JsonSerializerOptions
+            var usuariosBloqueados = JsonSerializer.Deserialize<List<Usuario>>(usuariosBloqueadosJson, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
 
-            ViewBag.Bloqueados = bloqueados;
+            ViewBag.Oyentes = oyentes;
+            ViewBag.Artistas = artistas;
+            ViewBag.UsuariosBloqueados = usuariosBloqueados;
 
             return View();
         }
-
 
 
         public async Task<IActionResult> IndexCanciones()
