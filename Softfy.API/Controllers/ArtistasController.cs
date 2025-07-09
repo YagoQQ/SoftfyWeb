@@ -192,5 +192,30 @@ namespace SoftfyWeb.Controllers
             return PhysicalFile(ruta, tipoMime);
         }
 
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> ObtenerPerfilPorId(int id)
+        {
+            // Obtener el perfil del artista con el id proporcionado
+            var artista = await _context.Artistas
+                .Include(a => a.Usuario)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (artista == null)
+                return NotFound(new { mensaje = "Artista no encontrado." });
+
+            // Crear el objeto de perfil del artista
+            var perfilArtista = new
+            {
+                artista.Id,
+                artista.NombreArtistico,
+                artista.Biografia,
+                artista.FotoUrl,
+                UsuarioEmail = artista.Usuario.Email
+            };
+
+            return Ok(perfilArtista);  // Retornar el perfil del artista
+        }
+
     }
 }

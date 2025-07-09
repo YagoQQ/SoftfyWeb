@@ -556,86 +556,55 @@ namespace SoftfyWeb.Controllers
             return RedirectToAction("VerPerfil");
         }
 
+
         [HttpGet]
-        public async Task<IActionResult> VerPerfilpublico()
+        public async Task<IActionResult> VerPerfilpublico(int id)
         {
-            var client = ObtenerClienteConToken();
+            // Obtener el rol del usuario autenticado (si existe)
             var rol = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
-            if (rol == "Artista")
+            // Obtener el perfil del artista usando el id
+            var client = new HttpClient();
+            var responsePerfil = await client.GetAsync($"https://localhost:7003/api/Artistas/{id}");
+
+            if (!responsePerfil.IsSuccessStatusCode)
+                return NotFound("Perfil del artista no encontrado");
+
+            var rawPerfil = await responsePerfil.Content.ReadAsStringAsync();
+            var perfil = JsonSerializer.Deserialize<PerfilArtistaDto>(rawPerfil,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            // Obtener las canciones del artista
+            var responseCanciones = await client.GetAsync($"https://localhost:7003/api/Artistas/{id}/canciones");
+            List<CancionDto> canciones = new List<CancionDto>();
+            if (responseCanciones.IsSuccessStatusCode)
             {
-                // 1. Obtener perfil del artista
-                var responsePerfil = await client.GetAsync("https://localhost:7003/api/Artistas/mi-perfil");
-                if (!responsePerfil.IsSuccessStatusCode)
-                    return NotFound("Perfil del artista no encontrado");
+                var rawCanciones = await responseCanciones.Content.ReadAsStringAsync();
+                canciones = JsonSerializer.Deserialize<List<CancionDto>>(rawCanciones, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                var rawPerfil = await responsePerfil.Content.ReadAsStringAsync();
-                var perfil = JsonSerializer.Deserialize<PerfilArtistaDto>(rawPerfil,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                // Enlace a la vista de canciones y playlists del artista
-                ViewBag.ArtistaId = perfil.Id;
-
-                // 2. Obtener canciones del artista
-                var responseCanciones = await client.GetAsync("https://localhost:7003/api/Canciones/mis-canciones");
-                List<CancionDto> canciones = new();
-                if (responseCanciones.IsSuccessStatusCode)
+                // Actualizar la URL de las canciones para ser reproducidas
+                foreach (var cancion in canciones)
                 {
-                    var rawCanciones = await responseCanciones.Content.ReadAsStringAsync();
-                    canciones = JsonSerializer.Deserialize<List<CancionDto>>(rawCanciones, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    foreach (var c in canciones)
-                    {
-                        var archivo = Path.GetFileName(c.UrlArchivo);
-                        c.UrlArchivo = $"https://localhost:7003/api/canciones/reproducir/{archivo}";
-                    }
-                }
-
-                // 3. Obtener playlists del artista
-                var responsePlaylists = await client.GetAsync("https://localhost:7003/api/Playlists/mis-playlists");
-                List<PlaylistDto> playlists = new();
-                if (responsePlaylists.IsSuccessStatusCode)
-                {
-                    var rawPlaylists = await responsePlaylists.Content.ReadAsStringAsync();
-                    playlists = JsonSerializer.Deserialize<List<PlaylistDto>>(rawPlaylists, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                }
-
-                // 4. Enviar datos a la vista
-                ViewBag.TipoUsuario = "Artista";
-                ViewBag.NombreArtistico = perfil.NombreArtistico;
-                ViewBag.FotoUrl = perfil.FotoUrl;
-                ViewBag.Biografia = perfil.Biografia;
-                ViewBag.Email = perfil.UsuarioEmail;
-                ViewBag.Canciones = canciones;
-                ViewBag.Playlists = playlists;
-
-                return View("VerPerfilArtista");
-            }
-
-            if (rol == "Oyente" || rol == "OyentePremium" || rol == "Admin")
-            {
-                // Perfil del oyente
-                var response = await client.GetAsync("https://localhost:7003/api/Oyentes/mi-perfil");
-                if (response.IsSuccessStatusCode)
-                {
-                    var raw = await response.Content.ReadAsStringAsync();
-                    var perfil = JsonSerializer.Deserialize<PerfilOyenteDto>(raw, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                    if (perfil != null)
-                    {
-                        ViewBag.TipoUsuario = perfil.TipoUsuario;
-                        ViewBag.Nombre = perfil.Nombre;
-                        ViewBag.Apellido = perfil.Apellido;
-                        ViewBag.Email = perfil.Email;
-                        return View("VerPerfilOyente");
-                    }
+                    var nombreArchivo = Path.GetFileName(cancion.UrlArchivo); // Extraer solo el nombre del archivo
+                    cancion.UrlArchivo = $"https://localhost:7003/api/canciones/reproducir/{nombreArchivo}"; // Enlace completo para reproducción
                 }
             }
 
-            return NotFound("Perfil no encontrado.");
+            if (!string.IsNullOrEmpty(perfil.FotoUrl))
+            {
+                perfil.FotoUrl = $"https://localhost:7003/api/artistas/foto/{perfil.FotoUrl}";
+            }
+
+            // Asignar los valores al ViewBag para pasarlos a la vista
+            ViewBag.ArtistaId = id;
+            ViewBag.NombreArtistico = perfil.NombreArtistico;
+            ViewBag.FotoUrl = perfil.FotoUrl; // Foto del artista
+            ViewBag.Biografia = perfil.Biografia;
+            ViewBag.Email = perfil.UsuarioEmail;
+            ViewBag.Canciones = canciones; // Lista de canciones del artista
+
+            return View("VerPerfilPublicoArtista"); // Retorna la vista que mostrará el perfil público del artista
         }
-
-
-
     }
 
 }

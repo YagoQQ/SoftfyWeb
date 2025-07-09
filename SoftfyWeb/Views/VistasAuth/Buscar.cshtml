@@ -82,16 +82,20 @@
             </ul>
         }
 
+        <!-- Resultados del Artista -->
         @if (ViewBag.Artista != null)
         {
             <h3 class="text-center text-white mb-4">Perfil del Artista</h3>
             <div class="artist-profile">
-                <!-- Foto del Artista en círculo -->
                 <img src="@ViewBag.Artista.FotoUrl" alt="@ViewBag.Artista.NombreArtistico" class="artist-photo" />
 
-                <!-- Información del Artista -->
                 <div class="artist-info">
-                    <h4>@ViewBag.Artista.NombreArtistico</h4>
+                    <h4>
+                        <a href="@Url.Action("VerPerfilpublico", "VistasAuth", new { id = ViewBag.Artista.Id })">
+                            @ViewBag.Artista.NombreArtistico
+                        </a>
+                    </h4>
+
                     @if (!string.IsNullOrEmpty(ViewBag.Artista.Biografia))
                     {
                         <p><strong>Biografía:</strong> @ViewBag.Artista.Biografia</p>
@@ -115,5 +119,3 @@
 
 </body>
 </html>
-
-

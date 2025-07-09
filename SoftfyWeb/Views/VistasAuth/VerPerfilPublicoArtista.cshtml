@@ -1,0 +1,41 @@
+﻿<h1>@ViewBag.NombreArtistico</h1>
+
+<div class="artist-profile">
+
+    <img src="@ViewBag.FotoUrl" alt="@ViewBag.NombreArtistico" class="artist-photo" />
+
+    <p><strong>Biografía:</strong> @ViewBag.Biografia</p>
+    <p><strong>Email:</strong> @ViewBag.Email</p>
+</div>
+
+<h2>Canciones de @ViewBag.NombreArtistico</h2>
+
+@if (ViewBag.Canciones != null)
+{
+    var canciones = ViewBag.Canciones as List<SoftfyWeb.Modelos.Dtos.CancionDto>;
+
+    @if (canciones != null && canciones.Count > 0)
+    {
+        <ul>
+            @foreach (var cancion in canciones)
+            {
+                <li>
+                    <strong>@cancion.Titulo</strong>
+                    <br>
+                    <audio controls>
+                        <source src="@cancion.UrlArchivo" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No hay canciones disponibles.</p>
+    }
+}
+else
+{
+    <p>No se pudieron obtener canciones para este artista.</p>
+}
