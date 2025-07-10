@@ -80,8 +80,7 @@ namespace SoftfyWeb.Controllers
 
         public async Task<IActionResult> IndexCanciones()
         {
-            var client = _httpClientFactory.CreateClient("SoftfyApi");
-
+            var client = ObtenerClienteConToken();
             var response = await client.GetAsync("https://localhost:7003/api/canciones/canciones");
 
             if (!response.IsSuccessStatusCode)
@@ -95,14 +94,6 @@ namespace SoftfyWeb.Controllers
             {
                 PropertyNameCaseInsensitive = true
             });
-
-            // Aquí transformamos la URL del archivo para que apunte al endpoint de reproducción
-            foreach (var cancion in canciones)
-            {
-                var nombreArchivo = Path.GetFileName(cancion.UrlArchivo); // extrae solo el nombre.mp3
-                cancion.UrlArchivo = $"https://localhost:7003/api/canciones/reproducir/{nombreArchivo}";
-            }
-
             return View(canciones);
         }
 
@@ -111,17 +102,15 @@ namespace SoftfyWeb.Controllers
         public async Task<IActionResult> EliminarCancion(int id)
         {
             var client = _httpClientFactory.CreateClient("SoftfyApi");
-            var token = Request.Cookies["jwt_token"]; // asegúrate de que coincida
+            var token = Request.Cookies["jwt_token"];
 
             if (!string.IsNullOrEmpty(token))
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var response = await client.DeleteAsync($"https://localhost:7003/api/Canciones/eliminar/{id}");
+            var response = await client.DeleteAsync($"https://localhost:7003/api/canciones/eliminar/{id}");
 
             if (!response.IsSuccessStatusCode)
-            {
                 TempData["Error"] = "No se pudo eliminar la canción.";
-            }
 
             return RedirectToAction("IndexCanciones");
         }
@@ -191,10 +180,9 @@ namespace SoftfyWeb.Controllers
 
             foreach (var cancion in canciones)
             {
-                if (!string.IsNullOrWhiteSpace(cancion.UrlArchivo))
+                if (string.IsNullOrWhiteSpace(cancion.UrlArchivo))
                 {
-                    var nombreArchivo = Path.GetFileName(cancion.UrlArchivo);
-                    cancion.UrlArchivo = $"https://localhost:7003/api/canciones/reproducir/{nombreArchivo}";
+                    cancion.UrlArchivo = "#"; 
                 }
             }
 

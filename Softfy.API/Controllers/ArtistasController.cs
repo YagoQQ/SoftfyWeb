@@ -48,12 +48,10 @@ namespace SoftfyWeb.Controllers
         [HttpGet("mi-perfil")]
         public async Task<IActionResult> ObtenerMiPerfil()
         {
-            // 1) Obtener el Usuario ASP.NET Identity actual
             var usuario = await _userManager.GetUserAsync(User);
             if (usuario == null)
                 return Unauthorized(new { mensaje = "No autenticado." });
 
-            // 2) Buscar la entidad Artista asociada
             var artista = await _context.Artistas
                 .Include(a => a.Usuario)
                 .FirstOrDefaultAsync(a => a.UsuarioId == usuario.Id);
@@ -61,7 +59,6 @@ namespace SoftfyWeb.Controllers
             if (artista == null)
                 return NotFound(new { mensaje = "Perfil de artista no encontrado." });
 
-            // 3) Devolver solo los campos que interesan
             return Ok(new
             {
                 artista.Id,
@@ -75,7 +72,6 @@ namespace SoftfyWeb.Controllers
         [HttpGet("{id}/canciones")]
         public IActionResult ObtenerCancionesDelArtista(int id)
         {
-            // Obtener las canciones subidas por el artista con el id correspondiente
             var canciones = _context.Canciones
                 .Where(c => c.ArtistaId == id)
                 .Select(c => new
@@ -89,7 +85,7 @@ namespace SoftfyWeb.Controllers
             if (!canciones.Any())
                 return NotFound("No hay canciones para este artista.");
 
-            return Ok(canciones); // Devuelve la lista de canciones del artista
+            return Ok(canciones); 
         }
 
         [HttpGet("artista/{nombre}/canciones")]
@@ -124,23 +120,21 @@ namespace SoftfyWeb.Controllers
         [AllowAnonymous]
         public IActionResult ObtenerPerfilDelArtistaPorNombre(string nombre)
         {
-            // Obtener el artista por su nombre
             var artista = _context.Artistas
                 .FirstOrDefault(a => a.NombreArtistico == nombre);
 
             if (artista == null)
                 return NotFound("No se encontró el artista.");
 
-            // Crear un objeto con la información del artista
             var perfilArtista = new
             {
                 artista.Id,
                 artista.NombreArtistico,
                 artista.FotoUrl,
-                artista.Biografia  // Si tienes una biografía del artista
+                artista.Biografia 
             };
 
-            return Ok(perfilArtista); // Devuelve solo el perfil del artista
+            return Ok(perfilArtista);
         }
 
         [Authorize(Roles = "Artista")]
@@ -172,7 +166,7 @@ namespace SoftfyWeb.Controllers
                     await foto.CopyToAsync(stream);
                 }
 
-                artista.FotoUrl = nombreArchivo; // Solo guardamos el nombre del archivo
+                artista.FotoUrl = nombreArchivo; 
             }
 
             await _context.SaveChangesAsync();
@@ -188,7 +182,7 @@ namespace SoftfyWeb.Controllers
             if (!System.IO.File.Exists(ruta))
                 return NotFound("Imagen no encontrada.");
 
-            var tipoMime = "image/jpeg"; // O usa lógica para detectar MIME según extensión
+            var tipoMime = "image/jpeg";
             return PhysicalFile(ruta, tipoMime);
         }
 
@@ -196,7 +190,6 @@ namespace SoftfyWeb.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> ObtenerPerfilPorId(int id)
         {
-            // Obtener el perfil del artista con el id proporcionado
             var artista = await _context.Artistas
                 .Include(a => a.Usuario)
                 .FirstOrDefaultAsync(a => a.Id == id);
@@ -204,7 +197,6 @@ namespace SoftfyWeb.Controllers
             if (artista == null)
                 return NotFound(new { mensaje = "Artista no encontrado." });
 
-            // Crear el objeto de perfil del artista
             var perfilArtista = new
             {
                 artista.Id,
@@ -214,7 +206,27 @@ namespace SoftfyWeb.Controllers
                 UsuarioEmail = artista.Usuario.Email
             };
 
-            return Ok(perfilArtista);  // Retornar el perfil del artista
+            return Ok(perfilArtista); 
+        }
+
+        [HttpGet("{id}/playlists")]
+        public IActionResult ObtenerPlaylistsDelArtista(String id)
+        {
+            var playlists = _context.Playlists
+                .Where(c => c.Usuario.Id == id)
+                .Select(c => new
+                {
+                    c.Id,
+                    c.Nombre,
+                    c.Usuario,
+                    c.PlaylistCanciones
+                })
+                .ToList();
+
+            if (!playlists.Any())
+                return NotFound("No hay canciones para este artista.");
+
+            return Ok(playlists);
         }
 
     }

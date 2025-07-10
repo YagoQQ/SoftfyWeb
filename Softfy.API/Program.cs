@@ -1,43 +1,35 @@
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Softfy.API.Services;
 using SoftfyWeb.Data;
 using SoftfyWeb.Modelos;
 using SoftfyWeb.Services;
 using System.Text;
-using Microsoft.Extensions.FileProviders;
-using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-// Add services to the container.
 builder.Services.AddControllers();
-
-// Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configurar DbContext con PostgreSQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configurar Identity con roles, confirmación de cuenta y correo único
 builder.Services.AddIdentity<Usuario, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
-    options.User.RequireUniqueEmail = true; // Evita registros con el mismo correo
-    // Configuración de lockout
-    options.Lockout.MaxFailedAccessAttempts = 5;  // Número máximo de intentos fallidos antes de bloquear la cuenta
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);  // Tiempo de bloqueo (1 minuto)
-    options.Lockout.AllowedForNewUsers = true;  // Permite el lockout para usuarios nuevos
+    options.User.RequireUniqueEmail = true;
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
+    options.Lockout.AllowedForNewUsers = true;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// Configurar autenticación JWT
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -58,40 +50,39 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Registrar servicios
 builder.Services.AddScoped<EmailService>();
-builder.Services.AddScoped<JwtService>(); // Registrar el servicio JwtService
+builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<AudioService>();
 
-// Configurar CORS para el front MVC
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowWeb",
         policy => policy
-            .WithOrigins("https://localhost:7130")  // Tu frontend MVC
+            .WithOrigins("https://localhost:7130")
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
 
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("CloudinarySettings"));
+
+builder.Services.AddSingleton(x =>
+{
+    var config = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
+    var account = new Account(config.CloudName, config.ApiKey, config.ApiSecret);
+    return new Cloudinary(account);
+});
+
 var app = builder.Build();
 
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-// Servir archivos estáticos desde la carpeta ArchivosCanciones
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "ArchivosCanciones")),
-    RequestPath = "/ArchivosCanciones"
-});
-
 
 app.UseHttpsRedirection();
 
-// Usar CORS
 app.UseCors("AllowWeb");
 
 app.UseAuthentication();

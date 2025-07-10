@@ -45,12 +45,11 @@ namespace SoftfyWeb.Controllers
             return new ErrorViewModel { RequestId = id };
         }
 
-        // 1) Listar todas las canciones (para oyentes)
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             HttpClient client = ObtenerCliente();
-            HttpResponseMessage response = await client.GetAsync("canciones/canciones"); // Solicita todas las canciones
+            HttpResponseMessage response = await client.GetAsync("canciones/canciones"); 
             if (!response.IsSuccessStatusCode)
                 return View("Error", CrearErrorModel());
 
@@ -58,18 +57,10 @@ namespace SoftfyWeb.Controllers
             var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var lista = JsonSerializer.Deserialize<List<CancionRespuestaDto>>(json, opciones);
 
-            // Asegurarse de que la URL del archivo esté correctamente formada
-            foreach (var cancion in lista)
-            {
-                var nombreArchivo = Path.GetFileName(cancion.UrlArchivo);
-                cancion.UrlArchivo = $"https://localhost:7003/api/canciones/reproducir/{nombreArchivo}";
-            }
-
             return View(lista);
         }
 
-        // 2) Listar mis canciones (solo Artista)
-        // --- MisCanciones (ARTISTA sólo) ---
+
         [Authorize(Roles = "Artista")]
         public async Task<IActionResult> MisCanciones()
         {
@@ -82,33 +73,24 @@ namespace SoftfyWeb.Controllers
             var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var lista = JsonSerializer.Deserialize<List<CancionRespuestaDto>>(json, opts);
 
-            // Asignar la URL completa para cada archivo, usando el endpoint correcto
-            foreach (var cancion in lista)
-            {
-                // Si UrlArchivo contiene una ruta completa, extraer solo el nombre del archivo
-                var nombreArchivo = Path.GetFileName(cancion.UrlArchivo);
-
-                // Asignar la URL correcta con el nombre del archivo
-                cancion.UrlArchivo = $"https://localhost:7003/api/canciones/reproducir/{nombreArchivo}";
-            }
-
             return View(lista);
         }
 
 
 
-        // 3) Formulario de creación
         [Authorize(Roles = "Artista")]
         public IActionResult CrearCancion()
         {
             return View(new CancionCrearDto());
         }
 
-        // --- CrearCancion POST ---
-        [HttpPost, Authorize(Roles = "Artista"), ValidateAntiForgeryToken]
+        [HttpPost]
+        [Authorize(Roles = "Artista")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CrearCancion(CancionCrearDto dto, IFormFile archivoCancion)
         {
-            if (!ModelState.IsValid) return View(dto);
+            if (!ModelState.IsValid)
+                return View(dto);
 
             if (archivoCancion == null || archivoCancion.Length == 0)
             {
@@ -116,26 +98,35 @@ namespace SoftfyWeb.Controllers
                 return View(dto);
             }
 
-            var form = new MultipartFormDataContent();
-            form.Add(new StringContent(dto.Titulo), nameof(dto.Titulo));
-            form.Add(new StringContent(dto.Genero ?? ""), nameof(dto.Genero));
-            form.Add(new StringContent(dto.FechaLanzamiento.ToString("o")),
-                     nameof(dto.FechaLanzamiento));
+            try
+            {
+                var form = new MultipartFormDataContent();
 
-            var stream = new StreamContent(archivoCancion.OpenReadStream());
-            stream.Headers.ContentType =
-                new MediaTypeHeaderValue(archivoCancion.ContentType);
-            form.Add(stream, "archivoCancion", archivoCancion.FileName);
+                form.Add(new StringContent(dto.Titulo), nameof(dto.Titulo));
+                form.Add(new StringContent(dto.Genero ?? ""), nameof(dto.Genero));
+                form.Add(new StringContent(dto.FechaLanzamiento.ToString("o")), nameof(dto.FechaLanzamiento));
 
-            var client = ObtenerClienteConToken();
-            var response = await client.PostAsync("canciones/crear", form);
-            if (response.IsSuccessStatusCode)
-                return RedirectToAction("MisCanciones");
+                var stream = new StreamContent(archivoCancion.OpenReadStream());
+                stream.Headers.ContentType = new MediaTypeHeaderValue(archivoCancion.ContentType);
+                form.Add(stream, "archivoCancion", archivoCancion.FileName);
 
-            var err = await response.Content.ReadAsStringAsync();
-            ModelState.AddModelError("", err);
+                var client = ObtenerClienteConToken();
+                var response = await client.PostAsync("canciones/crear", form);
+
+                if (response.IsSuccessStatusCode)
+                    return RedirectToAction("MisCanciones");
+
+                var errorContenido = await response.Content.ReadAsStringAsync();
+                ModelState.AddModelError("", $"Error al crear la canción: {errorContenido}");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Error inesperado: {ex.Message}");
+            }
+
             return View(dto);
         }
+
 
         [AllowAnonymous]
         public IActionResult Error()

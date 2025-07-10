@@ -80,8 +80,6 @@ namespace SoftfyWeb.Controllers
         public async Task<IActionResult> Detalle(int id)
         {
             var client = ObtenerClienteConToken();
-
-            // 1️⃣ Obtener las canciones que ya están en la playlist
             var resp = await client.GetAsync($"playlists/{id}/canciones");
             if (!resp.IsSuccessStatusCode)
                 return View("Error", CrearErrorModel());
@@ -90,12 +88,7 @@ namespace SoftfyWeb.Controllers
             var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var cancionesPlaylist = JsonSerializer.Deserialize<List<PlaylistCancionDto>>(raw, opciones);
 
-            // Ajustar URL de reproducción
-            foreach (var c in cancionesPlaylist)
-            {
-                var nombreArchivo = Path.GetFileName(c.UrlArchivo);
-                c.UrlArchivo = $"https://localhost:7003/api/canciones/reproducir/{nombreArchivo}";
-            }
+            cancionesPlaylist = cancionesPlaylist.Where(c => !string.IsNullOrWhiteSpace(c.UrlArchivo)).ToList();
 
             var respArtista = await client.GetAsync("canciones/mis-canciones");
             List<CancionDto> cancionesArtista = new();
@@ -110,6 +103,7 @@ namespace SoftfyWeb.Controllers
 
             return View(cancionesPlaylist);
         }
+
 
 
         [HttpPost, Authorize(Roles = "OyentePremium,Artista,Admin"), ValidateAntiForgeryToken]

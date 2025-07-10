@@ -1,11 +1,12 @@
 ﻿@{
-    ViewData["Title"] = "Bienvenida, @ViewBag.OyenteNombre";
+    ViewData["Title"] = "Bienvenida, " + ViewBag.OyenteNombre;
 }
+
+<link rel="stylesheet" href="~/css/player.css" />
 
 <div class="container">
     <h2>Bienvenido a Softfy 🎵, @ViewBag.OyenteNombre</h2>
 
-    <!-- Sección de todas las canciones del sistema -->
     <div class="section">
         <h3>Todas las Canciones</h3>
         <div class="canciones-container">
@@ -13,14 +14,26 @@
             {
                 <div class="cancion-item">
                     <p><strong>@cancion.Titulo</strong></p>
-                    <p><em>@cancion.Artista?.NombreArtistico</em></p> <!-- Muestra el nombre del artista -->
+                    <p><em>@cancion.Artista?.NombreArtistico</em></p>
                     <p><em>@cancion.Genero</em></p>
+
                     @if (!string.IsNullOrEmpty(cancion.UrlArchivo))
                     {
-                        <audio controls>
-                            <source src="@cancion.UrlArchivo" type="audio/mpeg">
-                            Your browser does not support the audio element.
-                        </audio>
+                        <audio id="audio-@cancion.Id" src="@cancion.UrlArchivo" preload="metadata"></audio>
+
+                        <div class="custom-player" data-audio-id="audio-@cancion.Id">
+                            <button class="play-btn">▶️</button>
+                            <button class="backward-btn">⏪</button>
+                            <button class="forward-btn">⏩</button>
+
+                            <input type="range" class="progress" value="0" min="0" step="0.1">
+                            <span class="time">0:00 / 0:00</span>
+
+                            <input type="range" class="volume" min="0" max="1" step="0.01" value="1">
+                            <button class="mute-btn">🔊</button>
+
+                            <a class="download-btn" download href="@cancion.UrlArchivo">⬇️</a>
+                        </div>
                     }
                     else
                     {
@@ -32,33 +45,16 @@
     </div>
 </div>
 
-<!-- Estilos CSS para una visualización horizontal -->
-<style>
-    .section {
-        margin-top: 2rem;
+<table>
+    @foreach (var playlists in ViewBag.TodasPlaylists)
+    {
+        <tr>
+            <td>@playlists.Propietario</td>
+            <td>@playlists.TotalCanciones</td>
+        </tr>
     }
+</table>
 
-    .canciones-container {
-        display: flex;
-        overflow-x: auto;
-        gap: 1rem;
-    }
-
-    .cancion-item {
-        min-width: 200px;
-        text-align: center;
-        background-color: #f1f1f1;
-        padding: 1rem;
-        border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-        .cancion-item p {
-            margin: 0.5rem 0;
-        }
-
-    audio {
-        width: 100%;
-        margin-top: 10px;
-    }
-</style>
+@section Scripts {
+    <script src="~/js/player.js"></script>
+}
