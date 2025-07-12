@@ -48,7 +48,7 @@ namespace SoftfyWeb.Controllers
             if (!oyentesResp.IsSuccessStatusCode || !artistasResp.IsSuccessStatusCode || !usuariosBloqueadosResp.IsSuccessStatusCode)
             {
                 ViewBag.Error = "Error al obtener usuarios.";
-                return View(); // vista vacía si falla
+                return View();
             }
 
             var oyentesJson = await oyentesResp.Content.ReadAsStringAsync();
@@ -161,7 +161,7 @@ namespace SoftfyWeb.Controllers
             return RedirectToAction("IndexPlaylists");
         }
 
-
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> VerCanciones(int id)
         {

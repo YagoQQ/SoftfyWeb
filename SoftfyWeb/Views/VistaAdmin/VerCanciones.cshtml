@@ -1,25 +1,62 @@
 ﻿@model IEnumerable<SoftfyWeb.Modelos.Dtos.PlaylistCancionDto>
 
-<h2>Detalle de la Playlist</h2>
+@{
+    ViewData["Title"] = "Ver Playlist";
+    var playlistId = ViewBag.PlaylistId as int?;
+    var nombrePlaylist = ViewBag.NombrePlaylist as string ?? "Playlist";
+}
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Título</th>
-            <th>Archivo</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var c in Model)
-        {
-            <tr>
-                <td>@c.Titulo</td>
-                <td>
-                    <audio controls>
-                        <source src="@c.UrlArchivo" type="audio/mpeg" />
-                    </audio>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="container mt-4">
+    <h2>
+        <a asp-action="VerPlaylist" asp-route-id="@playlistId" class="text-decoration-none">
+            🎵 @nombrePlaylist
+        </a>
+    </h2>
+
+    @if (!Model.Any())
+    {
+        <p class="text-muted">Esta playlist no tiene canciones aún.</p>
+    }
+    else
+    {
+        <table class="table table-bordered table-hover mt-3">
+            <thead class="table-dark">
+                <tr>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <th>Acciones</th>
+                    }
+                    <th>Título</th>
+                    <th>Audio</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <td style="width: 130px;">
+                                <form asp-action="EliminarCancionDePlaylist" method="post" onsubmit="return confirm('¿Eliminar esta canción de la playlist?')">
+                                    <input type="hidden" name="playlistId" value="@playlistId" />
+                                    <input type="hidden" name="cancionId" value="@c.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        🗑 Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        }
+
+                        <td>@c.Titulo</td>
+                        <td>
+                            <audio controls style="width: 200px;">
+                                <source src="@c.UrlArchivo" type="audio/mpeg" />
+                                Tu navegador no soporta audio.
+                            </audio>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

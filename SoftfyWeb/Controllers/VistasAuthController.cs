@@ -298,7 +298,7 @@ namespace SoftfyWeb.Controllers
                     .ToList();
             }
             var playlists = new List<PlaylistDto>();
-            var respPlaylists = await client.GetAsync("https://localhost:7003/api/Playlists/todas");
+            var respPlaylists = await client.GetAsync("https://localhost:7003/api/Playlists/todas/artistas");
 
             if (respPlaylists.IsSuccessStatusCode)
             {

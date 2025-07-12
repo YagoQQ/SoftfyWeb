@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SoftfyWeb.Data;
 using SoftfyWeb.Modelos;
+using SoftfyWeb.Modelos.Dtos;
 
 namespace SoftfyWeb.Controllers
 {
@@ -20,7 +21,6 @@ namespace SoftfyWeb.Controllers
             _userManager = userManager;
         }
 
-        // Crear una nueva playlist personalizada
         [Authorize(Roles = "OyentePremium,Artista")]
         [HttpPost("crear")]
         public async Task<IActionResult> CrearPlaylist([FromBody] string nombre)
@@ -155,7 +155,6 @@ namespace SoftfyWeb.Controllers
         {
             var usuario = await _userManager.GetUserAsync(User);
 
-            // Buscar la playlist, incluyendo usuario y canciones
             var playlist = await _context.Playlists
                 .Include(p => p.PlaylistCanciones)
                 .Include(p => p.Usuario)
@@ -169,14 +168,11 @@ namespace SoftfyWeb.Controllers
 
             var esAdmin = await _userManager.IsInRoleAsync(usuario, "Admin");
 
-            // Si no es admin, verificar que la playlist le pertenezca
             if (!esAdmin && playlist.UsuarioId != usuario.Id)
                 return Forbid("No tienes permiso para eliminar esta playlist.");
 
-            // Eliminar relaciones con canciones
             _context.PlaylistCanciones.RemoveRange(playlist.PlaylistCanciones);
 
-            // Eliminar la playlist
             _context.Playlists.Remove(playlist);
             await _context.SaveChangesAsync();
 
@@ -237,8 +233,6 @@ namespace SoftfyWeb.Controllers
                 _context.Playlists.Add(playlist);
                 await _context.SaveChangesAsync();
             }
-
-            // Verifica si ya existe esa relación
             var yaExiste = _context.PlaylistCanciones.Any(pc =>
                 pc.PlaylistId == playlist.Id && pc.CancionId == cancionId);
 
@@ -298,5 +292,39 @@ namespace SoftfyWeb.Controllers
 
             return Ok(playlists);
         }
+
+        [HttpGet("todas/artistas")]
+        public async Task<IActionResult> ObtenerPlaylistsDeArtistas()
+        {
+            var artistas = await _context.Artistas
+                .Include(a => a.Usuario)
+                .ToListAsync();
+
+            var artistasIds = artistas.Select(a => a.UsuarioId).ToList();
+
+            var playlists = await _context.Playlists
+                .Include(p => p.Usuario)
+                .Include(p => p.PlaylistCanciones)
+                .Where(p => artistasIds.Contains(p.UsuarioId))
+                .ToListAsync();
+
+            var resultado = playlists.Select(p =>
+            {
+                var artista = artistas.FirstOrDefault(a => a.UsuarioId == p.UsuarioId);
+
+                return new PlaylistDto
+                {
+                    Id = p.Id,
+                    Nombre = p.Nombre,
+                    Propietario = p.Usuario.Email,
+                    NombreArtistico = artista?.NombreArtistico,
+                    TotalCanciones = p.PlaylistCanciones.Count
+                };
+            }).ToList();
+
+            return Ok(resultado);
+        }
+
+
     }
 }

@@ -22,18 +22,24 @@
                         <audio id="audio-@cancion.Id" src="@cancion.UrlArchivo" preload="metadata"></audio>
 
                         <div class="custom-player" data-audio-id="audio-@cancion.Id">
-                            <button class="play-btn">▶️</button>
+                        <div class="controls">
                             <button class="backward-btn">⏪</button>
+                            <button class="play-btn">▶️</button>
                             <button class="forward-btn">⏩</button>
+                        </div>
 
+                        <div class="progress-container">
                             <input type="range" class="progress" value="0" min="0" step="0.1">
                             <span class="time">0:00 / 0:00</span>
+                        </div>
 
+                        <div class="volume-controls">
                             <input type="range" class="volume" min="0" max="1" step="0.01" value="1">
                             <button class="mute-btn">🔊</button>
-
-                            <a class="download-btn" download href="@cancion.UrlArchivo">⬇️</a>
                         </div>
+
+                        <a class="download-btn" download href="@cancion.UrlArchivo">⬇️</a>
+                    </div>
                     }
                     else
                     {
@@ -43,17 +49,26 @@
             }
         </div>
     </div>
+    <div class="section">
+    <h3>Todas las Playlists</h3>
+    <div class="canciones-container">
+        @foreach (var playlist in ViewBag.TodasPlaylists)
+        {
+                <div class="cancion-item">
+                    <h4>
+                        <a asp-action="VerCanciones" asp-controller="VistaAdmin" asp-route-id="@playlist.Id" class="text-decoration-none">
+                            @playlist.Nombre
+                        </a>
+                    </h4>
+                    <p><strong>Artista:</strong> @playlist.NombreArtistico</p>
+                    <p><strong>Total de Canciones:</strong> @playlist.TotalCanciones</p>
+                </div>
+        }
+    </div>
+</div>
 </div>
 
-<table>
-    @foreach (var playlists in ViewBag.TodasPlaylists)
-    {
-        <tr>
-            <td>@playlists.Propietario</td>
-            <td>@playlists.TotalCanciones</td>
-        </tr>
-    }
-</table>
+
 
 @section Scripts {
     <script src="~/js/player.js"></script>

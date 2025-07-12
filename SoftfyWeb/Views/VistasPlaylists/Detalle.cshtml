@@ -16,7 +16,6 @@
             <tr>
                 <td>@c.Titulo</td>
                 <td>
-                    <!-- Reproductor de audio con la URL correcta -->
                     <audio controls>
                         <source src="@c.UrlArchivo" type="audio/mpeg" />
                     </audio>
@@ -46,7 +45,7 @@
             {
                 foreach (var cancion in ViewBag.CancionesArtista)
                 {
-                    <option value="@cancion.Id">@cancion.Titulo</option>  <!-- Mostrar solo canciones subidas por el artista -->
+                    <option value="@cancion.Id">@cancion.Titulo</option> 
                 }
             }
             else

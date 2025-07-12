@@ -1,5 +1,7 @@
 .container {
     padding: 2rem;
+    max-width: 1400px; /* Hacerlo más ancho */
+    margin: 0 auto;
 }
 
 .section {
@@ -9,80 +11,108 @@
 .canciones-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: 2rem;
     justify-content: center;
 }
 
 .cancion-item {
-    width: 300px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    padding: 1rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
+    width: 350px;
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
     font-family: 'Segoe UI', sans-serif;
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
 }
 
+    .cancion-item:hover {
+        transform: translateY(-4px);
+    }
+
     .cancion-item p {
-        margin: 0.5rem 0;
+        margin: 0.3rem 0;
+        font-size: 15px;
+        color: #555;
+        text-align: center;
+        font-style: italic;
     }
 
 .custom-player {
-    margin-top: 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.6rem;
+    gap: 1rem;
+    margin-top: 1.2rem;
+    width: 100%;
 }
 
 .controls {
     display: flex;
-    gap: 0.5rem;
     justify-content: center;
+    gap: 1rem;
+}
+
+.progress-container {
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    width: 100%;
 }
 
 input.progress {
-    appearance: none;
     width: 100%;
     height: 6px;
+    border-radius: 6px;
     background: #1db954;
-    border-radius: 4px;
     cursor: pointer;
 }
 
 span.time {
-    font-size: 14px;
+    font-size: 13px;
     color: #333;
+    margin-top: 0.2rem;
+}
+
+.volume-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.6rem;
 }
 
 input.volume {
-    width: 100px;
+    width: 120px;
     height: 6px;
-    background: #d32f2f;
-    border-radius: 4px;
-    appearance: none;
-    cursor: pointer;
-}
-
-.bottom-controls {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    justify-content: center;
-}
-
-button, .download-btn {
-    background-color: #2196f3;
-    color: white;
-    border: none;
-    padding: 6px 10px;
     border-radius: 6px;
+    background: #f44336;
     cursor: pointer;
-    font-size: 14px;
-    text-decoration: none;
 }
 
-    button:hover, .download-btn:hover {
-        background-color: #1976d2;
+.download-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: #d32f2f;
+    color: white;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 16px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+    .download-btn:hover {
+        background-color: #b71c1c;
     }
+
+.download-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    padding: 6px 8px;
+    font-size: 16px;
+}

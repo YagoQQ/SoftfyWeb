@@ -121,7 +121,7 @@ namespace SoftfyWeb.Controllers
                 });
             }
 
-            return NoContent(); // 204 OK sin cuerpo
+            return NoContent(); 
         }
     }
 }

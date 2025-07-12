@@ -4,7 +4,8 @@
     {
         public int Id { get; set; }
         public string Nombre { get; set; }
-        public string Propietario { get; set; } 
+        public string Propietario { get; set; }
+        public string? NombreArtistico { get; set; }
         public int TotalCanciones { get; set; }
     }
 }
