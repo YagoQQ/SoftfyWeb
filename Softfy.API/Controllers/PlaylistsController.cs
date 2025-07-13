@@ -325,6 +325,24 @@ namespace SoftfyWeb.Controllers
             return Ok(resultado);
         }
 
+        [HttpGet("correo/{email}/playlists")]
+        [AllowAnonymous]
+        public IActionResult ObtenerPlaylistsPorCorreo(string email)
+        {
+            var playlists = _context.Playlists
+                .Include(p => p.Usuario) 
+                .Include(p => p.PlaylistCanciones)
+                .Where(p => p.Usuario.Email == email && !p.EsMeGusta)
+                .Select(p => new PlaylistDto
+                {
+                    Id = p.Id,
+                    Nombre = p.Nombre,
+                    TotalCanciones = p.PlaylistCanciones.Count,
+                })
+                .ToList();
+
+            return Ok(playlists);
+        }
 
     }
 }

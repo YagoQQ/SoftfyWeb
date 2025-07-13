@@ -39,7 +39,7 @@
                         </div>
 
                         <a class="download-btn" download href="@cancion.UrlArchivo">⬇️</a>
-                    </div>
+                        </div>
                     }
                     else
                     {
@@ -65,6 +65,24 @@
                 </div>
         }
     </div>
+    <div class="section">
+    <h3>Todos los artistas</h3>
+    <div class="artistas-grid">
+        @foreach (var artista in ViewBag.Artistas)
+        {
+            <div class="artista-card">
+                <img src="@artista.FotoUrl" alt="Foto de @artista.NombreArtistico" class="artista-img" />
+                <h5>
+                    <a href="@Url.Action("VerPerfilpublico", "VistasAuth", new { id = artista.Id })">
+                        @artista.NombreArtistico
+                    </a>
+                </h5>
+
+                <p class="bio">@artista.Biografia</p>
+            </div>
+        }
+    </div>
+</div>
 </div>
 </div>
 
@@ -73,3 +91,44 @@
 @section Scripts {
     <script src="~/js/player.js"></script>
 }
+
+    <style>
+    .artistas-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .artista-card {
+        width: 230px;
+        padding: 1rem;
+        background-color: #f8f8f8;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .artista-img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #1db954;
+        margin-bottom: 0.6rem;
+    }
+
+    .artista-card h5 {
+        margin: 0;
+        font-size: 17px;
+        color: #111;
+    }
+
+    .artista-card .bio {
+        font-size: 13px;
+        color: #444;
+        margin-top: 0.3rem;
+        font-style: italic;
+    }
+</style>

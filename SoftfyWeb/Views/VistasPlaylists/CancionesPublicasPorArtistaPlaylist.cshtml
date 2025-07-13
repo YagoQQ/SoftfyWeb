@@ -1,0 +1,26 @@
+﻿@model List<SoftfyWeb.Modelos.Dtos.PlaylistCancionDto>
+
+@{
+    ViewData["Title"] = "Canciones de la Playlist";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (Model != null && Model.Any())
+{
+    <ul class="list-group">
+        @foreach (var cancion in Model)
+        {
+            <li class="list-group-item">
+                <strong>@cancion.Titulo</strong>
+                <audio controls src="@cancion.UrlArchivo" class="mt-2 w-100"></audio>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <div class="alert alert-warning mt-3">
+        No hay canciones disponibles en esta playlist.
+    </div>
+}

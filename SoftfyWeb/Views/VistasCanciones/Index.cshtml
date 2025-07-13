@@ -5,29 +5,60 @@
 
 <h2>@ViewData["Title"]</h2>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Título</th>
-            <th>Género</th>
-            <th>Fecha Lanzamiento</th>
-            <th>Reproducir</th> 
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var c in Model)
-        {
-            <tr>
-                <td>@c.Titulo</td>
-                <td>@c.Genero</td>
-                <td>@c.FechaLanzamiento.ToString("yyyy-MM-dd")</td>
-                <td>>
-                    <audio controls>
-                        <source src="@c.UrlArchivo" type="audio/mpeg">
-                        Tu navegador no soporta el elemento de audio.
-                    </audio>
-                </td>
-            </tr>
+<style>
+    .cuadro-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        justify-content: center;
+        margin-top: 1.5rem;
+    }
+
+    .cuadro-cancion {
+        background-color: #fff;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        font-family: 'Segoe UI', sans-serif;
+        text-align: center;
+        transition: transform 0.2s ease;
+    }
+
+        .cuadro-cancion:hover {
+            transform: translateY(-5px);
         }
-    </tbody>
-</table>
+
+        .cuadro-cancion h4 {
+            font-size: 18px;
+            color: #111;
+            margin-bottom: 0.5rem;
+        }
+
+        .cuadro-cancion p {
+            font-size: 14px;
+            color: #555;
+            margin: 0.25rem 0;
+        }
+
+        .cuadro-cancion audio {
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+</style>
+
+<div class="cuadro-container">
+    @foreach (var c in Model)
+    {
+        <div class="cuadro-cancion">
+            <h4>@c.Titulo</h4>
+            <p><strong>Género:</strong> @c.Genero</p>
+            <p><strong>Artista:</strong> @c.Artista.NombreArtistico</p>
+            <p><strong>Lanzamiento:</strong> @c.FechaLanzamiento.ToString("yyyy-MM-dd")</p>
+            <audio controls>
+                <source src="@c.UrlArchivo" type="audio/mpeg">
+                Tu navegador no soporta el elemento de audio.
+            </audio>
+        </div>
+    }
+</div>

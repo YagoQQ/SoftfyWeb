@@ -208,26 +208,6 @@ namespace SoftfyWeb.Controllers
 
             return Ok(perfilArtista); 
         }
-
-        [HttpGet("{id}/playlists")]
-        public IActionResult ObtenerPlaylistsDelArtista(String id)
-        {
-            var playlists = _context.Playlists
-                .Where(c => c.Usuario.Id == id)
-                .Select(c => new
-                {
-                    c.Id,
-                    c.Nombre,
-                    c.Usuario,
-                    c.PlaylistCanciones
-                })
-                .ToList();
-
-            if (!playlists.Any())
-                return NotFound("No hay canciones para este artista.");
-
-            return Ok(playlists);
-        }
-
+        
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SoftfyWeb.Modelos;
 using SoftfyWeb.Modelos.Dtos;
 using SoftfyWeb.Models;
 using System.Diagnostics;
@@ -214,5 +216,63 @@ namespace SoftfyWeb.Controllers
 
             return View(dto);
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> PlaylistPorArtista(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                ViewBag.Mensaje = "No se pudo obtener el correo del artista.";
+                return View(new List<PlaylistDto>());
+            }
+
+            var client = ObtenerClienteConToken();
+            var response = await client.GetAsync($"playlists/correo/{email}/playlists");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.Mensaje = "No se pudieron obtener las playlists del artista.";
+                return View(new List<PlaylistDto>());
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            var playlists = JsonSerializer.Deserialize<List<PlaylistDto>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            ViewBag.Email = email;
+            return View(playlists);
+        }
+
+        public async Task<IActionResult> CancionesPublicasPorArtistaPlaylist(int id)
+        {
+            var client = ObtenerClienteConToken();
+            var resp = await client.GetAsync($"playlists/{id}/canciones");
+            if (!resp.IsSuccessStatusCode)
+                return View("Error", CrearErrorModel());
+
+            var raw = await resp.Content.ReadAsStringAsync();
+            var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var cancionesPlaylist = JsonSerializer.Deserialize<List<PlaylistCancionDto>>(raw, opciones);
+
+            cancionesPlaylist = cancionesPlaylist.Where(c => !string.IsNullOrWhiteSpace(c.UrlArchivo)).ToList();
+
+            var respArtista = await client.GetAsync("canciones/mis-canciones");
+            List<CancionDto> cancionesArtista = new();
+            if (respArtista.IsSuccessStatusCode)
+            {
+                var rawArtista = await respArtista.Content.ReadAsStringAsync();
+                cancionesArtista = JsonSerializer.Deserialize<List<CancionDto>>(rawArtista, opciones);
+            }
+
+            ViewBag.PlaylistId = id;
+            ViewBag.CancionesArtista = cancionesArtista;
+
+            return View(cancionesPlaylist);
+        }
+
+
     }
 }

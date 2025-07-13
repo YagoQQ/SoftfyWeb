@@ -1,6 +1,6 @@
 .container {
     padding: 2rem;
-    max-width: 1400px; /* Hacerlo más ancho */
+    max-width: 1400px;
     margin: 0 auto;
 }
 
@@ -108,11 +108,3 @@ input.volume {
     .download-btn:hover {
         background-color: #b71c1c;
     }
-
-.download-btn {
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
-    padding: 6px 8px;
-    font-size: 16px;
-}

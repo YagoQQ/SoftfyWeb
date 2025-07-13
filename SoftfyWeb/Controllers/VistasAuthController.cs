@@ -307,6 +307,28 @@ namespace SoftfyWeb.Controllers
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
 
+            var artistas = new List<Artista>();
+            var respArtistas = await client.GetAsync("https://localhost:7003/api/Artistas");
+
+            if (respArtistas.IsSuccessStatusCode)
+            {
+                var artistasJson = await respArtistas.Content.ReadAsStringAsync();
+                artistas = JsonSerializer.Deserialize<List<Artista>>(artistasJson, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                foreach (var artista in artistas)
+                {
+                    if (!string.IsNullOrEmpty(artista.FotoUrl))
+                    {
+                        artista.FotoUrl = $"https://localhost:7003/api/artistas/foto/{artista.FotoUrl}";
+                    }
+                }
+
+                ViewBag.Artistas = artistas;
+            }
+
             ViewBag.TodasCanciones = canciones;
             ViewBag.TodasPlaylists = playlists;
 

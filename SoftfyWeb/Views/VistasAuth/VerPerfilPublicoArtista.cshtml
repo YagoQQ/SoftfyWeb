@@ -1,11 +1,55 @@
-﻿<h1>@ViewBag.NombreArtistico</h1>
+﻿@{
+    ViewData["Title"] = "Perfil público";
+    string artistaId = ViewBag.ArtistaId as string;
+}
+
+<style>
+    .artist-profile {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .artist-photo {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #007bff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .view-playlists-btn {
+        margin-top: 15px;
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white;
+        font-weight: bold;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+    }
+
+        .view-playlists-btn:hover {
+            background-color: #218838;
+            text-decoration: none;
+            color: white;
+        }
+</style>
+
+<h1>@ViewBag.NombreArtistico</h1>
 
 <div class="artist-profile">
-
     <img src="@ViewBag.FotoUrl" alt="@ViewBag.NombreArtistico" class="artist-photo" />
 
-    <p><strong>Biografía:</strong> @ViewBag.Biografia</p>
-    <p><strong>Email:</strong> @ViewBag.Email</p>
+    <div>
+        <p><strong>Biografía:</strong> @ViewBag.Biografia</p>
+        <p><strong>Email:</strong> @ViewBag.Email</p>
+
+        <a asp-controller="VistasPlaylists" asp-action="PlaylistPorArtista" asp-route-email="@ViewBag.Email" class="btn btn-primary">Ver Playlists</a>
+    </div>
 </div>
 
 <h2>Canciones de @ViewBag.NombreArtistico</h2>
@@ -14,17 +58,17 @@
 {
     var canciones = ViewBag.Canciones as List<SoftfyWeb.Modelos.Dtos.CancionDto>;
 
-    @if (canciones != null && canciones.Count > 0)
+    if (canciones != null && canciones.Count > 0)
     {
         <ul>
             @foreach (var cancion in canciones)
             {
                 <li>
                     <strong>@cancion.Titulo</strong>
-                    <br>
+                    <br />
                     <audio controls>
                         <source src="@cancion.UrlArchivo" type="audio/mpeg">
-                        Your browser does not support the audio element.
+                        Tu navegador no soporta el elemento de audio.
                     </audio>
                 </li>
             }
@@ -39,4 +83,3 @@ else
 {
     <p>No se pudieron obtener canciones para este artista.</p>
 }
-
