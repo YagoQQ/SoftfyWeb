@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Softfy.API.Services;
 using SoftfyWeb.Data;
 using SoftfyWeb.Dtos;
 using SoftfyWeb.Modelos;
-using System.Security.Claims;
 using SoftfyWeb.Services;
-using CloudinaryDotNet.Actions;
+using System.Security.Claims;
 
 namespace SoftfyWeb.Controllers
 {
@@ -16,11 +17,15 @@ namespace SoftfyWeb.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly AudioService _audioService;
+        private readonly IConfiguration _configuration;
+        private readonly Cloudinary _cloudinary;
 
-        public CancionesController(ApplicationDbContext context, AudioService audioService)
+        public CancionesController(ApplicationDbContext context, AudioService audioService, IConfiguration configuration, Cloudinary cloudinary)
         {
             _context = context;
             _audioService = audioService;
+            _configuration = configuration;
+            _cloudinary = cloudinary;
         }
 
         [HttpPost("crear")]
@@ -89,6 +94,70 @@ namespace SoftfyWeb.Controllers
                 .ToList();
 
             return Ok(canciones);
+        }
+
+
+        [HttpGet("estadisticas")]
+        [Authorize(Roles = "Artista")]
+        public async Task<IActionResult> Estadisticas()
+        {
+            var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var artista = _context.Artistas.FirstOrDefault(a => a.UsuarioId == usuarioId);
+            if (artista == null)
+                return NotFound("No se encontró el perfil del artista.");
+
+            var canciones = _context.Canciones
+                .Where(c => c.ArtistaId == artista.Id)
+                .ToList();
+
+            var stats = new List<object>();
+            foreach (var cancion in canciones)
+            {
+                var publicId = ObtenerPublicIdDesdeUrl(cancion.UrlArchivo);
+
+                var result = await _cloudinary.GetResourceAsync(new GetResourceParams(publicId)
+                {
+                    ResourceType = ResourceType.Raw
+                });
+
+                stats.Add(new
+                {
+                    cancion.Titulo,
+                    cancion.Genero,
+                    cancion.FechaLanzamiento,
+                    result.Bytes,
+                    result.Format,
+                    result.CreatedAt
+                });
+            }
+
+            return Ok(stats);
+        }
+
+
+        private string ObtenerPublicIdDesdeUrl(string url)
+        {
+            var uri = new Uri(url);
+            var path = uri.AbsolutePath;
+
+            var uploadIndex = path.IndexOf("/upload/");
+            if (uploadIndex < 0)
+                return null;
+
+            var afterUpload = path.Substring(uploadIndex + "/upload/".Length);
+
+            var parts = afterUpload.Split('/', 2);
+            if (parts.Length == 2 && parts[0].StartsWith("v") && long.TryParse(parts[0].Substring(1), out _))
+                return parts[1];
+
+            return afterUpload;
+        }
+
+        [HttpGet("ver-public-id")]
+        public IActionResult VerPublicId([FromQuery] string url)
+        {
+            var publicId = ObtenerPublicIdDesdeUrl(url);
+            return Ok(new { publicId });
         }
 
         [HttpGet("canciones")]

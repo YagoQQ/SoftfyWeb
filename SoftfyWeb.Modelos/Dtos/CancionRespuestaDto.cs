@@ -13,8 +13,12 @@ namespace SoftfyWeb.Modelos.Dtos
         public string? Genero { get; set; }
         public DateTime FechaLanzamiento { get; set; }
         public string? UrlArchivo { get; set; }
+        public double DuracionSegundos { get; set; }
+        public double TamanoMB { get; set; }
+        public string? Formato { get; set; }
+        public string? PublicId { get; set; }
 
-        public ArtistaDto Artista { get; set; }
+        public ArtistaDto? Artista { get; set; }
     }
 
 }

@@ -30,37 +30,41 @@ namespace SoftfyWeb.Services
 
         public async Task EliminarArchivoAsync(string url)
         {
+            if (string.IsNullOrEmpty(url))
+                return;
+
             var publicId = ObtenerPublicIdDesdeUrl(url);
-            if (publicId == null) return;
+
+            if (string.IsNullOrEmpty(publicId))
+                throw new Exception("No se pudo extraer el Public ID desde la URL.");
 
             var deletionParams = new DeletionParams(publicId)
             {
-                ResourceType = ResourceType.Raw
+                ResourceType = ResourceType.Raw // si subiste archivos .mp3
             };
 
-            await _cloudinary.DestroyAsync(deletionParams);
+            var resultado = await _cloudinary.DestroyAsync(deletionParams);
+
+            if (resultado.Result != "ok")
+                throw new Exception($"Error desde Cloudinary: {resultado.Error?.Message}");
         }
 
-        private string? ObtenerPublicIdDesdeUrl(string url)
+        private string ObtenerPublicIdDesdeUrl(string url)
         {
-            try
-            {
-                var uri = new Uri(url);
-                var partes = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            var uri = new Uri(url);
+            var path = uri.AbsolutePath;
 
-                var indexUpload = Array.IndexOf(partes, "upload");
-                if (indexUpload == -1 || indexUpload + 1 >= partes.Length)
-                    return null;
-
-                var partesId = partes.Skip(indexUpload + 1).ToArray();
-                var nombreConExtension = Path.Combine(partesId);
-                var extension = Path.GetExtension(nombreConExtension);
-                return nombreConExtension.Replace(extension, "").Replace("\\", "/");
-            }
-            catch
-            {
+            var uploadIndex = path.IndexOf("/upload/");
+            if (uploadIndex < 0)
                 return null;
-            }
+
+            var afterUpload = path.Substring(uploadIndex + "/upload/".Length);
+
+            var parts = afterUpload.Split('/', 2);
+            if (parts.Length == 2 && parts[0].StartsWith("v") && long.TryParse(parts[0].Substring(1), out _))
+                return parts[1];
+
+            return afterUpload;
         }
     }
 }
