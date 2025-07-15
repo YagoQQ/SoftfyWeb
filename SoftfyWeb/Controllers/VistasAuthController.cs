@@ -241,27 +241,50 @@ namespace SoftfyWeb.Controllers
         [Authorize(Roles = "Artista")]
         public async Task<IActionResult> BienvenidoArtista()
         {
-            var nombreArtistico = User.Identity.Name;
-            try
-            {
-                var client = ObtenerClienteConToken();
-                var resp = await client.GetAsync("artistas/mi-perfil");
-                if (resp.IsSuccessStatusCode)
+            var client = ObtenerClienteConToken();
+            string nombreArtistico = User.Identity?.Name ?? "Artista";
+            ViewBag.Canciones = new List<CancionDto>();
+            ViewBag.Playlists = new List<PlaylistDto>();
+
+
+                var respPerfil = await client.GetAsync("artistas/mi-perfil");
+                if (respPerfil.IsSuccessStatusCode)
                 {
-                    var raw = await resp.Content.ReadAsStringAsync();
-                    var perfil = JsonSerializer.Deserialize<PerfilArtistaDto>(raw,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (perfil != null)
+                    var raw = await respPerfil.Content.ReadAsStringAsync();
+                    var perfil = JsonSerializer.Deserialize<PerfilArtistaDto>(raw, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    if (perfil is not null)
                         nombreArtistico = perfil.NombreArtistico;
                 }
-            }
-            catch
-            {
-                // opcional: loguear el error
-            }
+
+                var respCanciones = await client.GetAsync("canciones/mis-canciones");
+                if (respCanciones.IsSuccessStatusCode)
+                {
+                    var raw = await respCanciones.Content.ReadAsStringAsync();
+                    var canciones = JsonSerializer.Deserialize<List<CancionDto>>(raw, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    ViewBag.Canciones = canciones ?? new List<CancionDto>();
+                }
+
+                var respPlaylists = await client.GetAsync("playlists/mis-playlists");
+                if (respPlaylists.IsSuccessStatusCode)
+                {
+                    var raw = await respPlaylists.Content.ReadAsStringAsync();
+                    var playlists = JsonSerializer.Deserialize<List<PlaylistDto>>(raw, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    ViewBag.Playlists = playlists ?? new List<PlaylistDto>();
+                }            
+
             ViewBag.ArtistaNombre = nombreArtistico;
             return View();
         }
+
 
         public async Task<IActionResult> BienvenidoOyente()
         {
@@ -596,7 +619,6 @@ namespace SoftfyWeb.Controllers
 
             return View("VerPerfilPublicoArtista");
         }
-
     }
 
 }

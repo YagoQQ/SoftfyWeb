@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Guardar Canción en Playlist";
+}
+
+<h3>Guardar Canción en Playlist</h3>
+
+@if (ViewBag.Playlists == null || !ViewBag.Playlists.Any())
+{
+    <p>No tienes playlists disponibles para guardar esta canción.</p>
+}
+else
+{
+    <form asp-action="AgregarACancion" method="post">
+        <input type="hidden" name="cancionId" value="@ViewBag.CancionId" />
+
+        <div class="form-group">
+            <label for="playlistId">Selecciona una Playlist</label>
+            <select id="playlistId" name="playlistId" class="form-control">
+                @foreach (var playlist in ViewBag.Playlists)
+                {
+                    <option value="@playlist.Id">@playlist.Nombre</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar Canción</button>
+    </form>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mt-3">@TempData["Error"]</div>
+}

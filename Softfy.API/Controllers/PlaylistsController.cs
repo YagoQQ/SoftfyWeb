@@ -39,7 +39,7 @@ namespace SoftfyWeb.Controllers
 
             return Ok(new { mensaje = "Playlist creada", playlistId = playlist.Id });
         }
-        [Authorize(Roles = "OyentePremium,Artista")]
+        [Authorize(Roles = "OyentePremium,Artista, Oyente")]
         [HttpGet("mis-playlists")]
         public async Task<IActionResult> ObtenerPlaylists()
         {

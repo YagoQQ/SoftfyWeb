@@ -12,7 +12,7 @@
         <div class="canciones-container">
             @foreach (var cancion in ViewBag.TodasCanciones)
             {
-                <div class="cancion-item">
+                <div class="cancion-item">                    
                     <p><strong>@cancion.Titulo</strong></p>
                     <p><em>@cancion.Artista?.NombreArtistico</em></p>
                     <p><em>@cancion.Genero</em></p>

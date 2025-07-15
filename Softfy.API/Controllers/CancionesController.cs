@@ -45,7 +45,6 @@ namespace SoftfyWeb.Controllers
             if (extension != ".mp3" && extension != ".wav")
                 return BadRequest("Solo se permiten archivos .mp3 y .wav.");
 
-            // Subir a Cloudinary
             RawUploadResult uploadResult;
             try
             {
@@ -153,12 +152,6 @@ namespace SoftfyWeb.Controllers
             return afterUpload;
         }
 
-        [HttpGet("ver-public-id")]
-        public IActionResult VerPublicId([FromQuery] string url)
-        {
-            var publicId = ObtenerPublicIdDesdeUrl(url);
-            return Ok(new { publicId });
-        }
 
         [HttpGet("canciones")]
         [AllowAnonymous]

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SoftfyWeb.Modelos;
 using SoftfyWeb.Modelos.Dtos;
 using SoftfyWeb.Models;
@@ -39,7 +40,7 @@ namespace SoftfyWeb.Controllers
             return new ErrorViewModel { RequestId = id };
         }
 
-        [Authorize(Roles = "OyentePremium,Artista,Admin")]
+        //[Authorize(Roles = "OyentePremium,Artista,Admin,Oyente")]
         public async Task<IActionResult> Index()
         {
             var client = ObtenerClienteConToken();
@@ -143,25 +144,17 @@ namespace SoftfyWeb.Controllers
             return View("Error", CrearErrorModel());
         }
 
-        [HttpPost, Authorize(Roles = "OyentePremium,Artista,Admin"), ValidateAntiForgeryToken]
+        [HttpPost, Authorize(Roles = "Artista,Admin"), ValidateAntiForgeryToken]
         public async Task<IActionResult> AgregarCancion(int playlistId, int cancionId)
         {
             var client = ObtenerClienteConToken();
-
-            // Llamamos al endpoint de la API que añade la canción a la playlist
             var resp = await client.PostAsync($"playlists/{playlistId}/agregar/{cancionId}", null);
-
-            if (resp.IsSuccessStatusCode)
-            {
-                // Redirigimos al detalle para recargar la lista
+            if (resp.IsSuccessStatusCode)            {
                 return RedirectToAction(nameof(Detalle), new { id = playlistId });
             }
-
             TempData["Error"] = "No se pudo agregar la canción. Intenta de nuevo.";
             return RedirectToAction(nameof(Detalle), new { id = playlistId });
         }
-
-
 
         [HttpPost, Authorize]
         public async Task<IActionResult> QuitarMeGusta(int cancionId)
@@ -185,7 +178,7 @@ namespace SoftfyWeb.Controllers
             return View("Error", CrearErrorModel());
         }
 
-        [Authorize(Roles = "OyentePremium,Artista")]
+        [Authorize(Roles = "OyentePremium,Artista,Oyente")]
         public async Task<IActionResult> MeGusta()
         {
             var client = ObtenerClienteConToken();
@@ -193,7 +186,6 @@ namespace SoftfyWeb.Controllers
 
             if (resp.StatusCode == HttpStatusCode.NotFound)
             {
-                // Nada en Me Gusta: devolvemos la vista con lista vacía y mensaje
                 ViewBag.Message = "No tienes canciones marcadas como Me Gusta.";
                 var emptyDto = new MeGustaRespuestaDto
                 {
@@ -206,7 +198,6 @@ namespace SoftfyWeb.Controllers
 
             if (!resp.IsSuccessStatusCode)
             {
-                // Otros errores
                 return View("Error", CrearErrorModel());
             }
 
@@ -273,6 +264,53 @@ namespace SoftfyWeb.Controllers
             return View(cancionesPlaylist);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GuardarCancion(int cancionId)
+        {
+            var client = ObtenerClienteConToken();
+            var response = await client.GetAsync("Playlists/mis-playlists");
+
+            if (!response.IsSuccessStatusCode)
+                return View("Error", CrearErrorModel());
+
+            var raw = await response.Content.ReadAsStringAsync();
+            var playlists = JsonSerializer.Deserialize<List<PlaylistDto>>(raw);
+
+            if (playlists == null || playlists.Count == 0)
+            {
+                TempData["Error"] = "No tienes playlists disponibles.";
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.Playlists = playlists;
+            ViewBag.CancionId = cancionId;
+
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> AgregarACancion(int playlistId, int cancionId)
+        {
+            if (playlistId == 0)
+            {
+                TempData["Error"] = "Debes seleccionar una playlist.";
+                return RedirectToAction("GuardarCancion", new { cancionId });
+            }
+
+            var client = ObtenerClienteConToken();
+            var response = await client.PostAsync($"playlists/{playlistId}/agregar/{cancionId}", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Detalle", new { id = playlistId });
+            }
+            else
+            {
+                TempData["Error"] = "No se pudo agregar la canción a la playlist.";
+                return RedirectToAction("GuardarCancion", new { cancionId });
+            }
+        }
 
     }
 }

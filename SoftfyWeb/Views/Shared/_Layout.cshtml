@@ -94,10 +94,15 @@
                 <a asp-controller="VistasAuth" asp-action="BienvenidoOyente">Inicio</a>
                 <a asp-controller="VistasCanciones" asp-action="Index">Explorar Canciones</a>
                 <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
+                <a asp-controller="VistasPlaylists" asp-action="MeGusta">Explorar</a>
             }
             else if (User.IsInRole("OyentePremium"))
             {
+                <a asp-controller="VistasAuth" asp-action="BienvenidoOyente">Inicio</a>
                 <a asp-controller="VistasCanciones" asp-action="Index">Explorar Canciones</a>
+                <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
+                <a asp-controller="VistasCanciones" asp-action="Index">Explorar Canciones</a>
+                <a asp-controller="VistasPlaylists" asp-action="MeGusta">Explorar</a>
             }
             else if (User.IsInRole("Artista"))
             {

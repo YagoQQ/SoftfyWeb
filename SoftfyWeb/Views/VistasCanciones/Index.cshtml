@@ -5,60 +5,46 @@
 
 <h2>@ViewData["Title"]</h2>
 
-<style>
-    .cuadro-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.5rem;
-        justify-content: center;
-        margin-top: 1.5rem;
-    }
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Género</th>
+            <th>Fecha Lanzamiento</th>
+            <th>Reproducir</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Titulo</td>
+                <td>@c.Genero</td>
+                <td>@c.FechaLanzamiento.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <audio controls>
+                        <source src="@c.UrlArchivo" type="audio/mpeg">
+                        Tu navegador no soporta el elemento de audio.
+                    </audio>
+                </td>
+                <td>
+                    <form asp-controller="VistasPlaylists" asp-action="DarMeGusta" method="post" class="d-inline">
+                        <input type="hidden" name="cancionId" value="@c.Id" />
+                        <button type="submit" class="btn btn-sm btn-primary"
+                                onclick="return confirm('¿Agregar esta canción a Me Gusta?');">
+                            Me Gusta
+                        </button>
+                    </form>
 
-    .cuadro-cancion {
-        background-color: #fff;
-        border-radius: 12px;
-        padding: 1rem 1.5rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        width: 300px;
-        font-family: 'Segoe UI', sans-serif;
-        text-align: center;
-        transition: transform 0.2s ease;
-    }
-
-        .cuadro-cancion:hover {
-            transform: translateY(-5px);
+                    <form asp-controller="VistasPlaylists" asp-action="GuardarCancion" method="get" class="d-inline" style="margin-left: 10px;">
+                        <input type="hidden" name="cancionId" value="@c.Id" />
+                        <button type="submit" class="btn btn-sm btn-success">
+                            Guardar canción
+                        </button>
+                    </form>
+                </td>
+            </tr>
         }
-
-        .cuadro-cancion h4 {
-            font-size: 18px;
-            color: #111;
-            margin-bottom: 0.5rem;
-        }
-
-        .cuadro-cancion p {
-            font-size: 14px;
-            color: #555;
-            margin: 0.25rem 0;
-        }
-
-        .cuadro-cancion audio {
-            margin-top: 0.5rem;
-            width: 100%;
-        }
-</style>
-
-<div class="cuadro-container">
-    @foreach (var c in Model)
-    {
-        <div class="cuadro-cancion">
-            <h4>@c.Titulo</h4>
-            <p><strong>Género:</strong> @c.Genero</p>
-            <p><strong>Artista:</strong> @c.Artista.NombreArtistico</p>
-            <p><strong>Lanzamiento:</strong> @c.FechaLanzamiento.ToString("yyyy-MM-dd")</p>
-            <audio controls>
-                <source src="@c.UrlArchivo" type="audio/mpeg">
-                Tu navegador no soporta el elemento de audio.
-            </audio>
-        </div>
-    }
-</div>
+    </tbody>
+</table>
