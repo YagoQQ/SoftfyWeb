@@ -1,4 +1,4 @@
-﻿@model List<SoftfyWeb.Modelos.Dtos.CancionRespuestaDto>
+﻿@model List<SoftfyWeb.Modelos.Dtos.CancionDto>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -79,6 +79,10 @@
                                     <source src="@cancion.UrlArchivo" type="audio/mpeg">
                                     Tu navegador no soporta el elemento de audio.
                                 </audio>
+                            </div>
+
+                            <div class="mt-3 text-end">
+                                <a asp-action="EditarCancion" asp-route-id="@cancion.Id" class="btn btn-outline-light btn-sm">Editar</a>
                             </div>
                         </div>
                     </div>

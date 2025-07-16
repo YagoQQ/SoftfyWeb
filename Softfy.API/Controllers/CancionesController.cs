@@ -6,6 +6,7 @@ using Softfy.API.Services;
 using SoftfyWeb.Data;
 using SoftfyWeb.Dtos;
 using SoftfyWeb.Modelos;
+using SoftfyWeb.Modelos.Dtos;
 using SoftfyWeb.Services;
 using System.Security.Claims;
 
@@ -227,5 +228,76 @@ namespace SoftfyWeb.Controllers
                 return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
+
+        [HttpPut("editar/{id}")]
+        [Authorize(Roles = "Admin,Artista")]
+        public async Task<IActionResult> EditarCancion(int id, [FromForm] CancionCrearDto song, IFormFile? nuevoArchivo)
+        {
+            var cancion = await _context.Canciones.FindAsync(id);
+
+            if (cancion == null)
+                return NotFound("Canción no encontrada.");
+
+            var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var artista = _context.Artistas.FirstOrDefault(a => a.UsuarioId == usuarioId);
+
+            if (!User.IsInRole("Admin") && (artista == null || cancion.ArtistaId != artista.Id))
+                return Forbid("No tiene permisos para editar esta canción.");
+
+            // Lógica para actualizar la canción
+            if (nuevoArchivo != null)
+            {
+                var extension = Path.GetExtension(nuevoArchivo.FileName).ToLower();
+                if (extension != ".mp3" && extension != ".wav")
+                    return BadRequest("Solo se permiten archivos .mp3 y .wav.");
+
+                try
+                {
+                    await _audioService.EliminarArchivoAsync(cancion.UrlArchivo);
+                    var nuevoUpload = await _audioService.SubirAudioCloudinaryAsync(nuevoArchivo);
+                    cancion.UrlArchivo = nuevoUpload.SecureUrl.ToString();
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Error al actualizar el archivo: {ex.Message}");
+                }
+            }
+
+            cancion.Titulo = song.Titulo;
+            cancion.Genero = song.Genero;
+            cancion.FechaLanzamiento = DateTime.SpecifyKind(song.FechaLanzamiento, DateTimeKind.Utc);
+
+            try
+            {
+                _context.Canciones.Update(cancion);
+                await _context.SaveChangesAsync();
+                return Ok(new { mensaje = "Canción actualizada correctamente", url = cancion.UrlArchivo });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al guardar cambios: {ex.Message}");
+            }
+        }
+
+        [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Artista")]
+        public async Task<IActionResult> ObtenerCancionPorId(int id)
+        {
+            var cancion = await _context.Canciones.FindAsync(id);
+
+            if (cancion == null)
+                return NotFound("Canción no encontrada.");
+            var respuesta = new CancionDto
+            {
+                Id = cancion.Id,
+                Titulo = cancion.Titulo,
+                Genero = cancion.Genero,
+                FechaLanzamiento = cancion.FechaLanzamiento,
+                UrlArchivo = cancion.UrlArchivo
+            };
+
+            return Ok(respuesta);
+        }
+
     }
 }
