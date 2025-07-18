@@ -10,7 +10,7 @@ namespace SoftfyWeb.Dtos
         public string Apellido { get; set; }
 
         [Required(ErrorMessage = "El nombre artístico es obligatorio.")]
-        public string NombreArtistico { get; set; }  // Ahora es obligatorio
+        public string NombreArtistico { get; set; }
         public string? Biografia { get; set; }
         public string? FotoUrl { get; set; }
     }

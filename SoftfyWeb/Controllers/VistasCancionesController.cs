@@ -192,6 +192,46 @@ namespace SoftfyWeb.Controllers
             return RedirectToAction("MisCanciones");  // Redirigir a la página de Mis Canciones
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> VerCanciones(int id)
+        {
+            var client = ObtenerClienteConToken();
 
+            var cancionesResponse = await client.GetAsync($"https://localhost:7003/api/playlists/{id}/canciones");
+
+            var playlistResponse = await client.GetAsync($"https://localhost:7003/api/Playlists/{id}");
+
+            if (!cancionesResponse.IsSuccessStatusCode || !playlistResponse.IsSuccessStatusCode)
+            {
+                ViewBag.Error = "No se pudieron obtener las canciones de la playlist o los detalles del álbum.";
+                return View(new List<Cancion>());
+            }
+            var cancionesContenido = await cancionesResponse.Content.ReadAsStringAsync();
+            var canciones = System.Text.Json.JsonSerializer.Deserialize<List<Cancion>>(cancionesContenido,
+                new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            var playlistContenido = await playlistResponse.Content.ReadAsStringAsync();
+            var playlist = System.Text.Json.JsonSerializer.Deserialize<Playlist>(playlistContenido, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (canciones == null || playlist == null)
+            {
+                ViewBag.Error = "No se encontraron canciones o la playlist no existe.";
+                return View(new List<Cancion>());
+            }
+
+            ViewBag.PlaylistNombre= playlist.Nombre;
+            ViewBag.PlaylistId = id;
+
+            foreach (var cancion in canciones)
+            {
+                if (string.IsNullOrWhiteSpace(cancion.UrlArchivo))
+                {
+                    cancion.UrlArchivo = "#";
+                }
+            }
+
+            return View("VerCanciones", canciones);
+        }
     }
 }

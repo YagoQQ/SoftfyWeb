@@ -433,6 +433,7 @@ namespace SoftfyWeb.Controllers
 
             var cancionesResponse = await client.GetAsync($"https://localhost:7003/api/Canciones/canciones/nombre?nombre={termino}");
             var artistasResponse = await client.GetAsync($"https://localhost:7003/api/Artistas/artista/{termino}/perfil");
+            var playlistsResponse = await client.GetAsync($"https://localhost:7003/api/Playlists/buscar/{termino}");
 
             if (cancionesResponse.IsSuccessStatusCode)
             {
@@ -449,6 +450,23 @@ namespace SoftfyWeb.Controllers
                 }
             }
 
+            // Verificar la respuesta de las playlists y deserializar correctamente
+            if (playlistsResponse.IsSuccessStatusCode)
+            {
+                var playlistsJson = await playlistsResponse.Content.ReadAsStringAsync();
+                var playlists = JsonSerializer.Deserialize<List<Playlist>>(playlistsJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                if (playlists != null && playlists.Any())
+                {
+                    ViewBag.Playlists = playlists;
+                }
+                else
+                {
+                    ViewBag.Error = "No se encontraron playlists.";
+                }
+            }
+
+            // Verificar la respuesta del artista
             if (artistasResponse.IsSuccessStatusCode)
             {
                 var artistasJson = await artistasResponse.Content.ReadAsStringAsync();

@@ -73,7 +73,10 @@ namespace SoftfyWeb.Controllers
             {
                 pc.Cancion.Id,
                 pc.Cancion.Titulo,
-                pc.Cancion.UrlArchivo
+                pc.Cancion.UrlArchivo,
+                pc.Cancion.Genero,
+                pc.Cancion.FechaLanzamiento,
+
             }).ToList();
 
             return Ok(canciones);
@@ -342,6 +345,39 @@ namespace SoftfyWeb.Controllers
                 .ToList();
 
             return Ok(playlists);
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult<Playlist> GetPlaylist(int id)
+        {
+            // Buscar la playlist por id
+            var playlist = _context.Playlists
+                .Where(p => p.Id == id)
+                .FirstOrDefault();
+
+            // Verificar si la playlist existe
+            if (playlist == null)
+            {
+                return NotFound(new { message = "La playlist no existe." });
+            }
+
+            // Retornar el modelo directamente
+            return Ok(playlist);
+        }
+
+        [HttpGet("buscar/{nombre}")]
+        public ActionResult<Playlist> GetPlaylistByName(string nombre)
+        {
+            var playlist = _context.Playlists
+                .Where(p => p.Nombre.ToLower() == nombre.ToLower()) 
+                .FirstOrDefault();
+
+            if (playlist == null)
+            {
+                return NotFound(new { message = "La playlist no existe." });
+            }
+
+            return Ok(playlist);
         }
 
     }

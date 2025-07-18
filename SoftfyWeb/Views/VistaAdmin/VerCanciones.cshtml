@@ -1,17 +1,12 @@
 ﻿@model IEnumerable<SoftfyWeb.Modelos.Dtos.PlaylistCancionDto>
 
+
 @{
     ViewData["Title"] = "Ver Playlist";
     var playlistId = ViewBag.PlaylistId as int?;
-    var nombrePlaylist = ViewBag.NombrePlaylist as string ?? "Playlist";
 }
 
 <div class="container mt-4">
-    <h2>
-        <a asp-action="VerPlaylist" asp-route-id="@playlistId" class="text-decoration-none">
-            🎵 @nombrePlaylist
-        </a>
-    </h2>
 
     @if (!Model.Any())
     {

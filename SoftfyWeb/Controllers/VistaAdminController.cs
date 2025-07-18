@@ -186,6 +186,7 @@ namespace SoftfyWeb.Controllers
                 }
             }
 
+
             ViewBag.PlaylistId = id;
             return View("VerCanciones", canciones);
         }

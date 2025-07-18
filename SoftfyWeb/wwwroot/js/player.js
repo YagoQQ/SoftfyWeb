@@ -20,20 +20,20 @@
         let isDragging = false;
         let isReady = false;
 
-        console.log(`Configurando audio ${audioId}`);
+        console.log(Configurando audio ${ audioId });
 
         audio.preload = 'metadata';
 
         audio.addEventListener('loadedmetadata', () => {
             isReady = true;
-            console.log(`${audioId} metadata cargada. Duración: ${audio.duration}`);
+            console.log(${ audioId } metadata cargada.Duración: ${ audio.duration });
 
             if (progress) {
                 progress.max = audio.duration;
                 progress.value = 0;
             }
             if (timeLabel) {
-                timeLabel.textContent = `0:00 / ${formatTime(audio.duration)}`;
+                timeLabel.textContent = 0:00 / ${ formatTime(audio.duration) };
             }
         });
 
@@ -41,13 +41,13 @@
             if (progress && isReady && !isDragging) {
                 progress.value = audio.currentTime;
                 if (timeLabel) {
-                    timeLabel.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+                    timeLabel.textContent = ${ formatTime(audio.currentTime) } / ${formatTime(audio.duration)};
                 }
             }
         });
 
         if (playBtn) playBtn.addEventListener('click', () => {
-            if (!isReady) return console.warn(`${audioId} no está listo para reproducir`);
+            if (!isReady) return console.warn(${ audioId } no está listo para reproducir);
             document.querySelectorAll('audio').forEach(other => {
                 if (other !== audio) other.pause();
             });
@@ -56,13 +56,13 @@
         });
 
         if (backBtn) backBtn.addEventListener('click', () => {
-            if (!isReady) return console.warn(`${audioId} no listo para retroceder`);
+            if (!isReady) return console.warn(${ audioId } no está listo para retroceder);
             audio.currentTime = Math.max(0, audio.currentTime - 10);
             progress.value = audio.currentTime;
         });
 
         if (fwdBtn) fwdBtn.addEventListener('click', () => {
-            if (!isReady) return console.warn(`${audioId} no listo para adelantar`);
+            if (!isReady) return console.warn(${ audioId } no está listo para adelantar);
             audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
             progress.value = audio.currentTime;
         });
@@ -76,7 +76,7 @@
             });
             progress.addEventListener('input', () => {
                 if (timeLabel && isDragging) {
-                    timeLabel.textContent = `${formatTime(progress.value)} / ${formatTime(audio.duration || 0)}`;
+                    timeLabel.textContent = ${ formatTime(progress.value) } / ${formatTime(audio.duration || 0)};
                 }
             });
         }
@@ -97,7 +97,5 @@
 function formatTime(seconds) {
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
+    return ${ m }:${ s.toString().padStart(2, '0') };
 }
-
-

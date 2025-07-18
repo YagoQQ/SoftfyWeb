@@ -298,6 +298,5 @@ namespace SoftfyWeb.Controllers
 
             return Ok(respuesta);
         }
-
     }
 }
