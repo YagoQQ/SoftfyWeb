@@ -264,52 +264,45 @@ namespace SoftfyWeb.Controllers
             return View(cancionesPlaylist);
         }
 
+
         [HttpGet]
-        public async Task<IActionResult> GuardarCancion(int cancionId)
+        public async Task<IActionResult> GuardarEnPlaylist(int cancionId)
         {
-            var client = ObtenerClienteConToken();
-            var response = await client.GetAsync("Playlists/mis-playlists");
+            var client = ObtenerClienteConToken(); 
+            var response = await client.GetAsync("https://localhost:7003/api/Playlists/mis-playlists");
 
-            if (!response.IsSuccessStatusCode)
-                return View("Error", CrearErrorModel());
-
-            var raw = await response.Content.ReadAsStringAsync();
-            var playlists = JsonSerializer.Deserialize<List<PlaylistDto>>(raw);
-
-            if (playlists == null || playlists.Count == 0)
+            if (response.IsSuccessStatusCode)
             {
-                TempData["Error"] = "No tienes playlists disponibles.";
-                return RedirectToAction("Index");
+                var playlistsJson = await response.Content.ReadAsStringAsync();
+                var playlists = JsonSerializer.Deserialize<List<PlaylistDto>>(playlistsJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                if (playlists != null)
+                {
+                    ViewBag.Playlists = playlists; 
+                    ViewBag.CancionId = cancionId; 
+                    return View();
+                }
             }
 
-            ViewBag.Playlists = playlists;
-            ViewBag.CancionId = cancionId;
-
+            ViewBag.Error = "No se pudieron cargar las playlists.";
             return View();
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> AgregarACancion(int playlistId, int cancionId)
-        {
-            if (playlistId == 0)
-            {
-                TempData["Error"] = "Debes seleccionar una playlist.";
-                return RedirectToAction("GuardarCancion", new { cancionId });
-            }
 
-            var client = ObtenerClienteConToken();
-            var response = await client.PostAsync($"playlists/{playlistId}/agregar/{cancionId}", null);
+        [HttpPost]
+        public async Task<IActionResult> GuardarEnPlaylist(int cancionId, int playlistId)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var response = await client.PostAsync($"https://localhost:7003/api/Playlists/guardar/{playlistId}/cancion/{cancionId}", null);
 
             if (response.IsSuccessStatusCode)
             {
-                return RedirectToAction("Detalle", new { id = playlistId });
+                return RedirectToAction("Index", "Home"); 
             }
-            else
-            {
-                TempData["Error"] = "No se pudo agregar la canción a la playlist.";
-                return RedirectToAction("GuardarCancion", new { cancionId });
-            }
+
+            ViewBag.Error = "No se pudo agregar la canción a la playlist.";
+            return View();
         }
 
     }

@@ -1,27 +1,9 @@
-.container {
-    padding: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.section {
-    margin-top: 2rem;
-}
-
-.canciones-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    justify-content: center;
-}
-
 .cancion-item {
     width: 350px;
     background-color: #fff;
     border-radius: 16px;
     padding: 1.5rem;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    font-family: 'Segoe UI', sans-serif;
     transition: transform 0.2s ease;
     display: flex;
     flex-direction: column;

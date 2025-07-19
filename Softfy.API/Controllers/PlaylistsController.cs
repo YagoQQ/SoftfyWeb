@@ -39,6 +39,8 @@ namespace SoftfyWeb.Controllers
 
             return Ok(new { mensaje = "Playlist creada", playlistId = playlist.Id });
         }
+
+
         [Authorize(Roles = "OyentePremium,Artista, Oyente")]
         [HttpGet("mis-playlists")]
         public async Task<IActionResult> ObtenerPlaylists()
@@ -378,6 +380,40 @@ namespace SoftfyWeb.Controllers
             }
 
             return Ok(playlist);
+        }
+
+        [HttpPost("guardar/{playlistId}/cancion/{cancionId}")]
+        public async Task<IActionResult> GuardarCancionEnPlaylist(int playlistId, int cancionId)
+        {
+            var cancion = await _context.Canciones.FindAsync(cancionId);
+            if (cancion == null)
+            {
+                return NotFound(new { message = "Canción no encontrada." });
+            }
+
+            var playlist = await _context.Playlists.FindAsync(playlistId);
+            if (playlist == null)
+            {
+                return NotFound(new { message = "Playlist no encontrada." });
+            }
+
+            var playlistCancionExistente = _context.PlaylistCanciones
+                .FirstOrDefault(pc => pc.PlaylistId == playlistId && pc.CancionId == cancionId);
+            if (playlistCancionExistente != null)
+            {
+                return BadRequest(new { message = "La canción ya está en esta playlist." });
+            }
+
+            var playlistCancion = new PlaylistCancion
+            {
+                PlaylistId = playlistId,
+                CancionId = cancionId
+            };
+
+            _context.PlaylistCanciones.Add(playlistCancion);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Canción agregada a la playlist." });
         }
 
     }

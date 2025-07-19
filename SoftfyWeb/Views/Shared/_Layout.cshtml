@@ -7,133 +7,51 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SoftfyWeb.styles.css" asp-append-version="true" />
-    <style>
-        body {
-            display: flex;
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        .sidebar {
-            width: 250px;
-            background-color: #1e1e2f;
-            color: white;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-        }
-
-            .sidebar a {
-                color: white;
-                text-decoration: none;
-                padding: 0.5rem 0;
-            }
-
-                .sidebar a:hover {
-                    background-color: #343456;
-                    border-radius: 5px;
-                }
-
-            .sidebar .logout {
-                margin-top: auto;
-            }
-
-            .sidebar h3 {
-                margin-bottom: 2rem;
-            }
-
-        .content {
-            flex-grow: 1;
-            padding: 1.5rem;
-            background-color: #f8f9fa;
-        }
-
-        /* Buscador integrado (flujo normal) */
-        .search-bar {
-            margin-bottom: 20px;
-            background-color: #fff;
-            padding: 10px 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .search-form {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-            .search-form input {
-                flex: 1;
-                padding: 6px 12px;
-                border: 1px solid #ccc;
-                border-radius: 20px;
-            }
-
-            .search-form button {
-                padding: 6px 16px;
-                border: 1px solid #007bff;
-                background-color: #007bff;
-                color: white;
-                border-radius: 20px;
-            }
-
-                .search-form button:hover {
-                    background-color: #0056b3;
-                }
-    </style>
+    <link rel="stylesheet" href="~/css/Fondo.css" />
 </head>
 <body>
-    <div class="sidebar">
-        <h3>Softfy</h3>
+    <div class="body-wrapper">
+        <div class="sidebar">
+            <h3>Softfy</h3>
 
-        @if (User.Identity?.IsAuthenticated == true)
-        {
-            if (User.IsInRole("Oyente"))
+            @if (User.Identity?.IsAuthenticated == true)
             {
-                <a asp-controller="VistasAuth" asp-action="BienvenidoOyente">Inicio</a>
-                <a asp-controller="VistasCanciones" asp-action="Index">Explorar Canciones</a>
-                <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
-                <a asp-controller="VistasPlaylists" asp-action="MeGusta">Explorar</a>
-            }
-            else if (User.IsInRole("OyentePremium"))
-            {
-                <a asp-controller="VistasAuth" asp-action="BienvenidoOyente">Inicio</a>
-                <a asp-controller="VistasCanciones" asp-action="Index">Explorar Canciones</a>
-                <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
-                <a asp-controller="VistasCanciones" asp-action="Index">Explorar Canciones</a>
-                <a asp-controller="VistasPlaylists" asp-action="MeGusta">Explorar</a>
-            }
-            else if (User.IsInRole("Artista"))
-            {
-                <a asp-controller="VistasAuth" asp-action="BienvenidoArtista">Inicio</a>
-                <a asp-controller="VistasCanciones" asp-action="MisCanciones">Mis Canciones</a>
-                <a asp-controller="VistasPlaylists" asp-action="Index">Mis Playlists</a>
-                <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
-            }
-            else if (User.IsInRole("Admin"))
-            {
-                <a asp-controller="VistasAuth" asp-action="Bienvenido">Inicio</a>
-                <a asp-controller="VistaAdmin" asp-action="IndexUsuario">Gestonar Usuarios</a>
-                <a asp-controller="VistaAdmin" asp-action="IndexCanciones">Gestionar Canciones</a>
-                <a asp-controller="VistaAdmin" asp-action="IndexPlaylists">Gestionar Playlists</a>
-                <a asp-controller="Planes" asp-action="Index">Gestionar Planes</a>
-                <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
-            }
+                if (User.IsInRole("Oyente") || User.IsInRole("OyentePremium"))
+                {
+                    <a asp-controller="VistasAuth" asp-action="BienvenidoOyente">Inicio</a>
+                    <a asp-controller="VistasCanciones" asp-action="Index">Explorar Canciones</a>
+                    <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
+                    <a asp-controller="VistasPlaylists" asp-action="MeGusta">Explorar</a>
+                }
+                else if (User.IsInRole("Artista"))
+                {
+                    <a asp-controller="VistasAuth" asp-action="BienvenidoArtista">Inicio</a>
+                    <a asp-controller="VistasCanciones" asp-action="MisCanciones">Mis Canciones</a>
+                    <a asp-controller="VistasPlaylists" asp-action="Index">Mis Playlists</a>
+                    <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
+                }
+                else if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="VistasAuth" asp-action="Bienvenido">Inicio</a>
+                    <a asp-controller="VistaAdmin" asp-action="IndexUsuario">Gestionar Usuarios</a>
+                    <a asp-controller="VistaAdmin" asp-action="IndexCanciones">Gestionar Canciones</a>
+                    <a asp-controller="VistaAdmin" asp-action="IndexPlaylists">Gestionar Playlists</a>
+                    <a asp-controller="Planes" asp-action="Index">Gestionar Planes</a>
+                    <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
+                }
 
-            <form method="post" asp-controller="VistasAuth" asp-action="Logout" class="logout mt-3">
-                <button type="submit" class="btn btn-danger w-100">Cerrar sesión</button>
-            </form>
-        }
-        else
-        {
-            <a asp-controller="VistasAuth" asp-action="Login">Iniciar sesión</a>
-            <a asp-controller="VistasAuth" asp-action="Registro">Registrarse</a>
-        }
-    </div>
+                <form method="post" asp-controller="VistasAuth" asp-action="Logout" class="logout">
+                    <button type="submit" class="btn btn-danger w-100">Cerrar sesión</button>
+                </form>
+            }
+            else
+            {
+                <a asp-controller="VistasAuth" asp-action="Login">Iniciar sesión</a>
+                <a asp-controller="VistasAuth" asp-action="Registro">Registrarse</a>
+            }
+        </div>
 
-    <div class="content">
-        <main role="main" class="pb-3">
+        <div class="content">
             @if (ViewData["ShowSearchBar"] == null || (bool)ViewData["ShowSearchBar"] == true)
             {
                 <div class="search-bar">
@@ -144,19 +62,12 @@
                 </div>
             }
 
-            @RenderBody()
-        </main>
-
-        <footer class="border-top footer text-muted mt-5">
-            <div class="container">
-                &copy; 2025 - SoftfyWeb - <a asp-controller="Home" asp-action="Privacy">Privacidad</a>
-            </div>
-        </footer>
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
     </div>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
