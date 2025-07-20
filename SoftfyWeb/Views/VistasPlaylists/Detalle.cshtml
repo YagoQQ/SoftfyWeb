@@ -16,9 +16,23 @@
             <tr>
                 <td>@c.Titulo</td>
                 <td>
-                    <audio controls>
-                        <source src="@c.UrlArchivo" type="audio/mpeg" />
-                    </audio>
+                    <div class="audio-player" data-id="@c.Id">
+                        <div class="player-controls">
+                            <button class="play-pause" data-id="@c.Id">▶️</button>
+                            <span class="time current">0:00</span>
+                            <input type="range" class="progress" value="0" step="1">
+                            <span class="time duration">0:00</span>
+
+                            @* Solo mostrar si es Oyente Premium *@
+                            @if (User.IsInRole("OyentePremium"))
+                            {
+                                <a class="download-btn" href="@c.UrlArchivo" download>
+                                    ⬇️
+                                </a>
+                            }
+                        </div>
+                        <audio id="audio-@c.Id" src="@c.UrlArchivo"></audio>
+                    </div>
                 </td>
                 <td>
                     <form asp-action="QuitarCancion" method="post">
