@@ -1,0 +1,41 @@
+﻿@model List<SoftfyWeb.Modelos.Dtos.PlanDto>
+
+@{
+    ViewData["Title"] = "Seleccionar Plan";
+}
+
+<h2 class="text-white text-center my-4">@ViewData["Title"]</h2>
+
+<form asp-action="ActivarSuscripcion" method="post">
+    <div class="row justify-content-center gap-4">
+        @foreach (var plan in Model)
+        {
+            <div class="col-md-3">
+                <label class="card plan-card" style="cursor:pointer;">
+                    <input type="radio" name="planId" value="@plan.Id" required class="d-none plan-radio" />
+                    <div class="card-body text-center">
+                        <h5 class="card-title" style="color:#00ffff;">@plan.Nombre</h5>
+                        <h6 class="card-subtitle mb-2" style="color:#00ced1;">@plan.Precio.ToString("C")</h6>
+                        <p class="card-text text-light">Máx. @plan.MaxUsuarios usuarios</p>
+                    </div>
+                </label>
+            </div>
+        }
+    </div>
+
+    <div class="text-center mt-4">
+        <button type="submit" class="btn btn-lg px-5" style="background-color:#00ced1; color:black;">Activar Plan</button>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.plan-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.plan-card').forEach(c => c.style.border = '2px solid transparent');
+                card.style.border = '2px solid #00ffff';
+                card.querySelector('.plan-radio').checked = true;
+            });
+        });
+    </script>
+}

@@ -4,35 +4,41 @@
     ViewData["Title"] = "Canciones de la Playlist";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h2 class="text-white text-center my-4">@ViewData["Title"]</h2>
 
 @if (Model != null && Model.Any())
 {
-    <ul class="list-group">
-        @foreach (var cancion in Model)
-        {
-            <li class="list-group-item">
-                <strong>@cancion.Titulo</strong>
-                <div class="audio-player" data-id="@cancion.Id">
-                    <div class="player-controls">
-                        <button class="play-pause" data-id="@cancion.Id">▶️</button>
-                        <span class="time current">0:00</span>
-                        <input type="range" class="progress" value="0" step="1">
-                        <span class="time duration">0:00</span>
+    <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+            @foreach (var cancion in Model)
+            {
+                <div class="col">
+                    <div class="card bg-dark text-white h-100 shadow" style="border-radius: 15px;">
+                        <div class="card-body">
+                            <h5 class="card-title">@cancion.Titulo</h5>
 
-                        @* Solo mostrar si es Oyente Premium *@
-                        @if (User.IsInRole("OyentePremium"))
-                        {
-                            <a class="download-btn" href="@cancion.UrlArchivo" download>
-                                ⬇️
-                            </a>
-                        }
+                            <div class="audio-player" data-id="@cancion.Id">
+                                <div class="player-controls">
+                                    <button class="play-pause" data-id="@cancion.Id">▶️</button>
+                                    <span class="time current">0:00</span>
+                                    <input type="range" class="progress" value="0" step="1">
+                                    <span class="time duration">0:00</span>
+
+                                    @if (User.IsInRole("OyentePremium"))
+                                    {
+                                        <a class="download-btn" href="@cancion.UrlArchivo" download>
+                                            ⬇️
+                                        </a>
+                                    }
+                                </div>
+                                <audio id="audio-@cancion.Id" src="@cancion.UrlArchivo"></audio>
+                            </div>
+                        </div>
                     </div>
-                    <audio id="audio-@cancion.Id" src="@cancion.UrlArchivo"></audio>
                 </div>
-            </li>
-        }
-    </ul>
+            }
+        </div>
+    </div>
 }
 else
 {

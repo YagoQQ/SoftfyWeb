@@ -1,0 +1,104 @@
+﻿@model SoftfyWeb.Modelos.Dtos.SuscripcionEstadoDto  
+@using System.Security.Claims  
+@{  
+    ViewData["Title"] = "Estado de la Suscripción";  
+    var currentEmail = User.Claims.FirstOrDefault(c => c.Type == "email")?.Value?.ToLower();  
+}  
+<h1>@ViewData["Title"]</h1>  
+
+@if (Model.Tipo == "Free")  
+{  
+    <div class="mb-4">  
+        <p>No tienes una suscripción activa. Si deseas activar una, selecciona un plan.</p>  
+        <a asp-action="ActivarSuscripcion" class="btn btn-primary">Activar Suscripción</a>  
+    </div>  
+}  
+else  
+{  
+    <div class="mb-4">  
+        <div class="card mb-4">  
+            <div class="card-body">  
+                <p><strong>Tipo de Suscripción:</strong> @Model.Tipo</p>  
+                <p><strong>Plan:</strong> @Model.Plan</p>  
+                <p><strong>Precio:</strong> @Model.Precio.ToString("C")</p>  
+                <p><strong>Fecha de Inicio:</strong> @Model.FechaInicio.ToString("dd/MM/yyyy HH:mm")</p>  
+                <p><strong>Fecha de Fin:</strong> @Model.FechaFin.ToString("dd/MM/yyyy HH:mm")</p>  
+                <p><strong>¿Eres el titular?:</strong> @(Model.EsTitular ? "Sí" : "No")</p>  
+            </div>  
+        </div>  
+
+        @if (ViewBag.ErrorMiembro != null)  
+        {  
+            <div class="alert alert-danger">  
+                @ViewBag.ErrorMiembro  
+            </div>  
+        }  
+
+        @* Solo permitir agregar miembros si es titular y el plan no es "Individual" *@  
+        @if (Model.EsTitular && !Model.Plan.Equals("Individual", StringComparison.OrdinalIgnoreCase))  
+        {  
+            <div class="mb-3 d-flex align-items-start">  
+                <form asp-action="AgregarMiembro" method="post" class="d-flex me-2">  
+                    <input type="email" name="email" class="form-control me-2" placeholder="Correo del nuevo miembro" required />  
+                    <button type="submit" class="btn btn-success">Agregar Miembro</button>  
+                </form>  
+            </div>  
+        }  
+
+        @* Botón para cancelar suscripción siempre disponible al titular *@  
+        @if (Model.EsTitular)  
+        {  
+            <div class="mb-3">  
+                <a asp-action="CancelarSuscripcion" class="btn btn-danger">Cancelar Suscripción</a>  
+            </div>  
+        }  
+
+        <h4>Miembros de tu suscripción</h4>  
+        <table class="table table-striped">  
+            <thead>  
+                <tr>  
+                    <th>Correo</th>  
+                    <th>Fecha agregado</th>  
+                    <th>Rol</th>  
+                    <th>Acciones</th>  
+                </tr>  
+            </thead>  
+            <tbody>  
+                @foreach (var miembro in Model.Miembros)  
+                {  
+                    <tr>  
+                        <td>@miembro.Email</td>  
+                        <td>@miembro.FechaAgregado.ToString("dd/MM/yyyy HH:mm")</td>  
+                        <td>  
+                            @if (miembro.EsTitular)  
+                            {  
+                                <span class="badge bg-primary">Titular</span>  
+                            }  
+                            else  
+                            {  
+                                <span class="badge bg-secondary">Miembro</span>  
+                            }  
+                        </td>  
+                        <td>  
+                            @if (Model.EsTitular && !miembro.EsTitular)  
+                            {  
+                                <form method="post" asp-action="EliminarMiembro" class="d-inline me-2">  
+                                    <input type="hidden" name="email" value="@miembro.Email" />  
+                                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>  
+                                </form>  
+                            }  
+                        </td>  
+                    </tr>  
+                }  
+            </tbody>  
+        </table>  
+
+        @* Botón Salir fuera de la tabla para miembros no titulares *@  
+        @if (!Model.EsTitular && Model.Miembros.Any(m => m.Email.ToLower() == currentEmail))  
+        {  
+            <form asp-action="SalirDeSuscripcion" method="post" class="mt-3">  
+                <button type="submit" class="btn btn-warning">Salir de la Suscripción</button>  
+            </form>  
+        }  
+    </div>  
+}
