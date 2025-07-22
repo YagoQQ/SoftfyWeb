@@ -55,6 +55,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<AudioService>();
+builder.Services.AddHttpClient<PayPalService>();
 
 builder.Services.AddCors(options =>
 {

@@ -4,12 +4,12 @@
     ViewData["Title"] = "Mis Playlists";
 }
 
-<div class="container py-5">
-    <h2 class="text-center">Selecciona una Playlist</h2>
+<div class="container mt-5">
+    <h2 class="text-white text-center mb-4">Selecciona una Playlist</h2>
 
     @if (ViewBag.Error != null)
     {
-        <div class="alert alert-danger text-center">@ViewBag.Error</div>
+        <div class="alert alert-danger text-center rounded-3 shadow-sm">@ViewBag.Error</div>
     }
 
     @if (ViewBag.Playlists != null)
@@ -17,19 +17,21 @@
         <form method="post" action="@Url.Action("GuardarEnPlaylist", "VistasCanciones")">
             <input type="hidden" name="cancionId" value="@ViewBag.CancionId" />
 
-            <ul class="list-group">
+            <div class="albums-grid">
                 @foreach (var playlist in ViewBag.Playlists as List<PlaylistDto>)
                 {
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>@playlist.Nombre</span>
-                        <button type="submit" class="btn btn-success" name="playlistId" value="@playlist.Id">Guardar Aquí</button>
-                    </li>
+                    <div class="cancion-item d-flex justify-content-between align-items-center" style="gap: 1rem;">
+                        <span class="playlist-label">@playlist.Nombre</span>
+                        <button type="submit" class="btn btn-success" name="playlistId" value="@playlist.Id">
+                            Guardar Aquí
+                        </button>
+                    </div>
                 }
-            </ul>
+            </div>
         </form>
     }
     else
     {
-        <p>No tienes playlists disponibles.</p>
+        <p class="text-white text-center mt-4">No tienes playlists disponibles.</p>
     }
 </div>

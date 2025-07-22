@@ -3,8 +3,6 @@
     var esPremium = User.IsInRole("OyentePremium"); // Verificar si el usuario es premium
 }
 
-<link rel="stylesheet" href="~/css/Fondo.css" />
-
 <style>
 h2.text-center {
     font-size: 4rem;
@@ -68,16 +66,16 @@ h2.text-center {
     </div>
 
     <div class="section">
-        <h3>Todas los Albumes</h3>
-        <div class="playlist-container">
+        <h3 class="text-white mb-4">Todos los Álbumes</h3>
+        <div class="albums-grid">
             @foreach (var playlist in ViewBag.TodasPlaylists)
             {
                 <div class="cancion-item">
-                    <h4>
-                        <a asp-action="VerCanciones" asp-controller="VistasCanciones" asp-route-id="@playlist.Id" class="text-decoration-none">
+                    <h5>
+                        <a asp-action="VerCanciones" asp-controller="VistasCanciones" asp-route-id="@playlist.Id">
                             @playlist.Nombre
                         </a>
-                    </h4>
+                    </h5>
                     <p><strong>Artista:</strong> @playlist.NombreArtistico</p>
                     <p><strong>Total de Canciones:</strong> @playlist.TotalCanciones</p>
                 </div>
@@ -104,7 +102,3 @@ h2.text-center {
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script src="~/js/player.js"></script>
-}

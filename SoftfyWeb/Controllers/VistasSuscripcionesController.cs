@@ -13,7 +13,6 @@ using System.Text.Json;
 
 namespace SoftfyWeb.Controllers
 {
-    [Authorize]
     public class VistasSuscripcionesController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -95,17 +94,18 @@ namespace SoftfyWeb.Controllers
         public async Task<IActionResult> ActivarSuscripcion(int planId)
         {
             var client = ObtenerClienteConToken();
-            var response = await client.PostAsJsonAsync("suscripciones/activar", planId);
+
+            // Llama a la API que crea la orden PayPal
+            var response = await client.PostAsJsonAsync("pagos/crear-orden", planId);
+
             if (!response.IsSuccessStatusCode)
                 return View("Error", CrearErrorModel());
 
-            // 2) Forzamos relogin limpiando la cookie protegida
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            TempData["Info"] = "Suscripción activada. Por favor, inicia sesión de nuevo para actualizar tus permisos.";
-            return RedirectToAction("Login", "VistasAuth");
+            var resultado = await response.Content.ReadFromJsonAsync<PayPalRespuestaDto>();
+
+            return Redirect(resultado!.Url);
         }
 
-        // POST: /VistasSuscripciones/AgregarMiembro
         [HttpPost]
         public async Task<IActionResult> AgregarMiembro(string email)
         {
@@ -197,5 +197,29 @@ namespace SoftfyWeb.Controllers
             TempData["Info"] = "Suscripción cancelada. Por seguridad, inicia sesión de nuevo.";
             return RedirectToAction("Login", "VistasAuth");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Exito(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+                return View("Error", CrearErrorModel());
+
+            var client = ObtenerClienteConToken();
+
+            // Llamar a la API que captura la orden
+            var response = await client.PostAsync($"pagos/capturar-orden?token={token}", null);
+
+            if (!response.IsSuccessStatusCode)
+                return View("Error", CrearErrorModel());
+
+            // Recarga estado actualizado
+            var estado = await CargarEstadoYMiembrosAsync();
+            if (estado == null)
+                return View("Error", CrearErrorModel());
+
+            return View("Estado", estado);
+        }
+
+
     }
 }

@@ -494,3 +494,44 @@ form .btn-success {
         color: white !important;
     }
 
+.albums-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.album-card {
+    background: linear-gradient(135deg, #181818, #1e1e1e);
+    border-radius: 20px;
+    padding: 1.5rem;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-family: 'Segoe UI', sans-serif;
+    width: 100%;
+    max-width: 300px;
+    margin: auto;
+}
+
+    .album-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 8px 30px rgba(0, 255, 200, 0.2);
+        background-color: #1f1f1f;
+    }
+
+.album-title a {
+    color: #00ffff;
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(0,255,255,0.5);
+}
+
+    .album-title a:hover {
+        color: #1DB954;
+        text-decoration: underline;
+    }
+
+
