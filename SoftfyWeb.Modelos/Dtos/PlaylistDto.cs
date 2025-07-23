@@ -7,5 +7,6 @@
         public string Propietario { get; set; }
         public string? NombreArtistico { get; set; }
         public int TotalCanciones { get; set; }
+        public int? ArtistaId { get; set; }
     }
 }

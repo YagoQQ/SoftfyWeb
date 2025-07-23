@@ -368,19 +368,43 @@ namespace SoftfyWeb.Controllers
         }
 
         [HttpGet("buscar/{nombre}")]
-        public ActionResult<Playlist> GetPlaylistByName(string nombre)
+        [AllowAnonymous]
+        public IActionResult BuscarPlaylists(string nombre)
         {
-            var playlist = _context.Playlists
-                .Where(p => p.Nombre.ToLower() == nombre.ToLower()) 
-                .FirstOrDefault();
+            var artistas = _context.Artistas
+                .Include(a => a.Usuario)
+                .ToList();
 
-            if (playlist == null)
+            var playlists = _context.Playlists
+                .Include(p => p.Usuario)
+                .Include(p => p.PlaylistCanciones)
+                .Where(p => p.Nombre.ToLower().Contains(nombre.ToLower()))
+                .ToList();
+
+            var resultado = playlists.Select(p =>
             {
-                return NotFound(new { message = "La playlist no existe." });
+                var artista = artistas.FirstOrDefault(a => a.UsuarioId == p.UsuarioId);
+
+                return new PlaylistDto
+                {
+                    Id = p.Id,
+                    Nombre = p.Nombre,
+                    TotalCanciones = p.PlaylistCanciones.Count,
+                    Propietario = p.Usuario.Id,
+                    NombreArtistico = artista?.NombreArtistico,
+                    ArtistaId = artista?.Id 
+                };
+            }).ToList();
+
+            if (resultado == null || resultado.Count == 0)
+            {
+                return NotFound(new { message = "No se encontraron playlists." });
             }
 
-            return Ok(playlist);
+            return Ok(resultado);
         }
+
+
 
         [HttpPost("guardar/{playlistId}/cancion/{cancionId}")]
         public async Task<IActionResult> GuardarCancionEnPlaylist(int playlistId, int cancionId)

@@ -433,6 +433,7 @@ namespace SoftfyWeb.Controllers
 
             var cancionesResponse = await client.GetAsync($"https://localhost:7003/api/Canciones/canciones/nombre?nombre={termino}");
             var artistasResponse = await client.GetAsync($"https://localhost:7003/api/Artistas/artista/{termino}/perfil");
+            var playlistResponse = await client.GetAsync($"https://localhost:7003/api/Playlists/buscar/{termino}");
 
             if (cancionesResponse.IsSuccessStatusCode)
             {
@@ -467,6 +468,21 @@ namespace SoftfyWeb.Controllers
                 else
                 {
                     ViewBag.Error = "No se encontró el artista.";
+                }
+            }
+
+            if (playlistResponse.IsSuccessStatusCode)
+            {
+                var playlistsJson = await playlistResponse.Content.ReadAsStringAsync();
+                var playlists = JsonSerializer.Deserialize<List<PlaylistDto>>(playlistsJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                if (playlists != null && playlists.Any())
+                {
+                    ViewBag.Playlists = playlists;
+                }
+                else
+                {
+                    ViewBag.Error = "No se encontro Albums con este Nombre.";
                 }
             }
 
