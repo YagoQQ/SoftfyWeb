@@ -1,18 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using SoftfyWeb.Dtos;
 using SoftfyWeb.Modelos;
 using SoftfyWeb.Modelos.Dtos;
 using SoftfyWeb.Models;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace SoftfyWeb.Controllers
 {
@@ -20,80 +15,63 @@ namespace SoftfyWeb.Controllers
     public class VistasCancionesController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         public VistasCancionesController(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }
 
-        private HttpClient ObtenerClienteConToken()
+        private HttpClient CrearCliente(bool incluirToken = false)
         {
             var client = _httpClientFactory.CreateClient("SoftfyApi");
-            var token = Request.Cookies["jwt_token"];
-            if (!string.IsNullOrEmpty(token))
-                client.DefaultRequestHeaders.Authorization
-                      = new AuthenticationHeaderValue("Bearer", token);
+            if (incluirToken)
+            {
+                var token = Request.Cookies["jwt_token"];
+                if (!string.IsNullOrEmpty(token))
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
             return client;
         }
 
-        private HttpClient ObtenerCliente()
+        private async Task<T?> LeerComo<T>(HttpResponseMessage response)
         {
-            return _httpClientFactory.CreateClient("SoftfyApi");
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<T>(json, _jsonOptions);
         }
 
-        private ErrorViewModel CrearErrorModel()
-        {
-            string id = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-            return new ErrorViewModel { RequestId = id };
-        }
+        private ErrorViewModel CrearErrorModel() =>
+            new() { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier };
 
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            HttpClient client = ObtenerCliente();
-            HttpResponseMessage response = await client.GetAsync("canciones/canciones"); 
-            if (!response.IsSuccessStatusCode)
-                return View("Error", CrearErrorModel());
+            var client = CrearCliente();
+            var response = await client.GetAsync("canciones/canciones");
+            if (!response.IsSuccessStatusCode) return View("Error", CrearErrorModel());
 
-            var json = await response.Content.ReadAsStringAsync();
-            var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var lista = JsonConvert.DeserializeObject<List<CancionRespuestaDto>>(json);
-
-            return View(lista);
+            var lista = await LeerComo<List<CancionRespuestaDto>>(response);
+            return View(lista ?? new List<CancionRespuestaDto>());
         }
-
 
         [Authorize(Roles = "Artista")]
         public async Task<IActionResult> MisCanciones()
         {
-            var client = ObtenerClienteConToken();
+            var client = CrearCliente(true);
             var response = await client.GetAsync("canciones/mis-canciones");
-            if (!response.IsSuccessStatusCode)
-                return View("Error", CrearErrorModel());
+            if (!response.IsSuccessStatusCode) return View("Error", CrearErrorModel());
 
-            var json = await response.Content.ReadAsStringAsync();
-            var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var lista = JsonConvert.DeserializeObject<List<CancionDto>>(json);
-
-            return View(lista);
+            var lista = await LeerComo<List<CancionDto>>(response);
+            return View(lista ?? new List<CancionDto>());
         }
 
-
-
         [Authorize(Roles = "Artista")]
-        public IActionResult CrearCancion()
-        {
-            return View(new CancionCrearDto());
-        }
+        public IActionResult CrearCancion() => View(new CancionCrearDto());
 
-        [HttpPost]
-        [Authorize(Roles = "Artista")]
-        [ValidateAntiForgeryToken]
+        [HttpPost, Authorize(Roles = "Artista"), ValidateAntiForgeryToken]
         public async Task<IActionResult> CrearCancion(CancionCrearDto dto, IFormFile archivoCancion)
         {
-            if (!ModelState.IsValid)
-                return View(dto);
-
+            if (!ModelState.IsValid) return View(dto);
             if (archivoCancion == null || archivoCancion.Length == 0)
             {
                 ModelState.AddModelError("", "Debes seleccionar un archivo.");
@@ -102,21 +80,22 @@ namespace SoftfyWeb.Controllers
 
             try
             {
-                var form = new MultipartFormDataContent();
+                using var form = new MultipartFormDataContent
+                {
+                    { new StringContent(dto.Titulo), nameof(dto.Titulo) },
+                    { new StringContent(dto.Genero ?? ""), nameof(dto.Genero) },
+                    { new StringContent(dto.FechaLanzamiento.ToString("o")), nameof(dto.FechaLanzamiento) }
+                };
 
-                form.Add(new StringContent(dto.Titulo), nameof(dto.Titulo));
-                form.Add(new StringContent(dto.Genero ?? ""), nameof(dto.Genero));
-                form.Add(new StringContent(dto.FechaLanzamiento.ToString("o")), nameof(dto.FechaLanzamiento));
+                await using var stream = archivoCancion.OpenReadStream();
+                var fileContent = new StreamContent(stream);
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(archivoCancion.ContentType);
+                form.Add(fileContent, "archivoCancion", archivoCancion.FileName);
 
-                var stream = new StreamContent(archivoCancion.OpenReadStream());
-                stream.Headers.ContentType = new MediaTypeHeaderValue(archivoCancion.ContentType);
-                form.Add(stream, "archivoCancion", archivoCancion.FileName);
-
-                var client = ObtenerClienteConToken();
+                var client = CrearCliente(true);
                 var response = await client.PostAsync("canciones/crear", form);
 
-                if (response.IsSuccessStatusCode)
-                    return RedirectToAction("MisCanciones");
+                if (response.IsSuccessStatusCode) return RedirectToAction(nameof(MisCanciones));
 
                 var errorContenido = await response.Content.ReadAsStringAsync();
                 ModelState.AddModelError("", $"Error al crear la canción: {errorContenido}");
@@ -129,106 +108,86 @@ namespace SoftfyWeb.Controllers
             return View(dto);
         }
 
-        [AllowAnonymous]
-        public IActionResult Error()
-        {
-            return View(CrearErrorModel());
-        }
-
-
-        [HttpGet]
-        [Authorize(Roles = "Artista")]
+        [HttpGet, Authorize(Roles = "Artista")]
         public async Task<IActionResult> EditarCancion(int id)
         {
-            var client = ObtenerClienteConToken();
+            var client = CrearCliente(true);
             var response = await client.GetAsync($"canciones/{id}");
-            if (!response.IsSuccessStatusCode)
-                return RedirectToAction("MisCanciones");
+            if (!response.IsSuccessStatusCode) return RedirectToAction(nameof(MisCanciones));
 
-            var json = await response.Content.ReadAsStringAsync();
-            var cancion = Newtonsoft.Json.JsonConvert.DeserializeObject<CancionCrearDto>(json);
-            var dto = new CancionCrearDto
-            {
-                Titulo = cancion.Titulo,
-                Genero = cancion.Genero,
-                FechaLanzamiento = cancion.FechaLanzamiento
-            };
+            var cancion = await LeerComo<CancionCrearDto>(response);
+            if (cancion == null) return RedirectToAction(nameof(MisCanciones));
+
             ViewBag.CancionId = id;
-            return View("Editar",dto);
+            return View("Editar", cancion);
         }
 
-        [HttpPost]
-        [Authorize(Roles = "Artista")]
+        [HttpPost, Authorize(Roles = "Artista")]
         public async Task<IActionResult> ActualizarCancion(int id, [FromForm] CancionCrearDto song, IFormFile? nuevoArchivo)
         {
-            if (song == null || string.IsNullOrEmpty(song.Titulo) || string.IsNullOrEmpty(song.Genero))
+            if (!ModelState.IsValid)
             {
                 ModelState.AddModelError("", "Por favor, complete todos los campos.");
-                return View("Editar", song);  // Regresar a la vista con los datos actuales
+                return View("Editar", song);
             }
 
-            var client = ObtenerClienteConToken();
-            var formData = new MultipartFormDataContent();
-            formData.Add(new StringContent(song.Titulo), "Titulo");
-            formData.Add(new StringContent(song.Genero), "Genero");
-            formData.Add(new StringContent(song.FechaLanzamiento.ToString("yyyy-MM-dd")), "FechaLanzamiento");
+            using var formData = new MultipartFormDataContent
+            {
+                { new StringContent(song.Titulo), nameof(song.Titulo) },
+                { new StringContent(song.Genero), nameof(song.Genero) },
+                { new StringContent(song.FechaLanzamiento.ToString("o")), nameof(song.FechaLanzamiento) }
+            };
 
             if (nuevoArchivo != null)
             {
-                var streamContent = new StreamContent(nuevoArchivo.OpenReadStream());
-                streamContent.Headers.Add("Content-Type", nuevoArchivo.ContentType);
-                formData.Add(streamContent, "nuevoArchivo", nuevoArchivo.FileName);
+                await using var stream = nuevoArchivo.OpenReadStream();
+                var fileContent = new StreamContent(stream);
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(nuevoArchivo.ContentType);
+                formData.Add(fileContent, "nuevoArchivo", nuevoArchivo.FileName);
             }
 
-            var response = await client.PutAsync($"canciones/editar/{id}", formData); // Aquí usamos PUT ya que es la acción de actualización en la API
+            var client = CrearCliente(true);
+            var response = await client.PutAsync($"canciones/editar/{id}", formData);
 
             if (!response.IsSuccessStatusCode)
             {
                 ViewBag.Error = "Hubo un problema al actualizar la canción.";
-                return View("Editar", song);  // Regresar a la vista si hay error
+                return View("Editar", song);
             }
 
-            ViewBag.Mensaje = "Canción actualizada correctamente.";
-            return RedirectToAction("MisCanciones");  // Redirigir a la página de Mis Canciones
+            return RedirectToAction(nameof(MisCanciones));
         }
 
         [AllowAnonymous]
-        [HttpGet]
         public async Task<IActionResult> VerCanciones(int id)
         {
-            var client = ObtenerClienteConToken();
+            var client = CrearCliente(true);
 
-            var cancionesResponse = await client.GetAsync($"https://localhost:7003/api/playlists/{id}/canciones");
-
-            var playlistResponse = await client.GetAsync($"https://localhost:7003/api/Playlists/{id}");
+            var cancionesResponse = await client.GetAsync($"playlists/{id}/canciones");
+            var playlistResponse = await client.GetAsync($"playlists/{id}");
 
             if (!cancionesResponse.IsSuccessStatusCode || !playlistResponse.IsSuccessStatusCode)
             {
-                ViewBag.Error = "No se pudieron obtener las canciones de la playlist o los detalles del álbum.";
+                ViewBag.Error = "No se pudieron obtener los datos.";
                 return View(new List<Cancion>());
             }
-            var cancionesContenido = await cancionesResponse.Content.ReadAsStringAsync();
-            var canciones = System.Text.Json.JsonSerializer.Deserialize<List<Cancion>>(cancionesContenido,
-                new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            var playlistContenido = await playlistResponse.Content.ReadAsStringAsync();
-            var playlist = System.Text.Json.JsonSerializer.Deserialize<Playlist>(playlistContenido, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var canciones = await LeerComo<List<Cancion>>(cancionesResponse);
+            var playlist = await LeerComo<Playlist>(playlistResponse);
 
             if (canciones == null || playlist == null)
             {
-                ViewBag.Error = "No se encontraron canciones o la playlist no existe.";
+                ViewBag.Error = "Datos no encontrados.";
                 return View(new List<Cancion>());
             }
 
-            ViewBag.PlaylistNombre= playlist.Nombre;
+            ViewBag.PlaylistNombre = playlist.Nombre;
             ViewBag.PlaylistId = id;
 
             foreach (var cancion in canciones)
             {
                 if (string.IsNullOrWhiteSpace(cancion.UrlArchivo))
-                {
                     cancion.UrlArchivo = "#";
-                }
             }
 
             return View("VerCanciones", canciones);

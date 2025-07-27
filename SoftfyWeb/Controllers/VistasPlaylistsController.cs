@@ -1,15 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SoftfyWeb.Modelos;
 using SoftfyWeb.Modelos.Dtos;
-using SoftfyWeb.Models;
-using System.Diagnostics;
-using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Security.Claims;
 using System.Text.Json;
 
 namespace SoftfyWeb.Controllers
@@ -18,47 +12,41 @@ namespace SoftfyWeb.Controllers
     public class VistasPlaylistsController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
+        private const string ApiBase = "playlists";
 
         public VistasPlaylistsController(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }
 
-        private HttpClient ObtenerClienteConToken()
+        private HttpClient CrearCliente()
         {
             var client = _httpClientFactory.CreateClient("SoftfyApi");
             var token = Request.Cookies["jwt_token"];
             if (!string.IsNullOrEmpty(token))
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             return client;
         }
 
-        private ErrorViewModel CrearErrorModel()
+        private async Task<T?> GetApiData<T>(string url)
         {
-            string id = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-            return new ErrorViewModel { RequestId = id };
+            var client = CrearCliente();
+            var response = await client.GetAsync(url);
+            if (!response.IsSuccessStatusCode) return default;
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<T>(json, _jsonOptions);
         }
 
-        //[Authorize(Roles = "OyentePremium,Artista,Admin,Oyente")]
+        // ✅ Listar playlists del usuario
         public async Task<IActionResult> Index()
         {
-            var client = ObtenerClienteConToken();
-            var resp = await client.GetAsync("playlists/mis-playlists");
-            if (!resp.IsSuccessStatusCode)
-                return View("Error", CrearErrorModel());
-
-            var raw = await resp.Content.ReadAsStringAsync();
-            var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var listas = JsonSerializer.Deserialize<List<PlaylistDto>>(raw, opts);
-            return View(listas);
+            var listas = await GetApiData<List<PlaylistDto>>($"{ApiBase}/mis-playlists");
+            return listas == null ? View("Error") : View(listas);
         }
 
         [Authorize(Roles = "OyentePremium,Artista,Admin")]
-        public IActionResult Crear()
-        {
-            return View();
-        }
+        public IActionResult Crear() => View();
 
         [HttpPost, Authorize(Roles = "OyentePremium,Artista"), ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(string nombre)
@@ -69,146 +57,90 @@ namespace SoftfyWeb.Controllers
                 return View();
             }
 
-            var client = ObtenerClienteConToken();
-            var resp = await client.PostAsJsonAsync("playlists/crear", nombre);
+            var client = CrearCliente();
+            var resp = await client.PostAsJsonAsync($"{ApiBase}/crear", nombre);
+
             if (resp.IsSuccessStatusCode)
                 return RedirectToAction(nameof(Index));
 
-            var err = await resp.Content.ReadAsStringAsync();
-            ModelState.AddModelError("", err);
+            ModelState.AddModelError("", await resp.Content.ReadAsStringAsync());
             return View();
         }
 
         [Authorize(Roles = "OyentePremium,Artista,Admin")]
         public async Task<IActionResult> Detalle(int id)
         {
-            var client = ObtenerClienteConToken();
-            var resp = await client.GetAsync($"playlists/{id}/canciones");
-            if (!resp.IsSuccessStatusCode)
-                return View("Error", CrearErrorModel());
+            var canciones = await GetApiData<List<PlaylistCancionDto>>($"{ApiBase}/{id}/canciones");
+            if (canciones == null) return View("Error");
 
-            var raw = await resp.Content.ReadAsStringAsync();
-            var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var cancionesPlaylist = JsonSerializer.Deserialize<List<PlaylistCancionDto>>(raw, opciones);
+            canciones = canciones.Where(c => !string.IsNullOrWhiteSpace(c.UrlArchivo)).ToList();
 
-            cancionesPlaylist = cancionesPlaylist.Where(c => !string.IsNullOrWhiteSpace(c.UrlArchivo)).ToList();
-
-            var respArtista = await client.GetAsync("canciones/mis-canciones");
-            List<CancionDto> cancionesArtista = new();
-            if (respArtista.IsSuccessStatusCode)
-            {
-                var rawArtista = await respArtista.Content.ReadAsStringAsync();
-                cancionesArtista = JsonSerializer.Deserialize<List<CancionDto>>(rawArtista, opciones);
-            }
+            var cancionesArtista = await GetApiData<List<CancionDto>>("canciones/mis-canciones") ?? new();
 
             ViewBag.PlaylistId = id;
             ViewBag.CancionesArtista = cancionesArtista;
 
-            return View(cancionesPlaylist);
+            return View(canciones);
         }
-
-
 
         [HttpPost, Authorize(Roles = "OyentePremium,Artista,Admin"), ValidateAntiForgeryToken]
         public async Task<IActionResult> Renombrar(int id, string nuevoNombre)
         {
-            var client = ObtenerClienteConToken();
-            var resp = await client.PutAsJsonAsync($"playlists/{id}/renombrar", nuevoNombre);
-            if (resp.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
-
-            var err = await resp.Content.ReadAsStringAsync();
-            TempData["Error"] = err;
+            var client = CrearCliente();
+            var resp = await client.PutAsJsonAsync($"{ApiBase}/{id}/renombrar", nuevoNombre);
+            TempData["Error"] = resp.IsSuccessStatusCode ? null : await resp.Content.ReadAsStringAsync();
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost, Authorize(Roles = "OyentePremium,Artista,Admin"), ValidateAntiForgeryToken]
         public async Task<IActionResult> Eliminar(int id)
         {
-            var client = ObtenerClienteConToken();
-            var resp = await client.DeleteAsync($"playlists/{id}/eliminar");
-            if (resp.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
-
-            return View("Error", CrearErrorModel());
+            var client = CrearCliente();
+            var resp = await client.DeleteAsync($"{ApiBase}/{id}/eliminar");
+            return resp.IsSuccessStatusCode ? RedirectToAction(nameof(Index)) : View("Error");
         }
 
-        [HttpPost, Authorize]
-        public async Task<IActionResult> QuitarCancion(int playlistId, int cancionId)
-        {
-            var client = ObtenerClienteConToken();
-            var resp = await client.DeleteAsync($"playlists/{playlistId}/quitar/{cancionId}");
-            if (resp.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Detalle), new { id = playlistId });
-
-            return View("Error", CrearErrorModel());
-        }
-
-        [HttpPost, Authorize(Roles = "Artista,Admin"), ValidateAntiForgeryToken]
+        [HttpPost]
         public async Task<IActionResult> AgregarCancion(int playlistId, int cancionId)
         {
-            var client = ObtenerClienteConToken();
-            var resp = await client.PostAsync($"playlists/{playlistId}/agregar/{cancionId}", null);
-            if (resp.IsSuccessStatusCode)            {
-                return RedirectToAction(nameof(Detalle), new { id = playlistId });
-            }
-            TempData["Error"] = "No se pudo agregar la canción. Intenta de nuevo.";
+            var client = CrearCliente();
+            var resp = await client.PostAsync($"{ApiBase}/{playlistId}/agregar/{cancionId}", null);
+            if (!resp.IsSuccessStatusCode) TempData["Error"] = "No se pudo agregar la canción.";
             return RedirectToAction(nameof(Detalle), new { id = playlistId });
         }
 
-        [HttpPost, Authorize]
-        public async Task<IActionResult> QuitarMeGusta(int cancionId)
+        [HttpPost]
+        public async Task<IActionResult> QuitarCancion(int playlistId, int cancionId)
         {
-            var client = ObtenerClienteConToken();
-            var resp = await client.DeleteAsync($"playlists/me-gusta/{cancionId}");
-            if (resp.IsSuccessStatusCode)
-                return RedirectToAction(nameof(MeGusta));
-
-            return View("Error", CrearErrorModel());
+            var client = CrearCliente();
+            await client.DeleteAsync($"{ApiBase}/{playlistId}/quitar/{cancionId}");
+            return RedirectToAction(nameof(Detalle), new { id = playlistId });
         }
 
-        [HttpPost, Authorize]
+        [HttpPost]
         public async Task<IActionResult> DarMeGusta(int cancionId)
         {
-            var client = ObtenerClienteConToken();
-            var resp = await client.PostAsync($"playlists/me-gusta/{cancionId}", null);
-            if (resp.IsSuccessStatusCode)
-                return RedirectToAction(nameof(MeGusta));
-
-            return View("Error", CrearErrorModel());
+            var client = CrearCliente();
+            await client.PostAsync($"{ApiBase}/me-gusta/{cancionId}", null);
+            return RedirectToAction(nameof(MeGusta));
         }
 
-        [Authorize(Roles = "OyentePremium,Artista,Oyente")]
+        [HttpPost]
+        public async Task<IActionResult> QuitarMeGusta(int cancionId)
+        {
+            var client = CrearCliente();
+            await client.DeleteAsync($"{ApiBase}/me-gusta/{cancionId}");
+            return RedirectToAction(nameof(MeGusta));
+        }
+
         public async Task<IActionResult> MeGusta()
         {
-            var client = ObtenerClienteConToken();
-            var resp = await client.GetAsync("playlists/me-gusta");
-
-            if (resp.StatusCode == HttpStatusCode.NotFound)
-            {
+            var dto = await GetApiData<MeGustaRespuestaDto>($"{ApiBase}/me-gusta");
+            if (dto == null || dto.Canciones == null)
                 ViewBag.Message = "No tienes canciones marcadas como Me Gusta.";
-                var emptyDto = new MeGustaRespuestaDto
-                {
-                    Nombre = null,
-                    Total = 0,
-                    Canciones = null
-                };
-                return View(emptyDto);
-            }
-
-            if (!resp.IsSuccessStatusCode)
-            {
-                return View("Error", CrearErrorModel());
-            }
-
-            var raw = await resp.Content.ReadAsStringAsync();
-            var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var dto = JsonSerializer.Deserialize<MeGustaRespuestaDto>(raw, opts);
-
-            return View(dto);
+            return View(dto ?? new MeGustaRespuestaDto { Canciones = new List<CancionDto>(), Total = 0 });
         }
 
-        [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> PlaylistPorArtista(string email)
         {
@@ -218,92 +150,15 @@ namespace SoftfyWeb.Controllers
                 return View(new List<PlaylistDto>());
             }
 
-            var client = ObtenerClienteConToken();
-            var response = await client.GetAsync($"playlists/correo/{email}/playlists");
-
-            if (!response.IsSuccessStatusCode)
+            var playlists = await GetApiData<List<PlaylistDto>>($"{ApiBase}/correo/{email}/playlists");
+            if (playlists == null)
             {
                 ViewBag.Mensaje = "No se pudieron obtener las playlists del artista.";
                 return View(new List<PlaylistDto>());
             }
 
-            var json = await response.Content.ReadAsStringAsync();
-            var playlists = JsonSerializer.Deserialize<List<PlaylistDto>>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-
             ViewBag.Email = email;
             return View(playlists);
         }
-
-        public async Task<IActionResult> CancionesPublicasPorArtistaPlaylist(int id)
-        {
-            var client = ObtenerClienteConToken();
-            var resp = await client.GetAsync($"playlists/{id}/canciones");
-            if (!resp.IsSuccessStatusCode)
-                return View("Error", CrearErrorModel());
-
-            var raw = await resp.Content.ReadAsStringAsync();
-            var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var cancionesPlaylist = JsonSerializer.Deserialize<List<PlaylistCancionDto>>(raw, opciones);
-
-            cancionesPlaylist = cancionesPlaylist.Where(c => !string.IsNullOrWhiteSpace(c.UrlArchivo)).ToList();
-
-            var respArtista = await client.GetAsync("canciones/mis-canciones");
-            List<CancionDto> cancionesArtista = new();
-            if (respArtista.IsSuccessStatusCode)
-            {
-                var rawArtista = await respArtista.Content.ReadAsStringAsync();
-                cancionesArtista = JsonSerializer.Deserialize<List<CancionDto>>(rawArtista, opciones);
-            }
-
-            ViewBag.PlaylistId = id;
-            ViewBag.CancionesArtista = cancionesArtista;
-
-            return View(cancionesPlaylist);
-        }
-
-
-        [HttpGet]
-        public async Task<IActionResult> GuardarEnPlaylist(int cancionId)
-        {
-            var client = ObtenerClienteConToken(); 
-            var response = await client.GetAsync("https://localhost:7003/api/Playlists/mis-playlists");
-
-            if (response.IsSuccessStatusCode)
-            {
-                var playlistsJson = await response.Content.ReadAsStringAsync();
-                var playlists = JsonSerializer.Deserialize<List<PlaylistDto>>(playlistsJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                if (playlists != null)
-                {
-                    ViewBag.Playlists = playlists; 
-                    ViewBag.CancionId = cancionId; 
-                    return View();
-                }
-            }
-
-            ViewBag.Error = "No se pudieron cargar las playlists.";
-            return View();
-        }
-
-
-
-        [HttpPost]
-        public async Task<IActionResult> GuardarEnPlaylist(int cancionId, int playlistId)
-        {
-            var client = _httpClientFactory.CreateClient();
-            var response = await client.PostAsync($"https://localhost:7003/api/Playlists/guardar/{playlistId}/cancion/{cancionId}", null);
-
-            if (response.IsSuccessStatusCode)
-            {
-                return RedirectToAction("Index", "Home"); 
-            }
-
-            ViewBag.Error = "No se pudo agregar la canción a la playlist.";
-            return View();
-        }
-
     }
 }
