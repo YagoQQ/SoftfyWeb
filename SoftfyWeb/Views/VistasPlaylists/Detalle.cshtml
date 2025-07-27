@@ -1,0 +1,88 @@
+﻿@model IEnumerable<SoftfyWeb.Modelos.Dtos.PlaylistCancionDto>
+
+<h2>Detalle de la Playlist</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Archivo</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Titulo</td>
+                <td>
+                    <div class="audio-player" data-id="@c.Id">
+                        <div class="player-controls">
+                            <button class="play-pause" data-id="@c.Id">▶️</button>
+                            <span class="time current">0:00</span>
+                            <input type="range" class="progress" value="0" step="1">
+                            <span class="time duration">0:00</span>
+
+                            @* Solo mostrar si es Oyente Premium *@
+                            @if (User.IsInRole("OyentePremium"))
+                            {
+                                <a class="download-btn" href="@c.UrlArchivo" download>
+                                    ⬇️
+                                </a>
+                            }
+                        </div>
+                        <audio id="audio-@c.Id" src="@c.UrlArchivo"></audio>
+                    </div>
+                </td>
+                <td>
+                    <form asp-controller="VistasPlaylists"
+                          asp-action="QuitarCancion"
+                          method="post"
+                          class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="playlistId" value="@ViewBag.PlaylistId" />
+                        <input type="hidden" name="cancionId" value="@c.Id" />
+                        <button type="submit"
+                                class="btn btn-sm btn-danger"
+                                onclick="return confirm('¿Eliminar?');">
+                            Eliminar
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (User.IsInRole("Artista"))
+{
+    <h4>Agregar canción al álbum</h4>
+    <form asp-action="AgregarCancion" method="post" class="row g-2">
+        @Html.AntiForgeryToken() <!-- Token anti-forgery -->
+
+        <input type="hidden" name="playlistId" value="@ViewBag.PlaylistId" />
+
+        <div class="col-auto">
+            <select name="cancionId" class="form-control">
+                <option value="">-- Selecciona una canción --</option>
+                @if (ViewBag.CancionesArtista != null && ViewBag.CancionesArtista.Count > 0)
+                {
+                    foreach (var cancion in ViewBag.CancionesArtista)
+                    {
+                        <option value="@cancion.Id">@cancion.Titulo</option>
+                    }
+                }
+                else
+                {
+                    <option value="">No hay canciones disponibles</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary mb-3">Agregar</button>
+        </div>
+    </form>
+}
+
+

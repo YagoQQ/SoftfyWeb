@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SoftfyWeb</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Fondo.css" />
+    <link rel="stylesheet" href="~/css/player.css" asp-append-version="true" /> <!-- Estilo del reproductor -->
+<style>
+
+.logout {
+    margin-top: auto !important;
+}
+</style>
+
+</head>
+<body>
+    <div class="body-wrapper">
+        <div class="sidebar">
+            <a asp-controller="Home" asp-action="Index">
+                <img src="~/images/SoftfyLogo.png" alt="Softfy" style="max-height: 150px;" />
+            </a>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            if (User.IsInRole("Oyente"))
+            {
+                <a asp-controller="VistasAuth" asp-action="BienvenidoOyente">Inicio</a>
+                <a asp-controller="VistasCanciones" asp-action="Index">Explorar Canciones</a>
+                <a asp-controller="VistasPlaylists" asp-action="MeGusta">Mis me gusta</a>
+                <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
+                <a asp-controller="VistasSuscripciones" asp-action="Estado">Estado de mi suscripción</a>
+            }
+            else if (User.IsInRole("OyentePremium"))
+            {
+                <a asp-controller="VistasAuth" asp-action="BienvenidoOyente">Inicio</a>
+                <a asp-controller="VistasCanciones" asp-action="Index">Explorar Canciones</a>
+                <a asp-controller="VistasPlaylists" asp-action="Index">Mis playlists</a>
+                <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
+                <a asp-controller="VistasSuscripciones" asp-action="Estado">Estado de mi suscripción</a>
+
+            }
+            else if (User.IsInRole("Artista"))
+            {
+                <a asp-controller="VistasAuth" asp-action="BienvenidoArtista">Inicio</a>
+                <a asp-controller="VistasCanciones" asp-action="MisCanciones">Mis Canciones</a>
+                <a asp-controller="VistasPlaylists" asp-action="Index">Mis Playlists</a>
+                <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
+            }
+            else if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="VistasAuth" asp-action="Bienvenido">Inicio</a>
+                <a asp-controller="VistaAdmin" asp-action="IndexUsuario">Gestionar Usuarios</a>
+                <a asp-controller="VistaAdmin" asp-action="IndexCanciones">Gestionar Canciones</a>
+                <a asp-controller="VistaAdmin" asp-action="IndexPlaylists">Gestionar Playlists</a>
+                <a asp-controller="VistasPlanes" asp-action="Index">Gestionar Planes</a>
+            }
+
+            <form method="post" asp-controller="VistasAuth" asp-action="Logout" class="logout">
+                <button type="submit" class="btn btn-danger w-100">Cerrar sesión</button>
+            </form>
+        }
+        else
+        {
+            <a asp-controller="VistasAuth" asp-action="Login">Iniciar sesión</a>
+            <a asp-controller="VistasAuth" asp-action="Registro">Registrarse</a>
+        }
+    </div>
+
+    <div class="content">
+        <main role="main" class="pb-3">
+
+            @* Mostrar buscador si no se oculta explícitamente *@
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="search-bar">
+                    <form method="get" action="@Url.Action("Buscar", "VistasAuth")" class="search-form">
+                        <input type="text" name="termino" placeholder="Buscar canciones o artistas..." />
+                        <button type="submit">Buscar</button>
+                    </form>
+                </div>
+            }
+
+            @RenderBody()
+        </main>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/player.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

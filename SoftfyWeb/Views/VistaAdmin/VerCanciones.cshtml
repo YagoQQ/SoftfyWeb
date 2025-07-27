@@ -1,0 +1,49 @@
+﻿@model IEnumerable<SoftfyWeb.Modelos.Dtos.PlaylistCancionDto>
+
+@{
+    ViewData["Title"] = "Ver Playlist";
+    var playlistId = ViewBag.PlaylistId as int?;
+    var nombrePlaylist = ViewBag.NombrePlaylist as string ?? "Playlist";
+}
+
+<div class="container mt-4">
+
+    @if (!Model.Any())
+    {
+        <p class="text-muted">Esta playlist no tiene canciones aún.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Acciones</th>
+                    <th>Título</th>
+                    <th>Audio</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td>
+                            <form asp-action="EliminarCancion" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@c.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar esta canción?')">
+                                    🗑 Eliminar
+                                </button>
+                            </form>
+                        </td>
+                        <td>@c.Titulo</td>
+                        <td>
+                            <audio controls style="width: 200px;">
+                                <source src="@c.UrlArchivo" type="audio/mpeg" />
+                                Tu navegador no soporta audio.
+                            </audio>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

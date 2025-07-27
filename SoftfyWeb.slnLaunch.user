@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Nuevo perfil",
+    "Projects": [
+      {
+        "Path": "SoftfyWeb\\SoftfyWeb.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Softfy.API\\Softfy.API.csproj",
+        "Action": "StartWithoutDebugging"
+      }
+    ]
+  }
+]

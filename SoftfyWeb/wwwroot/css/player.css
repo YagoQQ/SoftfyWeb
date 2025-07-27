@@ -1,0 +1,82 @@
+﻿.audio-player {
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 20px;
+    max-width: 100%;
+    backdrop-filter: blur(6px);
+    transition: box-shadow 0.3s ease;
+}
+
+    .audio-player:hover {
+        box-shadow: 0 0 25px #c2a4f7;
+    }
+
+.player-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.play-pause {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #ff4d4d;
+    transition: transform 0.2s ease;
+}
+
+    .play-pause:hover {
+        transform: scale(1.2);
+        color: #ff1a1a;
+    }
+
+.progress {
+    flex: 1;
+    cursor: pointer;
+    appearance: none;
+    height: 8px;
+    background: #330000;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+}
+
+    .progress::-webkit-slider-thumb {
+        appearance: none;
+        width: 14px;
+        height: 14px;
+        background: #ff0000;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.9);
+        cursor: pointer;
+    }
+
+    .progress::-moz-range-thumb {
+        width: 14px;
+        height: 14px;
+        background: #ff0000;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.9);
+        cursor: pointer;
+    }
+
+.time {
+    font-family: 'Trebuchet MS', monospace;
+    font-size: 0.9rem;
+    color: #ffffff;
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+}
+
+.download-btn {
+    margin-left: 5px;
+    font-size: 1.4rem;
+    text-decoration: none;
+    color: #ff6666;
+    transition: color 0.3s ease;
+}
+
+    .download-btn:hover {
+        color: #ffffff;
+    }

@@ -1,0 +1,54 @@
+/* _content/SoftfyWeb/Views/Shared/_Layout.cshtml.rz.scp.css */
+/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+a.navbar-brand[b-s07if6b5kw] {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+a[b-s07if6b5kw] {
+  color: #0077cc;
+}
+
+.btn-primary[b-s07if6b5kw] {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active[b-s07if6b5kw], .nav-pills .show > .nav-link[b-s07if6b5kw] {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.border-top[b-s07if6b5kw] {
+  border-top: 1px solid #e5e5e5;
+}
+.border-bottom[b-s07if6b5kw] {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow[b-s07if6b5kw] {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy[b-s07if6b5kw] {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+.footer[b-s07if6b5kw] {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px;
+}
+body[b-s07if6b5kw] {
+    background-color: #1c1c1c;
+    color: white; /* Opcional: para que el texto no se vea negro sobre negro */
+}
+

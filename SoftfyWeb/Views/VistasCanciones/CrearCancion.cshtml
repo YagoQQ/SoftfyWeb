@@ -1,0 +1,53 @@
+﻿@model SoftfyWeb.Dtos.CancionCrearDto
+@{
+    ViewData["Title"] = "Subir Canción";
+    var generos = new List<string> {
+        "Pop", "Rock", "Hip Hop", "Reggaetón", "Jazz", "Blues", "Clásica",
+        "Electrónica", "Salsa", "Cumbia", "Bachata", "Trap", "R&B",
+        "Funk", "Country", "Metal", "Indie", "Punk", "House", "Tecno",
+        "Disco", "Alternativa", "Flamenco", "Merengue", "Folk", "Góspel",
+        "K-Pop", "Ska", "Ambient", "Dubstep", "Drum and Bass", "Reggae",
+        "Lofi", "Synthwave", "Opera", "Instrumental"
+    };
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="CrearCancion" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label>Título</label>
+        <input asp-for="Titulo" class="form-control" />
+        <span asp-validation-for="Titulo" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Género</label>
+        <select asp-for="Genero" class="form-control">
+            <option value="">-- Selecciona un género --</option>
+            @foreach (var genero in generos)
+            {
+                <option value="@genero">@genero</option>
+            }
+        </select>
+        <span asp-validation-for="Genero" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Fecha de lanzamiento</label>
+        <input asp-for="FechaLanzamiento" type="date" class="form-control" />
+        <span asp-validation-for="FechaLanzamiento" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Archivo de canción (.mp3)</label>
+        <input name="archivoCancion" type="file" accept=".mp3,.wav" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Subir</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

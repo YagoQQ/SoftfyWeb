@@ -1,0 +1,62 @@
+﻿@model SoftfyWeb.Dtos.UsuarioRegistroDto
+@{
+    ViewData["Title"] = "Registrarse";
+}
+
+<div class="form-wrapper">
+    <div class="form-card">
+        <h3>Registrarse</h3>
+
+        @* Mostrar mensaje de éxito *@
+        @if (TempData["RegistroOk"] != null)
+        {
+            <div class="alert alert-info text-center">
+                @TempData["RegistroOk"]
+            </div>
+        }
+
+        <form asp-action="Registro" method="post">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <input asp-for="Nombre" class="form-control mb-2" placeholder="Nombre" />
+            <input asp-for="Apellido" class="form-control mb-2" placeholder="Apellido" />
+            <input asp-for="Email" class="form-control mb-2" placeholder="Correo electrónico" type="email" />
+            <input asp-for="Password" class="form-control mb-3" placeholder="Contraseña" type="password" />
+
+            <select asp-for="TipoUsuario" class="form-select mb-3" id="TipoUsuario" onchange="mostrarFormulario()">
+                <option value="Oyente">Oyente</option>
+                <option value="Artista">Artista</option>
+            </select>
+
+            <div id="formArtista" style="display:none;">
+                <input asp-for="NombreArtistico" class="form-control mb-3" placeholder="Nombre Artístico" />
+            </div>
+
+            <div id="formOyente" style="display:none;">
+                <p class="text-white small mb-2">Formulario de oyente</p>
+                <!-- Puedes agregar más campos si los necesitas -->
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">Registrarse</button>
+        </form>
+
+        <p class="text-center text-white mt-3">
+            ¿Ya tienes cuenta?
+            <a asp-action="Login" class="text-link">Iniciar sesión</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function mostrarFormulario() {
+            const tipoUsuario = document.getElementById("TipoUsuario").value;
+            document.getElementById("formArtista").style.display = (tipoUsuario === "Artista") ? "block" : "none";
+            document.getElementById("formOyente").style.display = (tipoUsuario === "Oyente") ? "block" : "none";
+        }
+
+        window.onload = mostrarFormulario;
+    </script>
+}

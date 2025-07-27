@@ -1,0 +1,12 @@
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\bin\Debug\net8.0\SoftfyWeb.Modelos.deps.json
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\bin\Debug\net8.0\SoftfyWeb.Modelos.dll
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\bin\Debug\net8.0\SoftfyWeb.Modelos.pdb
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\obj\Debug\net8.0\SoftfyWeb.Modelos.csproj.AssemblyReference.cache
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\obj\Debug\net8.0\SoftfyWeb.Modelos.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\obj\Debug\net8.0\SoftfyWeb.Modelos.AssemblyInfoInputs.cache
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\obj\Debug\net8.0\SoftfyWeb.Modelos.AssemblyInfo.cs
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\obj\Debug\net8.0\SoftfyWeb.Modelos.csproj.CoreCompileInputs.cache
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\obj\Debug\net8.0\SoftfyWeb.Modelos.dll
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\obj\Debug\net8.0\refint\SoftfyWeb.Modelos.dll
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\obj\Debug\net8.0\SoftfyWeb.Modelos.pdb
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\obj\Debug\net8.0\ref\SoftfyWeb.Modelos.dll

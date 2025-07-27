@@ -1,0 +1,68 @@
+﻿@model IEnumerable<SoftfyWeb.Modelos.Cancion>
+
+@{
+    ViewData["Title"] = "Ver Álbum";
+    var playlistId = ViewBag.PlaylistId as int?;
+    var nombreAlbum = ViewBag.PlaylistNombre;
+    var propietario = ViewBag.PlaylistPropietario as string;
+}
+
+<div class="container mt-4">
+    <h1>
+        Album @nombreAlbum
+    </h1>
+
+    @if (!Model.Any())
+    {
+        <p class="text-muted">Este álbum no tiene canciones aún.</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var cancion in Model)
+            {
+                <div class="cancion-item">
+                    <p><strong>@cancion.Titulo</strong></p>
+                    <p><em>@cancion.Artista?.NombreArtistico</em></p>
+                    <p><em>@cancion.Genero</em></p>
+
+                    @if (!string.IsNullOrEmpty(cancion.UrlArchivo))
+                    {
+                        <div class="audio-player" data-id="@cancion.Id">
+                            <div class="player-controls">
+                                <button class="play-pause btn btn-success btn-sm" data-id="@cancion.Id">▶️</button>
+                                <span class="time current">0:00</span>
+                                <input type="range" class="progress" value="0" step="1">
+                                <span class="time duration">0:00</span>
+                                @if (User.IsInRole("OyentePremium"))
+                                {
+                                    <a class="btn btn-info btn-sm" href="@cancion.UrlArchivo" download>⬇️</a>
+                                }
+                            </div>
+                            <audio id="audio-@cancion.Id" src="@cancion.UrlArchivo"></audio>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>No disponible</p>
+                    }
+
+                    <div class="btn-group-custom">
+                        <form asp-controller="VistasPlaylists" asp-action="DarMeGusta" method="post" class="form-inline">
+                            <input type="hidden" name="cancionId" value="@cancion.Id" />
+                            <button type="submit" class="btn btn-primary btn-sm" onclick="return confirm('¿Agregar esta canción a Me Gusta?');">Me Gusta</button>
+                        </form>
+
+                        @if (User.IsInRole("OyentePremium"))
+                        {
+                            <form asp-controller="VistasPlaylists" asp-action="GuardarEnPlaylist" method="get">
+                                <input type="hidden" name="cancionId" value="@cancion.Id" />
+                                <button type="submit" class="btn btn-warning btn-sm">Guardar</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

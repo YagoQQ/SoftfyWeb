@@ -1,0 +1,174 @@
+﻿@{
+    ViewData["Title"] = "Bienvenido, " + ViewBag.OyenteNombre;
+    var esPremium = User.IsInRole("OyentePremium");
+}
+
+<style>
+    h2.text-center {
+        font-size: 3rem;
+        margin-bottom: 2rem;
+        color: #fff;
+    }
+
+    /* Contenedor general */
+    .container2 {
+        padding: 20px;
+    }
+
+    /* Scroll horizontal */
+    .scroll-horizontal {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        gap: 1.2rem;
+        padding-bottom: 10px;
+    }
+
+        .scroll-horizontal::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .scroll-horizontal::-webkit-scrollbar-thumb {
+            background: #00ffe0;
+            border-radius: 4px;
+        }
+
+    /* Tarjetas */
+    .cancion-item{
+        min-width: 280px;
+        max-width: 300px;
+        background: #2c2f48;
+        color: #fff;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.3s ease;
+    }
+
+        .cancion-item:hover, {
+            transform: scale(1.05);
+        }
+
+        .cancion-item p {
+            margin: 5px 0;
+        }
+
+    /* Controles del reproductor */
+    .player-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .progress {
+        flex: 1;
+        margin: 0 8px;
+    }
+    .btn-group-custom {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="container2">
+    <h2 class="text-center">Bienvenido a Softfy, ¡@ViewBag.OyenteNombre!</h2>
+
+    <!-- Sección: Canciones -->
+    <div class="section">
+        <h3 class="text-white mb-3">Todas las Canciones</h3>
+        <div class="scroll-horizontal">
+            @foreach (var cancion in ViewBag.TodasCanciones)
+            {
+                <div class="cancion-item">
+                    <p><strong>@cancion.Titulo</strong></p>
+                    <p><em>@cancion.Artista?.NombreArtistico</em></p>
+                    <p><em>@cancion.Genero</em></p>
+
+                    @if (!string.IsNullOrEmpty(cancion.UrlArchivo))
+                    {
+                        <div class="audio-player" data-id="@cancion.Id">
+                            <div class="player-controls">
+                                <button class="play-pause btn btn-success btn-sm" data-id="@cancion.Id">▶️</button>
+                                <span class="time current">0:00</span>
+                                <input type="range" class="progress" value="0" step="1">
+                                <span class="time duration">0:00</span>
+                                @if (esPremium)
+                                {
+                                    <a class="btn btn-info btn-sm" href="@cancion.UrlArchivo" download>⬇️</a>
+                                }
+                            </div>
+                            <audio id="audio-@cancion.Id" src="@cancion.UrlArchivo"></audio>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>No disponible</p>
+                    }
+
+                    <div class="btn-group-custom">
+                        <form asp-controller="VistasPlaylists" asp-action="DarMeGusta" method="post" class="form-inline">
+                            <input type="hidden" name="cancionId" value="@cancion.Id" />
+                            <button type="submit" class="btn btn-primary btn-sm" onclick="return confirm('¿Agregar esta canción a Me Gusta?');">Me Gusta</button>
+                        </form>
+
+                        @if (esPremium)
+                        {
+                            <form asp-controller="VistasPlaylists" asp-action="GuardarEnPlaylist" method="get">
+                                <input type="hidden" name="cancionId" value="@cancion.Id" />
+                                <button type="submit" class="btn btn-warning btn-sm">Guardar</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Sección: Álbumes -->
+    <div class="section mt-4">
+        <h3 class="text-white mb-3">Todos los Álbumes</h3>
+        <div class="scroll-horizontal">
+            @foreach (var playlist in ViewBag.TodasPlaylists)
+            {
+                <div class="cancion-item">
+                    <h4>
+                        <a asp-action="VerCanciones" asp-controller="VistasCanciones" asp-route-id="@playlist.Id" class="text-decoration-none text-info">
+                            @playlist.Nombre
+                        </a>
+                    </h4>
+                    <p><strong>Artista:</strong> @playlist.NombreArtistico</p>
+                    <p><strong>Total Canciones:</strong> @playlist.TotalCanciones</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Sección: Artistas -->
+    <div class="section mt-4">
+        <h3 class="text-white mb-3">Todos los Artistas</h3>
+        <div class="scroll-horizontal">
+            @foreach (var artista in ViewBag.Artistas)
+            {
+                var fotoUrl = string.IsNullOrEmpty(artista.FotoUrl) ? "/images/ProfileImage.png" : artista.FotoUrl;
+
+                <div class="artista-card">
+                    <img src="@fotoUrl" alt="Foto de @artista.NombreArtistico" class="artista-img" />
+                    <h5>
+                        <a href="@Url.Action("VerPerfilpublico", "VistasAuth", new { id = artista.Id })">
+                            @artista.NombreArtistico
+                        </a>
+                    </h5>
+                    <p class="bio">@artista.Biografia</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

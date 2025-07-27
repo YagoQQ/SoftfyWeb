@@ -1,0 +1,103 @@
+﻿@using SoftfyWeb.Modelos.Dtos
+@{
+    ViewData["Title"] = "Bienvenido, Artista";
+    var canciones = ViewBag.Canciones as List<CancionRespuestaDto> ?? new List<CancionRespuestaDto>();
+    var playlists = ViewBag.Playlists as List<PlaylistDto> ?? new List<PlaylistDto>();
+}
+
+<h1>Bienvenido, @ViewBag.ArtistaNombre</h1>
+
+<p>¡Gracias por ser parte de nuestra comunidad de artistas! Desde aquí podrás gestionar y subir tus canciones.</p>
+
+<p>
+    <a asp-controller="VistasCanciones" asp-action="CrearCancion" class="btn btn-primary">
+        Subir Canción
+    </a>
+</p>
+
+<!-- === Canciones === -->
+<h2>Tus canciones</h2>
+@if (canciones.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Género</th>
+                <th>Fecha de lanzamiento</th>
+                <th>Reproducir</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in canciones)
+            {
+                <tr>
+                    <td>@c.Titulo</td>
+                    <td>@c.Genero</td>
+                    <td>@c.FechaLanzamiento.ToString("yyyy-MM-dd")</td>
+                    <td><audio controls src="@c.UrlArchivo" style="max-width: 200px"></audio></td>
+                    <td>
+                    <form asp-controller="VistasPlaylists" asp-action="GuardarEnPlaylist" method="get">
+                        <input type="hidden" name="cancionId" value="@c.Id" />
+                        <button type="submit" class="btn btn-sm btn-primary" onclick="return confirm('¿Guardar esta canción?');">
+                            Agregar a album
+                        </button>
+                    </form>
+                        <form method="post" action="@Url.Action("EliminarCancion", "VistasCanciones")" onsubmit="return confirm('¿Estás seguro de eliminar esta canción?');">
+                            <input type="hidden" name="id" value="@c.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm mt-2">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="text-muted">Aún no has subido canciones.</p>
+}
+
+<h2>Tus Albums</h2>
+
+@if (playlists.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Canciones</th>
+                <th>Acciones</th>
+                <th>Renombrar</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in playlists)
+            {
+                <tr>
+                    <td>@p.Nombre</td>
+                    <td>@p.TotalCanciones</td>
+                    <td>
+                        <a asp-controller="VistasPlaylists" asp-action="Detalle" asp-route-id="@p.Id" class="btn btn-sm btn-info">Ver</a>
+                        <form asp-controller="VistasPlaylists" asp-action="Eliminar" method="post" asp-route-id="@p.Id" class="d-inline"
+                              onsubmit="return confirm('¿Estás seguro de eliminar este álbum?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form asp-controller="VistasPlaylists" asp-action="Renombrar" method="post" class="d-flex">
+                            <input type="hidden" name="id" value="@p.Id" />
+                            <input type="text" name="nuevoNombre" class="form-control form-control-sm" placeholder="Nuevo nombre" />
+                            <button type="submit" class="btn btn-sm btn-secondary ms-1">Ok</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="text-muted">No tienes playlists creadas.</p>
+}

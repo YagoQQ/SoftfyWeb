@@ -1,0 +1,36 @@
+﻿@model IEnumerable<SoftfyWeb.Modelos.Dtos.PlaylistDto>
+
+<h2>Playlists del sistema</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Acciones</th>
+            <th>Nombre</th>
+            <th>Artista</th>
+            <th>Propietario</th>
+            <th>Total Canciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td>
+                    <form asp-action="EliminarPlaylist" asp-controller="VistaAdmin" method="post">
+                        <input type="hidden" name="id" value="@p.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm">🗑 Eliminar</button>
+                    </form>
+                </td>
+                <td>
+                    <a asp-action="VerCanciones" asp-controller="VistaAdmin" asp-route-id="@p.Id">
+                        @p.Nombre
+                    </a>
+                </td>
+                <td>@p.NombreArtistico @p.Apellido</td>
+                <td>@p.Propietario</td>
+                <td>@p.TotalCanciones</td>
+            </tr>
+        }
+    </tbody>
+</table>

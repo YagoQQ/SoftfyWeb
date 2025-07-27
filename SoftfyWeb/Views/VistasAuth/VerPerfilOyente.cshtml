@@ -1,0 +1,66 @@
+﻿@{
+    ViewData["Title"] = "Perfil del Oyente";
+    var nombre = ViewBag.Nombre as string;
+    var apellido = ViewBag.Apellido as string;
+    var tipoUsuario = ViewBag.TipoUsuario as string;
+}
+
+<div class="container mt-5">
+    <h2>Perfil del Oyente</h2>
+
+    <div id="modoTexto">
+        <p><strong>Nombre:</strong> @nombre</p>
+        <p><strong>Apellido:</strong> @apellido</p>
+        <p><strong>Tipo de Usuario:</strong> @tipoUsuario</p>
+        <button class="btn btn-warning" onclick="activarEdicion()">Editar</button>
+    </div>
+
+    <!-- Formulario de edición -->
+    <form id="formEditar" method="post" asp-action="ActualizarPerfilOyente" asp-controller="VistasAuth" style="display:none;">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" name="Nombre" value="@nombre" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Apellido</label>
+            <input type="text" class="form-control" name="Apellido" value="@apellido" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <button type="button" class="btn btn-secondary" onclick="cancelarEdicion()">Cancelar</button>
+    </form>
+
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Mensaje"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Muestra el formulario de edición y oculta los datos de perfil
+        function activarEdicion() {
+            document.getElementById('modoTexto').style.display = 'none';
+            document.getElementById('formEditar').style.display = 'block';
+        }
+
+        // Cancela la edición y vuelve a mostrar los datos del perfil
+        function cancelarEdicion() {
+            document.getElementById('formEditar').reset();
+            document.getElementById('modoTexto').style.display = 'block';
+            document.getElementById('formEditar').style.display = 'none';
+        }
+    </script>
+}

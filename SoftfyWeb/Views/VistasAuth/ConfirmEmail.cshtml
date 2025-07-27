@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Confirmación de Correo";
+}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh; background-color: #1c1c1c;">
+    <div class="card p-4" style="max-width: 400px; width: 100%; background-color: #2c2c2c;">
+        <h2 class="text-center text-white mb-4">Confirmación de Correo</h2>
+
+        @* Mensajes de éxito o error *@
+        @if (TempData["Info"] != null)
+        {
+            <div class="alert alert-info text-center">
+                @TempData["Info"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger text-center">
+                @TempData["Error"]
+            </div>
+        }
+
+        <div class="text-center">
+            <a href="@Url.Action("Login", "VistasAuth")" class="btn btn-primary w-100">Ir al Login</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,78 @@
+﻿@model List<SoftfyWeb.Modelos.Dtos.CancionRespuestaDto>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Canciones</title>
+    <style>
+        .song-card {
+            background-color: var(--bg-panel);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px #2867A6;
+        }
+
+            .song-card h5 {
+                color: var(--text-light);
+            }
+
+            .song-card p {
+                color: var(--accent);
+            }
+    </style>
+</head>
+<body>
+
+    <p>
+        <a asp-controller="VistasCanciones" asp-action="CrearCancion" class="btn btn-primary">
+            Subir Canción
+        </a>
+    </p>
+
+    <div class="container py-5">
+        <h2 class="text-center text-white mb-4">Mis Canciones</h2>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="row">
+                @foreach (var cancion in Model)
+                {
+                    <div class="col-md-4">
+                        <div class="song-card">
+                            <h5>@cancion.Titulo</h5>
+                            <p><strong>Género:</strong> @cancion.Genero</p>
+                            <p><strong>Fecha de Lanzamiento:</strong> @cancion.FechaLanzamiento.ToString("dd/MM/yyyy")</p>
+
+                            <!-- Reproductor de audio -->
+                            <div class="audio-player">
+                                <audio controls>
+                                    <source src="@cancion.UrlArchivo" type="audio/mpeg">
+                                    Tu navegador no soporta el elemento de audio.
+                                </audio>
+                            </div>
+
+                            <!-- Botón para eliminar -->
+                            <form method="post" action="@Url.Action("EliminarCancion", "VistasCanciones")" onsubmit="return confirm('¿Estás seguro de eliminar esta canción?');">
+                                <input type="hidden" name="id" value="@cancion.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm mt-2">Eliminar</button>
+                            </form>
+                            <div class="mt-3 text-end">
+                                <a asp-action="EditarCancion" asp-route-id="@cancion.Id" class="btn btn-outline-light btn-sm">Editar</a>
+                            </div>
+
+              
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-center text-white">No tienes canciones.</p>
+        }
+    </div>
+</body>
+</html>

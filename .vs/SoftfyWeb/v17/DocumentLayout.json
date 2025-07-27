@@ -1,0 +1,254 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{28C55C5C-D400-4810-B907-953415C8A1E5}|SoftfyWeb\\SoftfyWeb.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfyweb\\views\\vistassuscripciones\\cancelarsuscripcion.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{28C55C5C-D400-4810-B907-953415C8A1E5}|SoftfyWeb\\SoftfyWeb.csproj|solutionrelative:softfyweb\\views\\vistassuscripciones\\cancelarsuscripcion.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28C55C5C-D400-4810-B907-953415C8A1E5}|SoftfyWeb\\SoftfyWeb.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfyweb\\views\\vistasauth\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{28C55C5C-D400-4810-B907-953415C8A1E5}|SoftfyWeb\\SoftfyWeb.csproj|solutionrelative:softfyweb\\views\\vistasauth\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28C55C5C-D400-4810-B907-953415C8A1E5}|SoftfyWeb\\SoftfyWeb.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfyweb\\controllers\\vistasauthcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28C55C5C-D400-4810-B907-953415C8A1E5}|SoftfyWeb\\SoftfyWeb.csproj|solutionrelative:softfyweb\\controllers\\vistasauthcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfy.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|solutionrelative:softfy.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfy.api\\controllers\\suscripcionescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|solutionrelative:softfy.api\\controllers\\suscripcionescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfy.api\\services\\iserviciosuscripciones.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|solutionrelative:softfy.api\\services\\iserviciosuscripciones.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfy.api\\services\\serviciosuscripciones.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|solutionrelative:softfy.api\\services\\serviciosuscripciones.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28C55C5C-D400-4810-B907-953415C8A1E5}|SoftfyWeb\\SoftfyWeb.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfyweb\\controllers\\vistassuscripcionescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28C55C5C-D400-4810-B907-953415C8A1E5}|SoftfyWeb\\SoftfyWeb.csproj|solutionrelative:softfyweb\\controllers\\vistassuscripcionescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfy.api\\controllers\\artistascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|solutionrelative:softfy.api\\controllers\\artistascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfy.api\\services\\jwtservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|solutionrelative:softfy.api\\services\\jwtservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfy.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|solutionrelative:softfy.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfy.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|solutionrelative:softfy.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 181,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "CancelarSuscripcion.cshtml",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\SoftfyWeb\\Views\\VistasSuscripciones\\CancelarSuscripcion.cshtml",
+              "RelativeDocumentMoniker": "SoftfyWeb\\Views\\VistasSuscripciones\\CancelarSuscripcion.cshtml",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\SoftfyWeb\\Views\\VistasSuscripciones\\CancelarSuscripcion.cshtml",
+              "RelativeToolTip": "SoftfyWeb\\Views\\VistasSuscripciones\\CancelarSuscripcion.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAABSAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-27T13:45:05.867Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Login.cshtml",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\SoftfyWeb\\Views\\VistasAuth\\Login.cshtml",
+              "RelativeDocumentMoniker": "SoftfyWeb\\Views\\VistasAuth\\Login.cshtml",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\SoftfyWeb\\Views\\VistasAuth\\Login.cshtml",
+              "RelativeToolTip": "SoftfyWeb\\Views\\VistasAuth\\Login.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-27T13:42:40.808Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "VistasSuscripcionesController.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\SoftfyWeb\\Controllers\\VistasSuscripcionesController.cs",
+              "RelativeDocumentMoniker": "SoftfyWeb\\Controllers\\VistasSuscripcionesController.cs",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\SoftfyWeb\\Controllers\\VistasSuscripcionesController.cs",
+              "RelativeToolTip": "SoftfyWeb\\Controllers\\VistasSuscripcionesController.cs",
+              "ViewState": "AgIAALUAAAAAAAAAAAAcwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-27T13:42:09.002Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "ArtistasController.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Controllers\\ArtistasController.cs",
+              "RelativeDocumentMoniker": "Softfy.API\\Controllers\\ArtistasController.cs",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Controllers\\ArtistasController.cs",
+              "RelativeToolTip": "Softfy.API\\Controllers\\ArtistasController.cs",
+              "ViewState": "AgIAAD4AAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-27T13:24:50.787Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "JwtService.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Services\\JwtService.cs",
+              "RelativeDocumentMoniker": "Softfy.API\\Services\\JwtService.cs",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Services\\JwtService.cs",
+              "RelativeToolTip": "Softfy.API\\Services\\JwtService.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAB0AAABSAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-27T13:18:23.119Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ServicioSuscripciones.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Services\\ServicioSuscripciones.cs",
+              "RelativeDocumentMoniker": "Softfy.API\\Services\\ServicioSuscripciones.cs",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Services\\ServicioSuscripciones.cs",
+              "RelativeToolTip": "Softfy.API\\Services\\ServicioSuscripciones.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAuwBMAAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-27T12:38:09.48Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IServicioSuscripciones.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Services\\IServicioSuscripciones.cs",
+              "RelativeDocumentMoniker": "Softfy.API\\Services\\IServicioSuscripciones.cs",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Services\\IServicioSuscripciones.cs",
+              "RelativeToolTip": "Softfy.API\\Services\\IServicioSuscripciones.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-27T12:37:12.161Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "SuscripcionesController.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Controllers\\SuscripcionesController.cs",
+              "RelativeDocumentMoniker": "Softfy.API\\Controllers\\SuscripcionesController.cs",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Controllers\\SuscripcionesController.cs",
+              "RelativeToolTip": "Softfy.API\\Controllers\\SuscripcionesController.cs",
+              "ViewState": "AgIAAFUBAAAAAAAAAAAUwGgBAABYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-27T12:29:22.103Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\appsettings.json",
+              "RelativeDocumentMoniker": "Softfy.API\\appsettings.json",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\appsettings.json",
+              "RelativeToolTip": "Softfy.API\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-07-27T11:43:16.043Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Program.cs",
+              "RelativeDocumentMoniker": "Softfy.API\\Program.cs",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Program.cs",
+              "RelativeToolTip": "Softfy.API\\Program.cs",
+              "ViewState": "AgIAADgAAAAAAAAAAAAQwEAAAABMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-27T11:27:43.901Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "VistasAuthController.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\SoftfyWeb\\Controllers\\VistasAuthController.cs",
+              "RelativeDocumentMoniker": "SoftfyWeb\\Controllers\\VistasAuthController.cs",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\SoftfyWeb\\Controllers\\VistasAuthController.cs",
+              "RelativeToolTip": "SoftfyWeb\\Controllers\\VistasAuthController.cs",
+              "ViewState": "AgIAAIIAAAAAAAAAAAAcwIoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-27T11:22:05.485Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "Softfy.API\\Controllers\\AuthController.cs",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "Softfy.API\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAADwv7AAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-27T11:21:24.834Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 270,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

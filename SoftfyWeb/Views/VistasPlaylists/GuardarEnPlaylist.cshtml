@@ -1,0 +1,37 @@
+﻿@using SoftfyWeb.Modelos.Dtos;
+
+@{
+    ViewData["Title"] = "Mis Playlists";
+}
+<div class="form-wrapper">
+    <div class="form-card">
+        <h2 class="text-center">Selecciona una Playlist</h2>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger text-center">@ViewBag.Error</div>
+        }
+
+        @if (ViewBag.Playlists is List<PlaylistDto> playlists && playlists.Any())
+        {
+                @foreach (var playlist in playlists)
+                {
+                    <div class="artista-card">
+                        <div class="playlist-info">
+                            <span>@playlist.Nombre</span>
+                            <form method="post" action="@Url.Action("GuardarEnPlaylist", "VistasPlaylists")">
+                                <input type="hidden" name="cancionId" value="@ViewBag.CancionId" />
+                                <input type="hidden" name="playlistId" value="@playlist.Id" />
+                                <button type="submit" class="btn btn-success">Guardar Aquí</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+        }
+        else
+        {
+            <p>No tienes playlists disponibles.</p>
+        }
+
+    </div>
+</div>

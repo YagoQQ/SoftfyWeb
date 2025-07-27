@@ -1,0 +1,94 @@
+﻿@model IEnumerable<SoftfyWeb.Modelos.Dtos.CancionRespuestaDto>
+@{
+    ViewData["Title"] = "Todas las Canciones";
+    var esPremium = User.IsInRole("OyentePremium");
+}
+
+<style>
+    .song-card {
+        background-color: #1e1e2f;
+        border-radius: 12px;
+        padding: 15px;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        transition: transform 0.2s;
+    }
+
+        .song-card:hover {
+            transform: scale(1.05);
+        }
+
+        .song-card h5 {
+            color: #00ffe0;
+        }
+
+        .song-card p {
+            margin: 5px 0;
+        }
+
+</style>
+
+<div class="container py-4">
+    <h2 class="text-center">Todas las Canciones</h2>
+
+    <div class="row g-4">
+        @foreach (var c in Model)
+        {
+            <div class="col-md-4">
+                <div class="song-card">
+                    <h5>@c.Titulo</h5>
+                    <h5>@c.Artista.NombreArtistico</h5>
+                    <p><strong>Género:</strong> @c.Genero</p>
+                    <p><strong>Lanzamiento:</strong> @c.FechaLanzamiento.ToString("dd/MM/yyyy")</p>
+
+                    <!-- Reproductor -->
+                    @if (!string.IsNullOrEmpty(c.UrlArchivo))
+                    {
+                        <div class="audio-player" data-id="@c.Id">
+                            <div class="player-controls">
+                                <button class="play-pause btn btn-sm btn-success" data-id="@c.Id">▶️</button>
+                                <span class="time current">0:00</span>
+                                <input type="range" class="progress" value="0" step="1">
+                                <span class="time duration">0:00</span>
+
+                                @if (esPremium)
+                                {
+                                    <a class="btn btn-info btn-sm" href="@c.UrlArchivo" download>⬇️</a>
+                                }
+                            </div>
+                            <audio id="audio-@c.Id" src="@c.UrlArchivo"></audio>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>No disponible</p>
+                    }
+
+                    <!-- Botones -->
+                    <div class="btn-group-custom mt-3">
+                        <form asp-controller="VistasPlaylists" asp-action="DarMeGusta" method="post" class="form-inline">
+                            <input type="hidden" name="cancionId" value="@c.Id" />
+                            <button type="submit" class="btn btn-primary btn-sm" onclick="return confirm('¿Agregar a Me Gusta?');">
+                                Me Gusta
+                            </button>
+                        </form>
+
+                        @if (esPremium)
+                        {
+                            <form asp-controller="VistasPlaylists" asp-action="GuardarEnPlaylist" method="get">
+                                <input type="hidden" name="cancionId" value="@c.Id" />
+                                <button type="submit" class="btn btn-warning btn-sm">
+                                    Guardar
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
