@@ -8,11 +8,11 @@ using System.Text.Json;
 namespace SoftfyWeb.Controllers
 {
     [Authorize(Roles = "Admin")]
-    public class PlanesController : Controller
+    public class VistasPlanesController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public PlanesController(IHttpClientFactory httpClientFactory)
+        public VistasPlanesController(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }

@@ -2,13 +2,75 @@
 @{
     ViewData["Title"] = "Registrarse";
 }
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-<div class="d-flex justify-content-center align-items-center" style="min-height:100vh; background:#1c1c1c">
-    <div class="card p-4" style="width:360px; background:#2c2c2c;">
-        <h3 class="text-center text-white mb-3">Registrarse</h3>
+<style>
 
-        @* Mostrar mensaje de éxito después del registro *@
+    .form-wrapper {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .form-card {
+        background-color: #2c2c2c;
+        border: 2px solid #00f2ff44;
+        border-radius: 15px;
+        padding: 40px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.08);
+    }
+
+        .form-card h3 {
+            color: white;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+    .form-control, .form-select {
+        background-color: #111;
+        color: white;
+        border: 1px solid #00f2ff;
+        border-radius: 8px;
+    }
+
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 10px #1db95455;
+            border-color: #1db954;
+        }
+
+    .btn-success {
+        background-color: #1db954;
+        border: none;
+        transition: 0.3s;
+    }
+
+        .btn-success:hover {
+            background-color: #17a44b;
+        }
+
+    .text-link {
+        color: #1db9ff;
+        text-decoration: none;
+    }
+
+        .text-link:hover {
+            text-decoration: underline;
+        }
+
+    .alert-info {
+        background-color: #0d6efd33;
+        border: 1px solid #0d6efd;
+        color: white;
+    }
+</style>
+
+<div class="form-wrapper">
+    <div class="form-card">
+        <h3>Registrarse</h3>
+
+        @* Mostrar mensaje de éxito *@
         @if (TempData["RegistroOk"] != null)
         {
             <div class="alert alert-info text-center">
@@ -17,27 +79,25 @@
         }
 
         <form asp-action="Registro" method="post">
-            <div asp-validation-summary="All" class="text-danger mb-2"></div>
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-            <input asp-for="Nombre" placeholder="Nombre" class="form-control mb-2" />
-            <input asp-for="Apellido" placeholder="Apellido" class="form-control mb-2" />
-            <input asp-for="Email" placeholder="Correo" class="form-control mb-2" type="email" />
-            <input asp-for="Password" placeholder="Contraseña" class="form-control mb-2" type="password" />
+            <input asp-for="Nombre" class="form-control mb-2" placeholder="Nombre" />
+            <input asp-for="Apellido" class="form-control mb-2" placeholder="Apellido" />
+            <input asp-for="Email" class="form-control mb-2" placeholder="Correo electrónico" type="email" />
+            <input asp-for="Password" class="form-control mb-3" placeholder="Contraseña" type="password" />
 
             <select asp-for="TipoUsuario" class="form-select mb-3" id="TipoUsuario" onchange="mostrarFormulario()">
                 <option value="Oyente">Oyente</option>
                 <option value="Artista">Artista</option>
             </select>
 
-            <!-- Formulario específico para Artistas -->
             <div id="formArtista" style="display:none;">
-                <input asp-for="NombreArtistico" placeholder="Nombre Artístico" class="form-control mb-2" />
+                <input asp-for="NombreArtistico" class="form-control mb-3" placeholder="Nombre Artístico" />
             </div>
 
-            <!-- Puedes agregar más campos para los oyentes si lo deseas -->
             <div id="formOyente" style="display:none;">
-                <p class="text-white">Formulario de oyente</p>
-                <!-- Aquí puedes agregar más campos si son necesarios para los oyentes -->
+                <p class="text-white small mb-2">Formulario de oyente</p>
+                <!-- Puedes agregar más campos si los necesitas -->
             </div>
 
             <button type="submit" class="btn btn-success w-100">Registrarse</button>
@@ -45,7 +105,7 @@
 
         <p class="text-center text-white mt-3">
             ¿Ya tienes cuenta?
-            <a asp-action="Login" class="text-primary">Iniciar sesión</a>
+            <a asp-action="Login" class="text-link">Iniciar sesión</a>
         </p>
     </div>
 </div>
@@ -55,21 +115,11 @@
 
     <script>
         function mostrarFormulario() {
-            var tipoUsuario = document.getElementById("TipoUsuario").value;
-
-            // Mostrar los campos para Artista
-            if (tipoUsuario === "Artista") {
-                document.getElementById("formArtista").style.display = "block";
-                document.getElementById("formOyente").style.display = "none";
-            } else {
-                document.getElementById("formArtista").style.display = "none";
-                document.getElementById("formOyente").style.display = "block";
-            }
+            const tipoUsuario = document.getElementById("TipoUsuario").value;
+            document.getElementById("formArtista").style.display = (tipoUsuario === "Artista") ? "block" : "none";
+            document.getElementById("formOyente").style.display = (tipoUsuario === "Oyente") ? "block" : "none";
         }
 
-        // Llamar a la función al cargar la página para asegurarnos de que el formulario correcto se muestre
-        window.onload = function() {
-            mostrarFormulario();
-        };
+        window.onload = mostrarFormulario;
     </script>
 }
