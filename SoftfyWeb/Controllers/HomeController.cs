@@ -13,8 +13,13 @@ namespace SoftfyWeb.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string? msg)
         {
+            if (msg == "actualizar")
+            {
+                msg = "Inicia sesión para aplicar cambios";
+            }
+            ViewBag.Message = msg;
             return View();
         }
 

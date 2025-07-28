@@ -11,8 +11,6 @@ namespace SoftfyWeb.Controllers
     public class VistaAdminController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly string apiUrl = "https://localhost:7003/api/Admin";
-
         public VistaAdminController(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
@@ -29,67 +27,32 @@ namespace SoftfyWeb.Controllers
 
         public async Task<IActionResult> IndexUsuario()
         {
-            var cliente = ObtenerClienteConToken(); // Llamar al método actualizado
+            var cliente = ObtenerClienteConToken();
 
-            var oyentesResp = await cliente.GetAsync("https://localhost:7003/api/oyentes");
-            var artistasResp = await cliente.GetAsync("https://localhost:7003/api/Artistas");
-            var usuariosBloqueadosResp = await cliente.GetAsync("https://localhost:7003/api/Admin/usuarios-bloqueados");
 
-            if (!oyentesResp.IsSuccessStatusCode || !artistasResp.IsSuccessStatusCode || !usuariosBloqueadosResp.IsSuccessStatusCode)
-            {
-                ViewBag.Error = "Error al obtener usuarios.";
-                return View(); // vista vacía si falla
-            }
-
-            var oyentesJson = await oyentesResp.Content.ReadAsStringAsync();
-            var artistasJson = await artistasResp.Content.ReadAsStringAsync();
-            var usuariosBloqueadosJson = await usuariosBloqueadosResp.Content.ReadAsStringAsync();
-
-            var oyentes = JsonSerializer.Deserialize<List<PerfilOyenteDto>>(oyentesJson, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-
-            var artistas = JsonSerializer.Deserialize<List<PerfilArtistaDto>>(artistasJson, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-
-            var usuariosBloqueados = JsonSerializer.Deserialize<List<Usuario>>(usuariosBloqueadosJson, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var oyentes = await cliente.GetFromJsonAsync<List<PerfilOyenteDto>>("https://localhost:7003/api/oyentes");
+            var artistas = await cliente.GetFromJsonAsync<List<PerfilArtistaDto>>("https://localhost:7003/api/Artistas");
+            var usuariosBloqueados = await cliente.GetFromJsonAsync<List<Usuario>>("https://localhost:7003/api/Admin/usuarios-bloqueados");
 
             ViewBag.Oyentes = oyentes;
             ViewBag.Artistas = artistas;
             ViewBag.UsuariosBloqueados = usuariosBloqueados;
-
+            
             return View();
         }
 
         public async Task<IActionResult> IndexCanciones()
         {
-            var client = ObtenerClienteConToken(); // Llamar al método actualizado
-            var response = await client.GetAsync("https://localhost:7003/api/canciones/canciones");
-
-            if (!response.IsSuccessStatusCode)
-            {
-                ViewBag.Error = "Error al cargar canciones.";
-                return View(new List<Cancion>());
-            }
-
-            var content = await response.Content.ReadAsStringAsync();
-            var canciones = JsonSerializer.Deserialize<List<Cancion>>(content, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var client = ObtenerClienteConToken();
+            var canciones = await client.GetFromJsonAsync<List<Cancion>>("https://localhost:7003/api/canciones/canciones");
             return View(canciones);
+            
         }
 
         [HttpPost]
         public async Task<IActionResult> EliminarCancion(int id)
         {
-            var client = ObtenerClienteConToken(); // Llamar al método actualizado
+            var client = ObtenerClienteConToken();
             var response = await client.DeleteAsync($"https://localhost:7003/api/canciones/eliminar/{id}");
 
             if (!response.IsSuccessStatusCode)
@@ -101,7 +64,7 @@ namespace SoftfyWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> IndexPlaylists()
         {
-            var client = ObtenerClienteConToken(); // Llamar al método actualizado
+            var client = ObtenerClienteConToken();
             var response = await client.GetAsync("https://localhost:7003/api/Playlists/todas");
 
             if (!response.IsSuccessStatusCode)
@@ -122,7 +85,7 @@ namespace SoftfyWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> EliminarPlaylist(int id)
         {
-            var client = ObtenerClienteConToken(); // Llamar al método actualizado
+            var client = ObtenerClienteConToken();
             var response = await client.DeleteAsync($"https://localhost:7003/api/playlists/{id}/eliminar");
 
             if (!response.IsSuccessStatusCode)
@@ -165,7 +128,7 @@ namespace SoftfyWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> BloquearUsuario(string email)
         {
-            var client = ObtenerClienteConToken(); // Llamar al método actualizado
+            var client = ObtenerClienteConToken();
             var response = await client.PostAsync($"https://localhost:7003/api/Admin/bloquear/{email}", null);
 
             if (!response.IsSuccessStatusCode)

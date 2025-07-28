@@ -81,7 +81,6 @@ namespace SoftfyWeb.Controllers
         {
             var client = ObtenerClienteConToken();
 
-            // Obtener las canciones que ya están en la playlist
             var resp = await client.GetAsync($"playlists/{id}/canciones");
             if (!resp.IsSuccessStatusCode)
                 return View("Error", CrearErrorModel());
@@ -146,12 +145,10 @@ namespace SoftfyWeb.Controllers
         {
             var client = ObtenerClienteConToken();
 
-            // Llamamos al endpoint de la API que añade la canción a la playlist
             var resp = await client.PostAsync($"playlists/{playlistId}/agregar/{cancionId}", null);
 
             if (resp.IsSuccessStatusCode)
             {
-                // Redirigimos al detalle para recargar la lista
                 return RedirectToAction(nameof(Detalle), new { id = playlistId });
             }
 
@@ -318,12 +315,18 @@ namespace SoftfyWeb.Controllers
                 return RedirectToAction("Index", "VistasPlaylists");
             }
 
-            var errorDetails = await response.Content.ReadAsStringAsync();
-            ViewBag.Error = $"Error: {response.StatusCode} - {errorDetails}";
+            var raw = await response.Content.ReadAsStringAsync();
+            try
+            {
+                var errorJson = JsonDocument.Parse(raw);
+                var msg = errorJson.RootElement.GetProperty("message").GetString();
+                ViewBag.Error = msg;
+            }
+            catch
+            {
+                ViewBag.Error = "Ocurrió un error inesperado.";
+            }
             return View();
         }
-
-
-
     }
 }

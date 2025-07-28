@@ -423,7 +423,7 @@ namespace SoftfyWeb.Controllers
                 .FirstOrDefault(pc => pc.PlaylistId == playlistId && pc.CancionId == cancionId);
             if (playlistCancionExistente != null)
             {
-                return BadRequest(new { message = "La canción ya está en esta playlist." });
+                return BadRequest(new { error = true, message = "La canción ya está en esta playlist." });
             }
 
             var playlistCancion = new PlaylistCancion

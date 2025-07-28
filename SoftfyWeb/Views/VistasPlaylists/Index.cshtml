@@ -3,18 +3,10 @@
     ViewData["Title"] = "Mis Playlists";
 }
 
-<style>
-
-
-
-</style>
-
-
 <h2>@ViewData["Title"]</h2>
 <p>
     <a asp-action="Crear" class="btn btn-primary">Nueva Playlist</a>
 
-    @* Mostrar el botón "Me Gusta" solo si el usuario es oyente o oyente premium *@
     @if (User.IsInRole("Oyente") || User.IsInRole("OyentePremium"))
     {
         <a asp-action="MeGusta" class="btn btn-secondary ms-2">Me Gusta</a>

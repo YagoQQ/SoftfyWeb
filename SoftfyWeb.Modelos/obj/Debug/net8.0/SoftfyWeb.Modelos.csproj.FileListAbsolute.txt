@@ -10,3 +10,4 @@ C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyW
 C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\obj\Debug\net8.0\refint\SoftfyWeb.Modelos.dll
 C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\obj\Debug\net8.0\SoftfyWeb.Modelos.pdb
 C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\obj\Debug\net8.0\ref\SoftfyWeb.Modelos.dll
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb.Modelos\obj\Debug\net8.0\SoftfyWeb.Modelos.sourcelink.json

@@ -1,19 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SoftfyWeb.Dtos;
 using SoftfyWeb.Modelos;
 using SoftfyWeb.Modelos.Dtos;
 using SoftfyWeb.Models;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.NetworkInformation;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace SoftfyWeb.Controllers
 {

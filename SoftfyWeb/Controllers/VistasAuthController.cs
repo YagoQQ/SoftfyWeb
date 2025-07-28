@@ -6,16 +6,12 @@ using SoftfyWeb.Dtos;
 using SoftfyWeb.Modelos;
 using SoftfyWeb.Modelos.Dtos;
 using SoftfyWeb.Models;
-using System;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace SoftfyWeb.Controllers
 {
@@ -26,7 +22,6 @@ namespace SoftfyWeb.Controllers
         public VistasAuthController(IHttpClientFactory httpClientFactory)
             => _httpClientFactory = httpClientFactory;
 
-        // Helper para inyectar el token JWT desde la cookie
         private HttpClient ObtenerClienteConToken()
         {
             var client = _httpClientFactory.CreateClient("SoftfyApi");
@@ -36,14 +31,17 @@ namespace SoftfyWeb.Controllers
                     new AuthenticationHeaderValue("Bearer", jwt);
             return client;
         }
+
         private ErrorViewModel CrearErrorModel()
         {
             string id = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
             return new ErrorViewModel { RequestId = id };
         }
 
+
         [HttpGet]
         public IActionResult ForgotPassword() => View();
+
 
         [HttpPost]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
@@ -53,7 +51,7 @@ namespace SoftfyWeb.Controllers
             if (!ModelState.IsValid)
                 return View(dto);
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("SoftfyApi");
             var resp = await client.PostAsync(
                 "https://localhost:7003/api/auth/forgot-password",
                 new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json")
@@ -80,7 +78,7 @@ namespace SoftfyWeb.Controllers
             if (!ModelState.IsValid)
                 return View(dto);
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("SoftfyApi");
             var resp = await client.PostAsync(
                 "https://localhost:7003/api/auth/reset-password",
                 new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json")
@@ -98,7 +96,6 @@ namespace SoftfyWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            // Cierra la sesión en la cookie 'auth_cookie'
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction(nameof(Login));
         }
@@ -119,7 +116,7 @@ namespace SoftfyWeb.Controllers
             if (!ModelState.IsValid)
                 return View(dto);
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("SoftfyApi");
             var url = dto.TipoUsuario == "Artista"
                 ? "https://localhost:7003/api/auth/registro-artista"
                 : "https://localhost:7003/api/auth/registro";
@@ -127,6 +124,7 @@ namespace SoftfyWeb.Controllers
                 url,
                 new StringContent(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json")
             );
+
             var raw = await resp.Content.ReadAsStringAsync();
             if (!resp.IsSuccessStatusCode)
             {
@@ -146,7 +144,6 @@ namespace SoftfyWeb.Controllers
                 ViewBag.Mensaje = "Suscripción activada correctamente. Por favor, vuelve a iniciar sesión.";
             }
 
-            // Si ya está autenticado normalmente
             if (User.Identity.IsAuthenticated)
                 return RedirectToAction("Index", "Home");
 
@@ -158,16 +155,36 @@ namespace SoftfyWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(UsuarioLoginDto dto, string returnUrl = null)
         {
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("SoftfyApi");
             var resp = await client.PostAsJsonAsync("https://localhost:7003/api/auth/login", dto);
             var raw = await resp.Content.ReadAsStringAsync();
 
             if (!resp.IsSuccessStatusCode)
             {
                 var errorResponse = JsonDocument.Parse(raw).RootElement;
-                var errorMessage = errorResponse.GetProperty("error").GetString();  // Extraemos el mensaje de error
+                string errorMessage = "Error desconocido.";
 
-                // Aquí mostramos el error de confirmación de correo o credenciales inválidas
+                if (errorResponse.TryGetProperty("error", out var errorProp))
+                {
+                    errorMessage = errorProp.GetString();
+                }
+                else if (errorResponse.TryGetProperty("errors", out var errorsProp) && errorsProp.ValueKind == JsonValueKind.Object)
+                {
+                    foreach (var prop in errorsProp.EnumerateObject())
+                    {
+                        if (prop.Value.ValueKind == JsonValueKind.Array && prop.Value.GetArrayLength() > 0)
+                        {
+                            errorMessage = prop.Value[0].GetString(); // Toma el primer mensaje de error
+                            break;
+                        }
+                    }
+                }
+                // Buscar en 'message'
+                else if (errorResponse.TryGetProperty("message", out var messageProp))
+                {
+                    errorMessage = messageProp.GetString();
+                }
+
                 ViewBag.Error = errorMessage;
                 return View(dto);
             }
@@ -177,7 +194,6 @@ namespace SoftfyWeb.Controllers
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
 
-            // Creamos la identidad y el principal del usuario
             var identity = new ClaimsIdentity(
                 jwtToken.Claims,
                 CookieAuthenticationDefaults.AuthenticationScheme
@@ -186,7 +202,6 @@ namespace SoftfyWeb.Controllers
 
             var principal = new ClaimsPrincipal(identity);
 
-            // Iniciamos la sesión
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 principal,
@@ -198,6 +213,7 @@ namespace SoftfyWeb.Controllers
             );
 
             var role = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
             if (role == "Artista")
@@ -236,118 +252,59 @@ namespace SoftfyWeb.Controllers
             ViewBag.Canciones = new List<CancionRespuestaDto>();
             ViewBag.Playlists = new List<PlaylistDto>();
 
+            var perfil = await client.GetFromJsonAsync<PerfilArtistaDto>("artistas/mi-perfil");
+            if (perfil is not null)
+                nombreArtistico = perfil.NombreArtistico;
 
-            var respPerfil = await client.GetAsync("artistas/mi-perfil");
-            if (respPerfil.IsSuccessStatusCode)
-            {
-                var raw = await respPerfil.Content.ReadAsStringAsync();
-                var perfil = JsonSerializer.Deserialize<PerfilArtistaDto>(raw, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-                if (perfil is not null)
-                    nombreArtistico = perfil.NombreArtistico;
-            }
+            var canciones = await client.GetFromJsonAsync<List<CancionRespuestaDto>>("canciones/mis-canciones");
+            if (canciones is not null)
+                ViewBag.Canciones = canciones;
 
-            var respCanciones = await client.GetAsync("canciones/mis-canciones");
-            if (respCanciones.IsSuccessStatusCode)
-            {
-                var raw = await respCanciones.Content.ReadAsStringAsync();
-                var canciones = JsonSerializer.Deserialize<List<CancionRespuestaDto>>(raw, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-                ViewBag.Canciones = canciones ?? new List<CancionRespuestaDto>();
-            }
-
-            var respPlaylists = await client.GetAsync("playlists/mis-playlists");
-            if (respPlaylists.IsSuccessStatusCode)
-            {
-                var raw = await respPlaylists.Content.ReadAsStringAsync();
-                var playlists = JsonSerializer.Deserialize<List<PlaylistDto>>(raw, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-                ViewBag.Playlists = playlists ?? new List<PlaylistDto>();
-            }
+            var playlists = await client.GetFromJsonAsync<List<PlaylistDto>>("playlists/mis-playlists");
+            if (playlists is not null)
+                ViewBag.Playlists = playlists;
 
             ViewBag.ArtistaNombre = nombreArtistico;
+
             return View();
         }
 
         public async Task<IActionResult> BienvenidoOyente()
         {
-            var nombreOyente = User.Identity.Name;
-
             var client = ObtenerClienteConToken();
-            var resp = await client.GetAsync("oyentes/mi-perfil");
+            string nombreOyente = User.Identity?.Name ?? "Oyente";
 
-            if (resp.IsSuccessStatusCode)
-            {
-                var raw = await resp.Content.ReadAsStringAsync();
-                var perfil = JsonSerializer.Deserialize<PerfilOyenteDto>(raw,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                if (perfil != null)
-                {
-                    nombreOyente = $"{perfil.Nombre} {perfil.Apellido}";
-                }
-            }
+            var perfil = await client.GetFromJsonAsync<PerfilOyenteDto>("oyentes/mi-perfil");
+            if (perfil is not null)
+                nombreOyente = $"{perfil.Nombre} {perfil.Apellido}";
 
             ViewBag.OyenteNombre = nombreOyente;
 
-            var canciones = new List<CancionRespuestaDto>();
-            var respCanciones = await client.GetAsync("https://localhost:7003/api/Canciones/canciones");
+            var canciones = await client.GetFromJsonAsync<List<CancionRespuestaDto>>("https://localhost:7003/api/Canciones/canciones");
 
-            if (respCanciones.IsSuccessStatusCode)
+            canciones = canciones
+                .Where(c => !string.IsNullOrWhiteSpace(c.UrlArchivo))
+                .ToList();
+
+            var playlists = await client.GetFromJsonAsync<List<PlaylistDto>>("https://localhost:7003/api/Playlists/todas/artistas");
+            ViewBag.TodasPlaylists = playlists;
+
+            // Obtener artistas
+            var artistas = await client.GetFromJsonAsync<List<Artista>>("https://localhost:7003/api/Artistas");
+
+            foreach (var artista in artistas)
             {
-                var json = await respCanciones.Content.ReadAsStringAsync();
-                canciones = JsonSerializer.Deserialize<List<CancionRespuestaDto>>(json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                canciones = canciones
-                    .Where(c => !string.IsNullOrWhiteSpace(c.UrlArchivo))
-                    .ToList();
-            }
-            var playlists = new List<PlaylistDto>();
-            var respPlaylists = await client.GetAsync("https://localhost:7003/api/Playlists/todas/artistas");
-
-            if (respPlaylists.IsSuccessStatusCode)
-            {
-                var json = await respPlaylists.Content.ReadAsStringAsync();
-                playlists = JsonSerializer.Deserialize<List<PlaylistDto>>(json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (!string.IsNullOrEmpty(artista.FotoUrl))
+                    artista.FotoUrl = $"https://localhost:7003/api/artistas/foto/{artista.FotoUrl}";
             }
 
-            var artistas = new List<Artista>();
-            var respArtistas = await client.GetAsync("https://localhost:7003/api/Artistas");
-
-            if (respArtistas.IsSuccessStatusCode)
-            {
-                var artistasJson = await respArtistas.Content.ReadAsStringAsync();
-                artistas = JsonSerializer.Deserialize<List<Artista>>(artistasJson, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
-                foreach (var artista in artistas)
-                {
-                    if (!string.IsNullOrEmpty(artista.FotoUrl))
-                    {
-                        artista.FotoUrl = $"https://localhost:7003/api/artistas/foto/{artista.FotoUrl}";
-                    }
-                }
-
-                ViewBag.Artistas = artistas;
-            }
-
+            ViewBag.OyenteNombre = nombreOyente;
             ViewBag.TodasCanciones = canciones;
             ViewBag.TodasPlaylists = playlists;
+            ViewBag.Artistas = artistas;
 
             return View();
         }
-
-
 
         public IActionResult Bienvenido() => View();
 
@@ -378,7 +335,7 @@ namespace SoftfyWeb.Controllers
                 return View();
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = ObtenerClienteConToken();
 
             var cancionesResponse = await client.GetAsync($"https://localhost:7003/api/Canciones/por-nombre/{termino}");
             var artistasResponse = await client.GetAsync($"https://localhost:7003/api/Artistas/perfil/{termino}");
@@ -425,9 +382,14 @@ namespace SoftfyWeb.Controllers
                 var playlistsJson = await playlistResponse.Content.ReadAsStringAsync();
                 var playlists = JsonSerializer.Deserialize<List<PlaylistDto>>(playlistsJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                if (playlists != null && playlists.Any())
+                var filtradas = playlists
+                    .Where(p => !string.Equals(p.Nombre, "Canciones que te gustan", StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+
+                if (filtradas.Any())
                 {
-                    ViewBag.Playlists = playlists;
+                    ViewBag.Playlists = filtradas;
                 }
                 else
                 {
@@ -446,73 +408,49 @@ namespace SoftfyWeb.Controllers
 
             if (rol == "Artista")
             {
-                var response = await client.GetAsync("https://localhost:7003/api/Artistas/mi-perfil");
-                if (response.IsSuccessStatusCode)
-                {
-                    var raw = await response.Content.ReadAsStringAsync();
-                    var perfil = JsonSerializer.Deserialize<PerfilArtistaDto>(raw,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var perfil = await client.GetFromJsonAsync<PerfilArtistaDto>("https://localhost:7003/api/Artistas/mi-perfil");
 
-                    if (perfil != null)
-                    {
-                        ViewBag.TipoUsuario = "Artista";
-                        ViewBag.NombreArtistico = perfil.NombreArtistico;
-                        ViewBag.FotoUrl = perfil.FotoUrl;
-                        ViewBag.Biografia = perfil.Biografia;
-                        ViewBag.Email = perfil.UsuarioEmail;
-                        return View("VerPerfilArtista");
-                    }
+                if (perfil != null)
+                {
+                    ViewBag.TipoUsuario = "Artista";
+                    ViewBag.NombreArtistico = perfil.NombreArtistico;
+                    ViewBag.FotoUrl = perfil.FotoUrl;
+                    ViewBag.Biografia = perfil.Biografia;
+                    ViewBag.Email = perfil.UsuarioEmail;
+                    return View("VerPerfilArtista");
                 }
             }
-
-            if (rol == "Oyente" || rol == "OyentePremium")
+            else if (rol == "Oyente" || rol == "OyentePremium")
             {
-                var response = await client.GetAsync("https://localhost:7003/api/Oyentes/mi-perfil");
-                if (response.IsSuccessStatusCode)
-                {
-                    var raw = await response.Content.ReadAsStringAsync();
-                    var perfil = JsonSerializer.Deserialize<PerfilOyenteDto>(raw,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var perfil = await client.GetFromJsonAsync<PerfilOyenteDto>("https://localhost:7003/api/Oyentes/mi-perfil");
 
-                    if (perfil != null)
-                    {
-                        ViewBag.TipoUsuario = perfil.TipoUsuario;
-                        ViewBag.Nombre = perfil.Nombre;
-                        ViewBag.Apellido = perfil.Apellido;
-                        return View("VerPerfilOyente");
-                    }
+                if (perfil != null)
+                {
+                    ViewBag.TipoUsuario = perfil.TipoUsuario;
+                    ViewBag.Nombre = perfil.Nombre;
+                    ViewBag.Apellido = perfil.Apellido;
+                    ViewBag.Email = perfil.Email;
+                    return View("VerPerfilOyente");
                 }
             }
 
             return NotFound("Perfil no encontrado.");
         }
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> VerPerfilpublico(int id)
         {
             var client = _httpClientFactory.CreateClient();
-            var responsePerfil = await client.GetAsync($"https://localhost:7003/api/Artistas/{id}");
 
-            if (!responsePerfil.IsSuccessStatusCode)
+            var perfil = await client.GetFromJsonAsync<PerfilArtistaDto>($"https://localhost:7003/api/Artistas/{id}");
+            if (perfil == null)
                 return NotFound("Perfil del artista no encontrado");
 
-            var rawPerfil = await responsePerfil.Content.ReadAsStringAsync();
-            var perfil = JsonSerializer.Deserialize<PerfilArtistaDto>(rawPerfil,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-            var responseCanciones = await client.GetAsync($"https://localhost:7003/api/Artistas/{id}/canciones");
-            List<CancionDto> canciones = new List<CancionDto>();
-            if (responseCanciones.IsSuccessStatusCode)
-            {
-                var rawCanciones = await responseCanciones.Content.ReadAsStringAsync();
-                canciones = JsonSerializer.Deserialize<List<CancionDto>>(rawCanciones, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-            }
+            var canciones = await client.GetFromJsonAsync<List<CancionDto>>($"https://localhost:7003/api/Artistas/{id}/canciones");
 
             if (!string.IsNullOrEmpty(perfil.FotoUrl))
-            {
                 perfil.FotoUrl = $"https://localhost:7003/api/artistas/foto/{perfil.FotoUrl}";
-            }
 
             ViewBag.ArtistaId = id;
             ViewBag.NombreArtistico = perfil.NombreArtistico;
@@ -529,9 +467,11 @@ namespace SoftfyWeb.Controllers
         {
             var client = ObtenerClienteConToken();
 
-            var form = new MultipartFormDataContent();
-            form.Add(new StringContent(NombreArtistico ?? ""), "nombreArtistico");
-            form.Add(new StringContent(Biografia ?? ""), "biografia");
+            var form = new MultipartFormDataContent
+            {
+                { new StringContent(NombreArtistico ?? ""), "nombreArtistico" },
+                { new StringContent(Biografia ?? ""), "biografia" }
+            };
 
             if (Foto != null && Foto.Length > 0)
             {
@@ -541,14 +481,9 @@ namespace SoftfyWeb.Controllers
             }
 
             var response = await client.PutAsync("https://localhost:7003/api/artistas/actualizar", form);
+            TempData[response.IsSuccessStatusCode ? "Mensaje" : "Error"] =
+                response.IsSuccessStatusCode ? "Perfil actualizado correctamente." : "Error al actualizar perfil.";
 
-            if (response.IsSuccessStatusCode)
-            {
-                TempData["Mensaje"] = "Perfil actualizado correctamente.";
-                return RedirectToAction("VerPerfil");
-            }
-
-            TempData["Error"] = "Error al actualizar perfil.";
             return RedirectToAction("VerPerfil");
         }
 
@@ -557,32 +492,25 @@ namespace SoftfyWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ActualizarPerfilOyente(string Nombre, string Apellido)
         {
-            Console.WriteLine($"Nombre: {Nombre}, Apellido: {Apellido}");
-
-            if (string.IsNullOrEmpty(Nombre) || string.IsNullOrEmpty(Apellido))
+            if (string.IsNullOrWhiteSpace(Nombre) || string.IsNullOrWhiteSpace(Apellido))
             {
                 TempData["Error"] = "El nombre y apellido no pueden estar vacíos.";
                 return RedirectToAction("VerPerfil");
             }
+
             var client = ObtenerClienteConToken();
-            var jsonBody = new
-            {
-                nombre = Nombre,
-                apellido = Apellido
-            };
-            var content = new StringContent(JsonSerializer.Serialize(jsonBody), Encoding.UTF8, "application/json");
+            var content = new StringContent(
+                JsonSerializer.Serialize(new { nombre = Nombre, apellido = Apellido }),
+                Encoding.UTF8,
+                "application/json"
+            );
 
             var response = await client.PostAsync("https://localhost:7003/api/oyentes/actualizar", content);
+            var mensaje = await response.Content.ReadAsStringAsync();
 
-            var respuestaTexto = await response.Content.ReadAsStringAsync();
+            TempData[response.IsSuccessStatusCode ? "Mensaje" : "Error"] =
+                response.IsSuccessStatusCode ? "Perfil actualizado correctamente." : $"Error al actualizar perfil: {mensaje}";
 
-            if (response.IsSuccessStatusCode)
-            {
-                TempData["Mensaje"] = "Perfil actualizado correctamente.";
-                return RedirectToAction("VerPerfil");
-            }
-
-            TempData["Error"] = $"Error al actualizar perfil: {respuestaTexto}";
             return RedirectToAction("VerPerfil");
         }
     }

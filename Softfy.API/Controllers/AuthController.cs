@@ -108,19 +108,22 @@ namespace SoftfyWeb.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UsuarioLoginDto dto)
         {
+            // Validación de campos obligatorios
+            if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password))
+            {
+                return BadRequest(new { error = "El correo y la contraseña son obligatorios." });
+            }
+
             var usuario = await _userManager.FindByEmailAsync(dto.Email);
 
-            // Verificar si el usuario existe
             if (usuario == null)
                 return Unauthorized(new { error = "Credenciales inválidas" });
 
-            // Verificar si el correo está confirmado
             if (!usuario.EmailConfirmed)
             {
                 return Unauthorized(new { error = "Debes confirmar tu correo antes de iniciar sesión." });
             }
 
-            // Verificar si la cuenta está bloqueada
             if (await _userManager.IsLockedOutAsync(usuario))
             {
                 var lockoutEnd = await _userManager.GetLockoutEndDateAsync(usuario);
@@ -128,7 +131,6 @@ namespace SoftfyWeb.Controllers
 
                 if (remainingLockoutTime.HasValue)
                 {
-                    // Si el tiempo restante es menor a 1 minuto, mostrar los segundos restantes
                     if (remainingLockoutTime.Value.TotalMinutes < 1)
                     {
                         int remainingSeconds = (int)remainingLockoutTime.Value.TotalSeconds;
@@ -136,28 +138,23 @@ namespace SoftfyWeb.Controllers
                     }
                     else
                     {
-                        // Si el tiempo restante es mayor o igual a 1 minuto, mostrar los minutos
                         int remainingMinutes = (int)remainingLockoutTime.Value.TotalMinutes;
                         return Unauthorized(new { error = $"La cuenta está bloqueada. Intenta nuevamente en {remainingMinutes} minuto{(remainingMinutes > 1 ? "s" : "")}." });
                     }
                 }
             }
 
-            // Validar las credenciales
             var resultado = await _signInManager.PasswordSignInAsync(dto.Email, dto.Password, false, false);
 
             if (!resultado.Succeeded)
             {
-                // Incrementar el contador de intentos fallidos
                 await _userManager.AccessFailedAsync(usuario);
 
-                // Verificar si la cuenta está bloqueada después del fallo
                 if (await _userManager.IsLockedOutAsync(usuario))
                 {
                     var lockoutEnd = await _userManager.GetLockoutEndDateAsync(usuario);
                     var remainingLockoutTime = lockoutEnd?.Subtract(DateTimeOffset.Now);
 
-                    // Mostrar el tiempo restante del bloqueo
                     if (remainingLockoutTime.HasValue)
                     {
                         if (remainingLockoutTime.Value.TotalMinutes < 1)
@@ -176,10 +173,8 @@ namespace SoftfyWeb.Controllers
                 return Unauthorized(new { error = "Credenciales inválidas" });
             }
 
-            // Si el login es exitoso, restablecer los intentos fallidos
             await _userManager.ResetAccessFailedCountAsync(usuario);
 
-            // Si el login es exitoso, generar el token JWT y devolverlo
             var roles = await _userManager.GetRolesAsync(usuario);
             var token = _jwtService.GenerarToken(usuario, roles);
 

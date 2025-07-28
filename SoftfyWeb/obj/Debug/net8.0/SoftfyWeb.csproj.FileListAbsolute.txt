@@ -47,3 +47,4 @@ C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyW
 C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb\obj\Debug\net8.0\SoftfyWeb.pdb
 C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb\obj\Debug\net8.0\SoftfyWeb.genruntimeconfig.cache
 C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb\obj\Debug\net8.0\ref\SoftfyWeb.dll
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\SoftfyWeb\obj\Debug\net8.0\SoftfyWeb.sourcelink.json

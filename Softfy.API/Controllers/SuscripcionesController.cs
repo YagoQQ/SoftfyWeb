@@ -1,4 +1,4 @@
-﻿    using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -77,7 +77,7 @@ namespace SoftfyWeb.Controllers
         }
 
         // Ver estado de la suscripción
-        [Authorize]
+        [Authorize(Roles = "OyentePremium, Oyente")]
         [HttpGet("estado")]
         public async Task<IActionResult> Estado()
         {
@@ -121,6 +121,10 @@ namespace SoftfyWeb.Controllers
             if (usuarioNuevo == null)
                 return NotFound(new { mensaje = "Usuario no encontrado" });
 
+            var artista = _context.Artistas.FirstOrDefault(a => a.UsuarioId == usuarioNuevo.Id);
+            if (artista != null)
+                return BadRequest(new { mensaje = "No puedes agregar a un artista como miembro de una suscripción" });
+
             // Ya es miembro de alguna suscripción
             var yaMiembro = _context.MiembrosSuscripciones.Any(m => m.UsuarioId == usuarioNuevo.Id);
             if (yaMiembro)
@@ -136,11 +140,9 @@ namespace SoftfyWeb.Controllers
             _context.MiembrosSuscripciones.Add(miembro);
             await _context.SaveChangesAsync();
 
-            // Cambiar rol
             await _userManager.RemoveFromRoleAsync(usuarioNuevo, "Oyente");
             await _userManager.AddToRoleAsync(usuarioNuevo, "OyentePremium");
 
-            // ✅ AGREGAR ESTAS LÍNEAS: Actualizar el campo TipoUsuario
             usuarioNuevo.TipoUsuario = "OyentePremium";
             await _userManager.UpdateAsync(usuarioNuevo);
 
@@ -148,6 +150,8 @@ namespace SoftfyWeb.Controllers
 
             return Ok(new { mensaje = "Usuario agregado a la suscripción con éxito" });
         }
+
+
         [Authorize]
         [HttpDelete("eliminar-miembro")]
         public async Task<IActionResult> EliminarMiembro([FromBody] EliminarMiembroDto dto)
@@ -181,14 +185,13 @@ namespace SoftfyWeb.Controllers
             {
                 await _userManager.RemoveFromRoleAsync(usuario, "OyentePremium");
                 await _userManager.AddToRoleAsync(usuario, "Oyente");
-
-                // ✅ AGREGAR ESTAS LÍNEAS: Actualizar el campo TipoUsuario
                 usuario.TipoUsuario = "Oyente";
                 await _userManager.UpdateAsync(usuario);
             }
 
             return Ok(new { mensaje = "Miembro eliminado correctamente" });
         }
+
         [Authorize(Roles = "OyentePremium")]
         [HttpPost("salir-de-suscripcion")]
         public async Task<IActionResult> SalirDeSuscripcion()
@@ -326,7 +329,7 @@ namespace SoftfyWeb.Controllers
                 ApplicationContext = new ApplicationContext
                 {
                     ReturnUrl = $"https://localhost:7003/api/suscripciones/capturar-orden/{planId}?email={email}",
-                    CancelUrl = "https://localhost:7003/api/suscripciones/cancelado"
+                    CancelUrl = "https://localhost:44315/Home"
                 }
             });
 
@@ -363,9 +366,6 @@ namespace SoftfyWeb.Controllers
 
             return BadRequest("Pago no completado");
         }
-
-
-
     }
 
 }

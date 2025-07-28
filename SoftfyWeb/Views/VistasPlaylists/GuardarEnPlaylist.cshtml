@@ -9,7 +9,9 @@
 
         @if (ViewBag.Error != null)
         {
-            <div class="alert alert-danger text-center">@ViewBag.Error</div>
+            <div class="alert alert-danger text-center" style="font-size: 1.1rem; font-weight: bold;">
+                @ViewBag.Error
+            </div>
         }
 
         @if (ViewBag.Playlists is List<PlaylistDto> playlists && playlists.Any())

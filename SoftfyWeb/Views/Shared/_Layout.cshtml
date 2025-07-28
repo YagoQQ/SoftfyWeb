@@ -70,8 +70,6 @@
 
     <div class="content">
         <main role="main" class="pb-3">
-
-            @* Mostrar buscador si no se oculta explícitamente *@
             @if (User.Identity?.IsAuthenticated == true)
             {
                 <div class="search-bar">
@@ -79,9 +77,16 @@
                         <input type="text" name="termino" placeholder="Buscar canciones o artistas..." />
                         <button type="submit">Buscar</button>
                     </form>
+                    @if (User.IsInRole("Oyente")){
+                        <div class="button-container">
+                            <a asp-controller="VistasSuscripciones" asp-action="ActivarSuscripcion" class="btn-ir-vista">
+                                Únete a un Plan
+                            </a>
+                        </div>
+                    }                    
                 </div>
             }
-
+            
             @RenderBody()
         </main>
 

@@ -274,3 +274,4 @@ C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\Softfy.
 C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\Softfy.API\obj\Debug\net8.0\Softfy.API.genruntimeconfig.cache
 C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\Softfy.API\bin\Debug\net8.0\PayPalCheckoutSdk.dll
 C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\Softfy.API\bin\Debug\net8.0\PayPalHttp-Dotnet.dll
+C:\Users\ASUS\Desktop\Mejoras\SoftfyWeb-Tania-Guerra\SoftfyWeb\SoftfyWeb\Softfy.API\obj\Debug\net8.0\Softfy.API.sourcelink.json

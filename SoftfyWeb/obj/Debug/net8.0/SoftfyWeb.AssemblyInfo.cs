@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SoftfyWeb")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0c547633743906d3e60e5e3ea207fb3ce6b1202d")]
 [assembly: System.Reflection.AssemblyProductAttribute("SoftfyWeb")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SoftfyWeb")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

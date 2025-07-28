@@ -30,7 +30,6 @@ namespace SoftfyWeb.Controllers
             if (usuario == null)
                 return NotFound(new { mensaje = "Usuario no encontrado." });
 
-            // Habilitar Lockout si no está habilitado
             if (!usuario.LockoutEnabled)
             {
                 usuario.LockoutEnabled = true;

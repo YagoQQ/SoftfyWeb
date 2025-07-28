@@ -64,15 +64,6 @@ builder.Services.AddScoped<JwtService>(); // Registrar el servicio JwtService
 builder.Services.AddScoped<AudioService>();
 builder.Services.AddScoped<IServicioSuscripciones, ServicioSuscripciones>();
 
-// Configurar CORS para el front MVC
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowWeb",
-        policy => policy
-            .WithOrigins("https://localhost:7130")  // Tu frontend MVC
-            .AllowAnyHeader()
-            .AllowAnyMethod());
-});
 
 builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));

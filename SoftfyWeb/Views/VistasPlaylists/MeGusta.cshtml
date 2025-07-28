@@ -3,6 +3,7 @@
     ViewData["Title"] = "Mis canciones Me Gusta";
 }
 <h2>Mis canciones Me Gusta</h2>
+
 @if (User.IsInRole("OyentePremium"))
 {
     <p>
@@ -25,51 +26,52 @@ else
             <tr>
                 <th>Título</th>
                 <th>Artista</th>
-                <th></th>
+                <th>Reproductor</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var cancion in Model.Canciones)
             {
-            <td>@cancion.Titulo</td>
-            <td>@cancion.Artista</td>
-            <tr>
-                <td>
-                    <div class="audio-player" data-id="@cancion.Id">
-                        <div class="player-controls">
-                            <button class="play-pause" data-id="@cancion.Id">▶️</button>
-                            <span class="time current">0:00</span>
-                            <input type="range" class="progress" value="0" step="1">
-                            <span class="time duration">0:00</span>
+                <tr>
+                    <td>@cancion.Titulo</td>
+                    <td>@cancion.Artista</td>
+                    <td>
+                        <div class="audio-player" data-id="@cancion.Id">
+                            <div class="player-controls">
+                                <button class="play-pause" data-id="@cancion.Id">▶️</button>
+                                <span class="time current">0:00</span>
+                                <input type="range" class="progress" value="0" step="1">
+                                <span class="time duration">0:00</span>
 
-                            @* Solo mostrar si es Oyente Premium *@
-                            @if (User.IsInRole("OyentePremium"))
-                            {
-                                <a class="download-btn" href="@cancion.UrlArchivo" download>
-                                    ⬇️
-                                </a>
-                            }
+                                @* Solo mostrar si es Oyente Premium *@
+                                @if (User.IsInRole("OyentePremium"))
+                                {
+                                    <a class="download-btn" href="@cancion.UrlArchivo" download>
+                                        ⬇️
+                                    </a>
+                                }
+                            </div>
+                            <audio id="audio-@cancion.Id" src="@cancion.UrlArchivo"></audio>
                         </div>
-                        <audio id="audio-@cancion.Id" src="@cancion.UrlArchivo"></audio>
-                    </div>
-                </td>
-                <td>
-                    <form asp-controller="VistasPlaylists"
-                          asp-action="QuitarMeGusta"
-                          method="post"
-                          class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="playlistId" value="@ViewBag.PlaylistId" />
-                        <input type="hidden" name="cancionId" value="@cancion.Id" />
-                        <button type="submit"
-                                class="btn btn-sm btn-danger"
-                                onclick="return confirm('¿Eliminar de Me Gusta?');">
-                            Eliminar
-                        </button>
-                    </form>
-                </td>
-            </tr>
-        }
+                    </td>
+                    <td>
+                        <form asp-controller="VistasPlaylists"
+                              asp-action="QuitarMeGusta"
+                              method="post"
+                              class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="playlistId" value="@ViewBag.PlaylistId" />
+                            <input type="hidden" name="cancionId" value="@cancion.Id" />
+                            <button type="submit"
+                                    class="btn btn-sm btn-danger"
+                                    onclick="return confirm('¿Eliminar de Me Gusta?');">
+                                Eliminar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 }

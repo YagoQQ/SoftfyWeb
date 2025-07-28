@@ -48,8 +48,8 @@
     }
 
     .artist-photo {
-        width: 200px;
-        height: 200px;
+        width: 400px;
+        height: 400px;
         border-radius: 50%;
         object-fit: cover;
         border: 5px solid #00ffff;
@@ -100,6 +100,15 @@
             <h1>@ViewBag.NombreArtistico</h1>
             <p><strong>Biografía:</strong> @ViewBag.Biografia</p>
             <p><strong>Email:</strong> @ViewBag.Email</p>
+
+            <a asp-controller="VistasPlaylists"
+               asp-action="PlaylistPorArtista"
+               asp-route-email="@ViewBag.Email"
+               class="btn btn-danger btn-lg fw-bold pulsate-button shadow">
+                Ver Albums
+            </a>
+
+
         </div>
     </div>
 </div>

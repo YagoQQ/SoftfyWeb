@@ -28,7 +28,7 @@ namespace SoftfyWeb.Data
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
             string email = "admin@softfy.com";
-            string password = "Admin123!"; // Requisitos de seguridad: mayúscula, minúscula, número, símbolo
+            string password = "Admin123!";
 
             // Verifica si ya existe
             var usuario = await userManager.FindByEmailAsync(email);
