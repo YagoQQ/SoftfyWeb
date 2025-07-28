@@ -15,9 +15,7 @@ namespace Softfy.API.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Usuario> _userManager;
 
-        public OyentesController(
-            ApplicationDbContext context,
-            UserManager<Usuario> userManager)
+        public OyentesController(ApplicationDbContext context, UserManager<Usuario> userManager)
         {
             _context = context;
             _userManager = userManager;
@@ -45,6 +43,7 @@ namespace Softfy.API.Controllers
             });
         }
 
+
         [Authorize(Roles = "Oyente, OyentePremium")]
         [HttpPost("actualizar")]
         public async Task<IActionResult> ActualizarPerfil(ActualizarPerfilOyenteDto data)
@@ -59,10 +58,12 @@ namespace Softfy.API.Controllers
 
             if (usuario.TipoUsuario != "Oyente" && usuario.TipoUsuario != "OyentePremium")
                 return Unauthorized(new { mensaje = "No autorizado para modificar este perfil." });
+
             usuario.Nombre = data.Nombre;
             usuario.Apellido = data.Apellido;
 
             var resultado = await _userManager.UpdateAsync(usuario);
+
             if (!resultado.Succeeded)
                 return BadRequest(resultado.Errors);
 

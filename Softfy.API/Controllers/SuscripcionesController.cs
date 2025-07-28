@@ -76,6 +76,8 @@ namespace SoftfyWeb.Controllers
             return Ok(new { mensaje = "Suscripción activada correctamente", plan = plan.Nombre });
         }
 
+
+
         // Ver estado de la suscripción
         [Authorize(Roles = "OyentePremium, Oyente")]
         [HttpGet("estado")]
@@ -101,6 +103,7 @@ namespace SoftfyWeb.Controllers
                 esTitular = miembro.Suscripcion.UsuarioPrincipalId == usuario.Id
             });
         }
+
         [Authorize]
         [HttpPost("agregar-miembro")]
         public async Task<IActionResult> AgregarMiembro([FromBody] AgregarMiembroDto dto)
@@ -215,14 +218,15 @@ namespace SoftfyWeb.Controllers
             await _userManager.RemoveFromRoleAsync(usuario, "OyentePremium");
             await _userManager.AddToRoleAsync(usuario, "Oyente");
 
-            // ✅ AGREGAR ESTAS LÍNEAS: Actualizar el campo TipoUsuario
+            //Actualizar el campo TipoUsuario
             usuario.TipoUsuario = "Oyente";
             await _userManager.UpdateAsync(usuario);
 
             return Ok(new { mensaje = "Has salido de la suscripción correctamente" });
         }
 
-        // Cancelar suscripción completa (solo titular)
+
+        //Cancelar suscripción completa (solo titular)
         [Authorize(Roles = "OyentePremium")]
         [HttpPost("cancelar")]
         public async Task<IActionResult> CancelarSuscripcion()
@@ -315,17 +319,17 @@ namespace SoftfyWeb.Controllers
             {
                 CheckoutPaymentIntent = "CAPTURE",
                 PurchaseUnits = new List<PurchaseUnitRequest>
-        {
-            new PurchaseUnitRequest
-            {
-                AmountWithBreakdown = new AmountWithBreakdown
                 {
-                    CurrencyCode = "USD",
-                    Value = plan.Precio.ToString("F2", CultureInfo.InvariantCulture)
+                    new PurchaseUnitRequest
+                    {
+                        AmountWithBreakdown = new AmountWithBreakdown
+                        {
+                            CurrencyCode = "USD",
+                            Value = plan.Precio.ToString("F2", CultureInfo.InvariantCulture)
+                        },
+                        Description = $"Suscripción al plan {plan.Nombre}"
+                    }
                 },
-                Description = $"Suscripción al plan {plan.Nombre}"
-            }
-        },
                 ApplicationContext = new ApplicationContext
                 {
                     ReturnUrl = $"https://localhost:7003/api/suscripciones/capturar-orden/{planId}?email={email}",

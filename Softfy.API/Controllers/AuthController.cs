@@ -21,12 +21,8 @@ namespace SoftfyWeb.Controllers
         private readonly JwtService _jwtService;
         private readonly EmailService _emailService;
 
-        public AuthController(
-            UserManager<Usuario> userManager,
-            SignInManager<Usuario> signInManager,
-            RoleManager<IdentityRole> roleManager,
-            JwtService jwtService,
-            EmailService emailService)
+        public AuthController(UserManager<Usuario> userManager,SignInManager<Usuario> signInManager,RoleManager<IdentityRole> roleManager,
+            JwtService jwtService, EmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -47,10 +43,10 @@ namespace SoftfyWeb.Controllers
             });
         }
 
+
         [HttpPost("registro")]
         public async Task<IActionResult> Registrar([FromBody] UsuarioRegistroDto dto)
         {
-            // Validación previa de email
             if (await _userManager.FindByEmailAsync(dto.Email) != null)
                 return BadRequest(new { error = "Ya existe una cuenta registrada con este correo." });
 
@@ -65,6 +61,7 @@ namespace SoftfyWeb.Controllers
             };
 
             var resultado = await _userManager.CreateAsync(user, dto.Password);
+
             if (!resultado.Succeeded)
             {
                 // Capturar error de email duplicado por si la validación previa falló
@@ -73,10 +70,6 @@ namespace SoftfyWeb.Controllers
 
                 return BadRequest(resultado.Errors);
             }
-
-            // Crear rol si no existe y asignarlo
-            if (!await _roleManager.RoleExistsAsync(dto.TipoUsuario))
-                await _roleManager.CreateAsync(new IdentityRole(dto.TipoUsuario));
 
             await _userManager.AddToRoleAsync(user, dto.TipoUsuario);
 
@@ -91,6 +84,7 @@ namespace SoftfyWeb.Controllers
             return Ok(new { mensaje = "Usuario registrado correctamente. Se ha enviado el correo de confirmación." });
         }
 
+
         [HttpGet("confirmar-email")]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
@@ -104,6 +98,7 @@ namespace SoftfyWeb.Controllers
 
             return BadRequest("Error al confirmar el correo");
         }
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UsuarioLoginDto dto)
@@ -253,7 +248,7 @@ namespace SoftfyWeb.Controllers
             var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
             // Crear el enlace manualmente
-            var frontendUrl = "https://localhost:7130";  // Asegúrate de usar la URL correcta de tu frontend
+            var frontendUrl = "https://localhost:44315";  // Asegúrate de usar la URL correcta de tu frontend
             var resetLink = $"{frontendUrl}/VistasAuth/ResetPassword?userId={Uri.EscapeDataString(user.Id)}" +
                             $"&token={Uri.EscapeDataString(encodedToken)}&email={Uri.EscapeDataString(dto.Email)}";
 
@@ -266,6 +261,7 @@ namespace SoftfyWeb.Controllers
 
             return Ok(new { mensaje = "Si el correo existe recibirás instrucciones para restablecer tu contraseña." });
         }
+
 
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)

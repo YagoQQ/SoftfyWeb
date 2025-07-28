@@ -3,6 +3,18 @@
   "WorkspaceRootPath": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfy.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|solutionrelative:softfy.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28C55C5C-D400-4810-B907-953415C8A1E5}|SoftfyWeb\\SoftfyWeb.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfyweb\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{28C55C5C-D400-4810-B907-953415C8A1E5}|SoftfyWeb\\SoftfyWeb.csproj|solutionrelative:softfyweb\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfy.api\\services\\audioservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|solutionrelative:softfy.api\\services\\audioservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|c:\\users\\asus\\desktop\\mejoras\\softfyweb-tania-guerra\\softfyweb\\softfyweb\\softfy.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{4FCE1F5B-659F-432A-AB8A-AD412127B869}|Softfy.API\\Softfy.API.csproj|solutionrelative:softfy.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -14,7 +26,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 181,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -30,13 +42,52 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\SoftfyWeb\\appsettings.json",
+              "RelativeDocumentMoniker": "SoftfyWeb\\appsettings.json",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\SoftfyWeb\\appsettings.json",
+              "RelativeToolTip": "SoftfyWeb\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-07-28T18:40:29.109Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "Softfy.API\\Controllers\\AuthController.cs",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "Softfy.API\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAAOkAAAAAAAAAAAAswPoAAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-28T18:21:19.661Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "AudioService.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Services\\AudioService.cs",
+              "RelativeDocumentMoniker": "Softfy.API\\Services\\AudioService.cs",
+              "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Services\\AudioService.cs",
+              "RelativeToolTip": "Softfy.API\\Services\\AudioService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-28T17:42:41.527Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Program.cs",
               "RelativeDocumentMoniker": "Softfy.API\\Program.cs",
               "ToolTip": "C:\\Users\\ASUS\\Desktop\\Mejoras\\SoftfyWeb-Tania-Guerra\\SoftfyWeb\\SoftfyWeb\\Softfy.API\\Program.cs",
               "RelativeToolTip": "Softfy.API\\Program.cs",
-              "ViewState": "AgIAACEAAAAAAAAAAAAAADkAAAAGAAAAAAAAAA==",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAADkAAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-28T17:35:18.744Z",
               "EditorCaption": ""

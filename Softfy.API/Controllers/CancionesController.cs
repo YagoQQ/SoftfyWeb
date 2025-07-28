@@ -37,10 +37,12 @@ namespace SoftfyWeb.Controllers
                 return BadRequest("No se ha seleccionado un archivo para la canción.");
 
             var extension = Path.GetExtension(archivoCancion.FileName).ToLower();
+
             if (extension != ".mp3" && extension != ".wav")
-                return BadRequest("Solo se permiten archivos .mp3 y .wav.");
+                return BadRequest("Solo se permiten archivos .mp3");
 
             RawUploadResult uploadResult;
+
             try
             {
                 uploadResult = await _audioService.SubirAudioCloudinaryAsync(archivoCancion);
@@ -92,6 +94,7 @@ namespace SoftfyWeb.Controllers
             return Ok(canciones);
         }
 
+
         [HttpGet("canciones")]
         [AllowAnonymous]
         public IActionResult ObtenerTodasLasCanciones()
@@ -115,12 +118,13 @@ namespace SoftfyWeb.Controllers
             return Ok(canciones);
         }
 
+
         [HttpGet("por-nombre/{nombre}")]
         [AllowAnonymous]
         public IActionResult ObtenerCancionesPorNombre(string nombre)
         {
             var canciones = _context.Canciones
-                .Where(c => c.Titulo.Contains(nombre))  // Filtra por el título que contenga el nombre dado
+                .Where(c => c.Titulo.Contains(nombre))
                 .Select(c => new
                 {
                     c.Id,
@@ -143,6 +147,7 @@ namespace SoftfyWeb.Controllers
 
             return Ok(canciones);
         }
+
 
         [HttpDelete("eliminar/{id}")]
         [Authorize(Roles = "Admin,Artista")]
@@ -175,6 +180,7 @@ namespace SoftfyWeb.Controllers
 
             if (cancion == null)
                 return NotFound("Canción no encontrada.");
+
             var respuesta = new CancionRespuestaDto
             {
                 Id = cancion.Id,
@@ -203,12 +209,11 @@ namespace SoftfyWeb.Controllers
             if (!User.IsInRole("Admin") && (artista == null || cancion.ArtistaId != artista.Id))
                 return Forbid("No tiene permisos para editar esta canción.");
 
-            // Lógica para actualizar la canción
             if (nuevoArchivo != null)
             {
                 var extension = Path.GetExtension(nuevoArchivo.FileName).ToLower();
                 if (extension != ".mp3" && extension != ".wav")
-                    return BadRequest("Solo se permiten archivos .mp3 y .wav.");
+                    return BadRequest("Solo se permiten archivos .mp3");
 
                 try
                 {

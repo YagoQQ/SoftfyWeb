@@ -18,9 +18,6 @@ namespace SoftfyWeb.Data
         public DbSet<Plan> Planes { get; set; }
         public DbSet<MiembroSuscripcion> MiembrosSuscripciones { get; set; }
 
-
-
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -42,10 +39,5 @@ namespace SoftfyWeb.Data
                    .HasIndex(u => u.Email)
                    .IsUnique();
         }
-
-
-
-        // Aquí luego agregaremos tus tablas: Canciones, Playlists, etc.
-        // public DbSet<Cancion> Canciones { get; set; }
     }
 }

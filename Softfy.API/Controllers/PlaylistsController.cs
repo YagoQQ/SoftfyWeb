@@ -40,6 +40,8 @@ namespace SoftfyWeb.Controllers
 
             return Ok(new { mensaje = "Playlist creada", playlistId = playlist.Id });
         }
+
+
         [Authorize(Roles = "OyentePremium,Artista")]
         [HttpGet("mis-playlists")]
         public async Task<IActionResult> ObtenerPlaylists()
@@ -81,6 +83,7 @@ namespace SoftfyWeb.Controllers
 
             return Ok(canciones);
         }
+
 
         [Authorize(Roles = "OyentePremium,Artista")]
         [HttpPost("{playlistId}/agregar/{cancionId}")]
@@ -134,6 +137,7 @@ namespace SoftfyWeb.Controllers
             return Ok(new { mensaje = "Canción removida de la playlist" });
         }
 
+
         [Authorize(Roles = "OyentePremium,Artista")]
         [HttpPut("{playlistId}/renombrar")]
         public async Task<IActionResult> RenombrarPlaylist(int playlistId, [FromBody] string nuevoNombre)
@@ -151,6 +155,7 @@ namespace SoftfyWeb.Controllers
 
             return Ok(new { mensaje = "Nombre de playlist actualizado", nuevoNombre });
         }
+
 
         [Authorize(Roles = "Admin,Artista,OyentePremium")]
         [HttpDelete("{playlistId}/eliminar")]
@@ -236,7 +241,6 @@ namespace SoftfyWeb.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            // Verifica si ya existe esa relación
             var yaExiste = _context.PlaylistCanciones.Any(pc =>
                 pc.PlaylistId == playlist.Id && pc.CancionId == cancionId);
 
@@ -253,6 +257,7 @@ namespace SoftfyWeb.Controllers
 
             return Ok(new { mensaje = "Canción agregada a Me Gusta" });
         }
+
 
         [Authorize]
         [HttpDelete("me-gusta/{cancionId}")]
@@ -277,6 +282,7 @@ namespace SoftfyWeb.Controllers
 
             return Ok(new { mensaje = "Canción removida de Me Gusta" });
         }
+
 
         [HttpGet("todas")]
         public async Task<IActionResult> ObtenerTodasLasPlaylists()
@@ -349,23 +355,23 @@ namespace SoftfyWeb.Controllers
 
             return Ok(playlists);
         }
+
+
         [HttpGet("{id}")]
         public ActionResult<Playlist> GetPlaylist(int id)
         {
-            // Buscar la playlist por id
             var playlist = _context.Playlists
                 .Where(p => p.Id == id)
                 .FirstOrDefault();
 
-            // Verificar si la playlist existe
             if (playlist == null)
             {
                 return NotFound(new { message = "La playlist no existe." });
             }
 
-            // Retornar el modelo directamente
             return Ok(playlist);
         }
+
 
         [HttpGet("buscar/{nombre}")]
         [AllowAnonymous]
@@ -403,6 +409,7 @@ namespace SoftfyWeb.Controllers
 
             return Ok(resultado);
         }
+
 
         [HttpPost("guardar/{playlistId}/cancion/{cancionId}")]
         public async Task<IActionResult> GuardarCancionEnPlaylist(int playlistId, int cancionId)

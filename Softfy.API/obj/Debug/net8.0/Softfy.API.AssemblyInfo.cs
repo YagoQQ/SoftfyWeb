@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Softfy.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0c547633743906d3e60e5e3ea207fb3ce6b1202d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+06d1b5de9ca1380fe5f39d3fe85ee3c49e998398")]
 [assembly: System.Reflection.AssemblyProductAttribute("Softfy.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Softfy.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SoftfyWeb.Modelos.Dtos
+﻿namespace SoftfyWeb.Modelos.Dtos
 {
     public class MeGustaRespuestaDto
     {

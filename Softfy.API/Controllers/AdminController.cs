@@ -27,22 +27,10 @@ namespace SoftfyWeb.Controllers
                 return BadRequest(new { mensaje = "El email es obligatorio." });
 
             var usuario = await _userManager.FindByEmailAsync(email);
+
             if (usuario == null)
                 return NotFound(new { mensaje = "Usuario no encontrado." });
 
-            if (!usuario.LockoutEnabled)
-            {
-                usuario.LockoutEnabled = true;
-                var updateResult = await _userManager.UpdateAsync(usuario);
-                if (!updateResult.Succeeded)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, new
-                    {
-                        mensaje = "Error al habilitar el bloqueo del usuario.",
-                        errores = updateResult.Errors
-                    });
-                }
-            }
             var resultado = await _userManager.SetLockoutEndDateAsync(usuario, DateTimeOffset.UtcNow.AddMinutes(60));
             if (!resultado.Succeeded)
             {
@@ -55,6 +43,8 @@ namespace SoftfyWeb.Controllers
 
             return NoContent();
         }
+
+
         [Authorize(Roles = "Admin")]
         [HttpPost("desbloquear/{email}")]
         public async Task<IActionResult> DesbloquearUsuario(string email)
@@ -66,8 +56,8 @@ namespace SoftfyWeb.Controllers
             if (usuario == null)
                 return NotFound(new { mensaje = "Usuario no encontrado." });
 
-            // Desbloquear al usuario estableciendo LockoutEnd a null
             var resultado = await _userManager.SetLockoutEndDateAsync(usuario, null);
+
             if (!resultado.Succeeded)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new
@@ -81,6 +71,7 @@ namespace SoftfyWeb.Controllers
 
             return NoContent();
         }
+
 
         [Authorize(Roles = "Admin")]
         [HttpGet("usuarios-bloqueados")]
@@ -147,6 +138,7 @@ namespace SoftfyWeb.Controllers
             var canciones = await _context.Canciones.ToListAsync();
             return Ok(canciones);
         }
+
         [HttpDelete("cancion/{id}")]
         public async Task<IActionResult> EliminarCancion(int id)
         {

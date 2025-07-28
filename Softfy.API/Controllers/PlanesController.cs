@@ -78,6 +78,7 @@ namespace SoftfyWeb.Controllers
             return Ok(new { mensaje = "Plan eliminado correctamente" });
         }
 
+
         [HttpGet("{id}")]
         public async Task<IActionResult> ObtenerPlanPorId(int id)
         {
