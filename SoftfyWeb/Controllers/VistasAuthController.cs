@@ -306,7 +306,39 @@ namespace SoftfyWeb.Controllers
             return View();
         }
 
-        public IActionResult Bienvenido() => View();
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Bienvenido()
+        {
+            var client = ObtenerClienteConToken();
+
+            var canciones = await client.GetFromJsonAsync<List<CancionRespuestaDto>>("https://localhost:7003/api/Canciones/canciones");
+
+            canciones = canciones
+                .Where(c => !string.IsNullOrWhiteSpace(c.UrlArchivo))
+                .ToList();
+
+            ViewBag.TodasCanciones = canciones;
+            ViewBag.CantidadCanciones = canciones.Count;
+
+            var playlists = await client.GetFromJsonAsync<List<PlaylistDto>>("https://localhost:7003/api/Playlists/todas/artistas");
+
+            ViewBag.TodasPlaylists = playlists;
+            ViewBag.CantidadPlaylists = playlists?.Count ?? 0;
+
+            var artistas = await client.GetFromJsonAsync<List<Artista>>("https://localhost:7003/api/Artistas");
+
+            foreach (var artista in artistas)
+            {
+                if (!string.IsNullOrEmpty(artista.FotoUrl))
+                    artista.FotoUrl = $"https://localhost:7003/api/artistas/foto/{artista.FotoUrl}";
+            }
+
+            ViewBag.Artistas = artistas;
+            ViewBag.CantidadArtistas = artistas?.Count ?? 0;
+
+            return View();
+        }
+
 
         // Métodos auxiliares
         private bool EsContrasenaSegura(string pwd) =>

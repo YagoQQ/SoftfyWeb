@@ -1,7 +1,154 @@
 ﻿@{
-    ViewData["Title"] = "Bienvenido";
+    ViewData["Title"] = "Bienvenido Admin";
+    var esPremium = User.IsInRole("OyentePremium");
 }
 
-<h2>¡Bienvenido a SoftfyWeb!</h2>
+<style>
+    h2.text-center {
+        font-size: 3rem;
+        margin-bottom: 2rem;
+        color: #fff;
+    }
 
-<p>Tu inicio de sesión fue exitoso.</p>
+    .container2 {
+        padding: 20px;
+    }
+
+    /* Círculos de resumen */
+    .resumen-circulos {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-bottom: 40px;
+    }
+
+    .circulo {
+        width: 250px;
+        height: 250px;
+        background-color: orange;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 2.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        text-align: center;
+    }
+
+    .scroll-horizontal {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        gap: 1.2rem;
+        padding-bottom: 10px;
+    }
+
+        .scroll-horizontal::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .scroll-horizontal::-webkit-scrollbar-thumb {
+            background: #00ffe0;
+            border-radius: 4px;
+        }
+
+</style>
+
+<div class="container2">
+    <h2 class="text-center">Bienvenido Admin</h2>
+
+    <!-- Resumen Superior -->
+    <div class="resumen-circulos">
+        <div class="circulo">
+            <div>@ViewBag.CantidadArtistas</div>
+            <div>Artistas</div>
+        </div>
+        <div class="circulo">
+            <div>@ViewBag.CantidadCanciones</div>
+            <div>Canciones</div>
+        </div>
+        <div class="circulo">
+            <div>@ViewBag.CantidadPlaylists</div>
+            <div>Álbumes</div>
+        </div>
+    </div>
+
+    <!-- Sección: Canciones -->
+    <div class="section">
+        <h3 class="text-white mb-3">Todas las Canciones</h3>
+        <div class="scroll-horizontal">
+            @foreach (var cancion in ViewBag.TodasCanciones)
+            {
+                <div class="cancion-item">
+                    <p><strong>@cancion.Titulo</strong></p>
+                    <p><em>@cancion.Artista?.NombreArtistico</em></p>
+                    <p><em>@cancion.Genero</em></p>
+
+                    @if (!string.IsNullOrEmpty(cancion.UrlArchivo))
+                    {
+                        <div class="audio-player" data-id="@cancion.Id">
+                            <div class="player-controls">
+                                <button class="play-pause btn btn-success btn-sm" data-id="@cancion.Id">▶️</button>
+                                <span class="time current">0:00</span>
+                                <input type="range" class="progress" value="0" step="1">
+                                <span class="time duration">0:00</span>
+                                @if (esPremium)
+                                {
+                                    <a class="btn btn-info btn-sm" href="@cancion.UrlArchivo" download>⬇️</a>
+                                }
+                            </div>
+                            <audio id="audio-@cancion.Id" src="@cancion.UrlArchivo"></audio>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>No disponible</p>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Sección: Álbumes -->
+    <div class="section mt-4">
+        <h3 class="text-white mb-3">Todos los Álbumes</h3>
+        <div class="scroll-horizontal">
+            @foreach (var playlist in ViewBag.TodasPlaylists)
+            {
+                <div class="cancion-item">
+                    <h4>
+                        <a asp-action="VerCanciones" asp-controller="VistasCanciones" asp-route-id="@playlist.Id" class="text-decoration-none text-info">
+                            @playlist.Nombre
+                        </a>
+                    </h4>
+                    <p><strong>Artista:</strong> @playlist.NombreArtistico</p>
+                    <p><strong>Total Canciones:</strong> @playlist.TotalCanciones</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Sección: Artistas -->
+    <div class="section mt-4">
+        <h3 class="text-white mb-3">Todos los Artistas</h3>
+        <div class="scroll-horizontal">
+            @foreach (var artista in ViewBag.Artistas)
+            {
+                var fotoUrl = string.IsNullOrEmpty(artista.FotoUrl) ? "/images/ProfileImage.png" : artista.FotoUrl;
+
+                <div class="artista-card">
+                    <img src="@fotoUrl" alt="Foto de @artista.NombreArtistico" class="artista-img" />
+                    <h5>
+                        <a href="@Url.Action("VerPerfilpublico", "VistasAuth", new { id = artista.Id })">
+                            @artista.NombreArtistico
+                        </a>
+                    </h5>
+                    <p class="bio">@artista.Biografia</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

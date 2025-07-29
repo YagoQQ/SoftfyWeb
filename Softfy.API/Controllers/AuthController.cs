@@ -171,7 +171,8 @@ namespace SoftfyWeb.Controllers
             await _userManager.ResetAccessFailedCountAsync(usuario);
 
             var roles = await _userManager.GetRolesAsync(usuario);
-            var token = _jwtService.GenerarToken(usuario, roles);
+            var rol = roles.FirstOrDefault();
+            var token = _jwtService.GenerarToken(usuario, rol);
 
             return Ok(new
             {

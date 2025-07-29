@@ -1,6 +1,13 @@
 ﻿@model IEnumerable<SoftfyWeb.Modelos.Dtos.PlaylistDto>
 @{
-    ViewData["Title"] = "Mis Playlists";
+    @if (User.IsInRole("Oyente") || User.IsInRole("OyentePremium"))
+    {
+        ViewData["Title"] = "Mis Playlists";
+    }
+    else
+    {
+        ViewData["Title"] = "Mis Álbumes";
+    }    
 }
 
 <h2>@ViewData["Title"]</h2>
@@ -13,35 +20,39 @@
     }
 </p>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Canciones</th>
-            <th></th>
-            <th>Renombrar</th>
-        </tr>
-    </thead>
-    <tbody>
+@if (!Model.Any())
+{
+    <div class="alert alert-warning mt-4">
+        No se encontraron playlists.
+    </div>
+}
+else
+{
+    <div class="row mt-4">
         @foreach (var p in Model)
         {
-            <tr>
-                <td>@p.Nombre</td>
-                <td>@p.TotalCanciones</td>
-                <td>
-                    <a asp-action="Detalle" asp-route-id="@p.Id" class="btn btn-sm btn-info">Ver</a>
-                    <form asp-action="Eliminar" method="post" asp-route-id="@p.Id" class="d-inline">
-                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="Renombrar" method="post" class="d-flex">
-                        <input type="hidden" name="id" value="@p.Id" />
-                        <input type="text" name="nuevoNombre" class="form-control form-control-sm" />
-                        <button type="submit" class="btn btn-sm btn-secondary ms-1">Ok</button>
-                    </form>
-                </td>
-            </tr>
+            <div class="col-md-4 mb-4">
+                <div class="artista-card">
+                    <div class="playlist-info">
+                        <h4 class="card-title">@p.Nombre</h4>
+                        <p class="card-text">Canciones: <strong>@p.TotalCanciones</strong></p>
+
+                        <div class="d-flex gap-2 mb-3">
+                            <a asp-action="Detalle" asp-route-id="@p.Id" class="btn btn-sm btn-info">Ver</a>
+
+                            <form asp-action="Eliminar" method="post" asp-route-id="@p.Id" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                            </form>
+                        </div>
+
+                        <form asp-action="Renombrar" method="post" class="d-flex">
+                            <input type="hidden" name="id" value="@p.Id" />
+                            <input type="text" name="nuevoNombre" class="form-control form-control-sm" placeholder="Nuevo nombre" />
+                            <button type="submit" class="btn btn-sm btn-secondary ms-1">Ok</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+}

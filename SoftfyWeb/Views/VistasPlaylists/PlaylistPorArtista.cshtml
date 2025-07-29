@@ -1,10 +1,11 @@
 ﻿@model IEnumerable<SoftfyWeb.Modelos.Dtos.PlaylistDto>
+
 @{
-    ViewData["Title"] = "Albumes del Artista";
+    ViewData["Title"] = "Álbumes del Artista";
     var email = ViewBag.Email as string ?? "Artista";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h2 class="text-white">@ViewData["Title"]</h2>
 
 @if (!Model.Any())
 {
@@ -14,25 +15,35 @@
 }
 else
 {
-    <table class="table table-bordered mt-3">
-        <thead class="table-light">
-            <tr>
-                <th>Nombre</th>
-                <th>Total Canciones</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var playlist in Model)
-            {
-                <tr>
-                    <td>@playlist.Nombre</td>
-                    <td>@playlist.TotalCanciones</td>
-                    <td>
-                        <a asp-action="CancionesPublicasPorArtistaPlaylist" asp-route-id="@playlist.Id" class="btn btn-sm btn-info">Ver Canciones</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="row mt-4">
+        @foreach (var playlist in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="artista-card">
+                    <div class="playlist-info">
+                        <h4 class="card-title">
+                            <a href="@Url.Action("CancionesPublicasPorArtistaPlaylist", "VistasPlaylists", new { id = playlist.Id })" class="text-decoration-none text-light">
+                                @playlist.Nombre
+                            </a>
+                        </h4>
+                        <p class="card-text">
+                            Total de Canciones: <strong>@playlist.TotalCanciones</strong>
+                        </p>
+                        @if (!string.IsNullOrEmpty(playlist.NombreArtistico))
+                        {
+                            <p class="card-text">
+                                Propietario:
+                                <a href="@Url.Action("VerPerfilpublico", "VistasAuth", new { id = playlist.ArtistaId })" class="text-decoration-none text-info">
+                                    @playlist.NombreArtistico
+                                </a>
+                            </p>
+                        }
+                        <a href="@Url.Action("CancionesPublicasPorArtistaPlaylist", "VistasPlaylists", new { id = playlist.Id })" class="btn btn-outline-light mt-2">
+                            Ver Canciones
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 }

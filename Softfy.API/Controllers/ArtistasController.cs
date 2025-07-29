@@ -81,10 +81,7 @@ namespace SoftfyWeb.Controllers
                 })
                 .ToList();
 
-            if (!canciones.Any())
-                return NotFound("No hay canciones para este artista.");
-
-            return Ok(canciones); // Devuelve la lista de canciones del artista
+            return Ok(canciones);
         }
 
 

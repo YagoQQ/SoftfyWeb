@@ -45,7 +45,7 @@
             {
                 <a asp-controller="VistasAuth" asp-action="BienvenidoArtista">Inicio</a>
                 <a asp-controller="VistasCanciones" asp-action="MisCanciones">Mis Canciones</a>
-                <a asp-controller="VistasPlaylists" asp-action="Index">Mis Playlists</a>
+                <a asp-controller="VistasPlaylists" asp-action="Index">Mis Álbumes</a>
                 <a asp-controller="VistasAuth" asp-action="VerPerfil">Mi Perfil</a>
             }
             else if (User.IsInRole("Admin"))
@@ -53,7 +53,7 @@
                 <a asp-controller="VistasAuth" asp-action="Bienvenido">Inicio</a>
                 <a asp-controller="VistaAdmin" asp-action="IndexUsuario">Gestionar Usuarios</a>
                 <a asp-controller="VistaAdmin" asp-action="IndexCanciones">Gestionar Canciones</a>
-                <a asp-controller="VistaAdmin" asp-action="IndexPlaylists">Gestionar Playlists</a>
+                <a asp-controller="VistaAdmin" asp-action="IndexPlaylists">Gestionar Álbumes</a>
                 <a asp-controller="VistasPlanes" asp-action="Index">Gestionar Planes</a>
             }
 

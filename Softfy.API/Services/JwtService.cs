@@ -18,9 +18,8 @@ namespace SoftfyWeb.Services
             _config = config;
         }
 
-        public string GenerarToken(Usuario usuario, IList<string> roles)
+        public string GenerarToken(Usuario usuario, string rol)
         {
-            // 1. Claims estándar + custom
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, usuario.Id),
@@ -28,25 +27,21 @@ namespace SoftfyWeb.Services
                 new Claim(JwtRegisteredClaimNames.Email, usuario.Email),
                 new Claim("TipoUsuario", usuario.TipoUsuario),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Name, usuario.Email)
+                new Claim(ClaimTypes.Name, usuario.Email),
+                // 2. Claim de Rol único
+                new Claim(ClaimTypes.Role, rol)
             };
 
-            // 2. Roles
-            foreach (var rol in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, rol));
-            }
-
-            // 3. Credenciales
+            // 3. Clave secreta y credenciales
             var keyBytes = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
             var signingKey = new SymmetricSecurityKey(keyBytes);
             var creds = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
 
-            // 4. Tiempos
+            // 4. Tiempos del token
             var now = DateTime.UtcNow;
             var expires = now.AddMinutes(_config.GetValue<double>("Jwt:ExpireMinutes"));
 
-            // 5. Crear token
+            // 5. Crear y firmar el token
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],

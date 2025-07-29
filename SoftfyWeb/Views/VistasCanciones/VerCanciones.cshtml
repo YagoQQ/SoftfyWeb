@@ -46,21 +46,23 @@
                     {
                         <p>No disponible</p>
                     }
-
-                    <div class="btn-group-custom">
-                        <form asp-controller="VistasPlaylists" asp-action="DarMeGusta" method="post" class="form-inline">
-                            <input type="hidden" name="cancionId" value="@cancion.Id" />
-                            <button type="submit" class="btn btn-primary btn-sm" onclick="return confirm('¿Agregar esta canción a Me Gusta?');">Me Gusta</button>
-                        </form>
-
-                        @if (User.IsInRole("OyentePremium"))
-                        {
-                            <form asp-controller="VistasPlaylists" asp-action="GuardarEnPlaylist" method="get">
+                    @if (!User.IsInRole("Admin"))
+                    {
+                        <div class="btn-group-custom">
+                            <form asp-controller="VistasPlaylists" asp-action="DarMeGusta" method="post" class="form-inline">
                                 <input type="hidden" name="cancionId" value="@cancion.Id" />
-                                <button type="submit" class="btn btn-warning btn-sm">Guardar</button>
+                                <button type="submit" class="btn btn-primary btn-sm" onclick="return confirm('¿Agregar esta canción a Me Gusta?');">Me Gusta</button>
                             </form>
-                        }
-                    </div>
+
+                            @if (User.IsInRole("OyentePremium"))
+                            {
+                                <form asp-controller="VistasPlaylists" asp-action="GuardarEnPlaylist" method="get">
+                                    <input type="hidden" name="cancionId" value="@cancion.Id" />
+                                    <button type="submit" class="btn btn-warning btn-sm">Guardar</button>
+                                </form>
+                            }
+                        </div>
+                    }                    
                 </div>
             }
         </div>

@@ -384,8 +384,12 @@ namespace SoftfyWeb.Controllers
             var playlists = _context.Playlists
                 .Include(p => p.Usuario)
                 .Include(p => p.PlaylistCanciones)
-                .Where(p => p.Nombre.ToLower().Contains(nombre.ToLower()))
+                .Where(p =>
+                    p.Nombre.ToLower().Contains(nombre.ToLower()) &&
+                    p.Usuario.TipoUsuario != "Oyente" &&
+                    p.Usuario.TipoUsuario != "OyentePremium")
                 .ToList();
+
 
             var resultado = playlists.Select(p =>
             {
